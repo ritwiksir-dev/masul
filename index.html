@@ -2981,9 +2981,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.40</span>
+                <span class="chip">V1.40.1</span>
               </div>
-              <div class="request-meta">Masul V1.40 • Secure Staff Invitations & Roles</div>
+              <div class="request-meta">Masul V1.40.1 • Secure Staff Roles Hotfix</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -9033,7 +9033,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.40"
+        sourceVersion:"1.40.1"
       };
 
       const ops=[];
@@ -9052,7 +9052,7 @@ handlePaymentRequestFromUrl();
           type:"setMerge",
           ref:doc(db,"organizations",orgId),
           data:{
-            ownerUid:cloud.user.uid,
+            ownerUid:cachedOrg.ownerUid||cloud.user.uid,
             name:orgData.name||bridge()?.getOrgDisplayName?.()||"Masul Organisation",
             orgData:cleanForFirestore(orgData),
             updatedAt:serverTimestamp(),
@@ -10449,7 +10449,7 @@ handlePaymentRequestFromUrl();
   renderAccessCentre();
   processEmailLinkLanding().catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.40 Firebase module ready");
+  console.info("Masul V1.40.1 Firebase module ready");
 
   window.MasulCloud={
     auth,
