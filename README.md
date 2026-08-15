@@ -1,60 +1,33 @@
-# Masul V1.33 — Live Cloud Sync
+# Masul V1.34 — Live Sync Stability
 
-## Major change
-V1.33 moves Masul from manual cloud migration to automatic Firebase synchronization.
+## Critical hotfix
+V1.33 could freeze with `Maximum call stack size exceeded`.
 
-### After sign-in
-- Masul opens the Firebase organisation automatically.
-- A fresh browser with no meaningful local data loads Firebase automatically.
-- If the local browser and Firebase contain the same data, live sync starts silently.
-- If both contain meaningful but different data, Masul pauses and shows a safety reconciliation screen instead of guessing.
+### Root cause
+Cloud status refresh called the full dashboard renderer:
 
-### Automatic saving
-Normal Masul `saveState()` actions now:
-1. save the browser working copy immediately,
-2. mark cloud changes as pending,
-3. debounce briefly,
-4. write only changed/added/deleted Firestore documents.
+Cloud status refresh
+→ full dashboard render
+→ saveState()
+→ cloud save hook
+→ cloud status refresh
+→ …
 
-The whole collection is not blindly deleted/re-uploaded for every normal edit.
-
-### Real-time receive
-Firestore `onSnapshot()` listeners watch:
-- organisation
-- config/app
-- batches
-- people
-- fees
-- paymentRequests
-- payments
-- historyImports
-
-Changes arriving from another signed-in browser update the local working copy automatically.
-
-### Status
-Masul now shows:
-- Synced
-- Syncing…
-- Pending sync
-- Offline • local safe
-- Cloud issue
-
-### Safety protections
-- Remote updates do not apply while a modal is open; they wait until the modal closes.
-- Remote state application does not trigger a write-back loop.
-- JSON backup restore while signed in first disconnects/signs out, so a restored backup cannot silently overwrite Firebase.
-- Reset Local Data while signed in first disconnects/signs out and keeps the Firebase copy unchanged.
-- Reload Cloud Copy downloads a JSON backup before replacing the browser working copy.
-- If a browser copy and Firebase differ at first connection, Masul asks which copy to use. Replacing Firebase requires typing `CLOUD`.
-
-### New owner accounts
-A newly created owner organisation uses the current browser setup as the initial Firebase copy automatically.
-
-## Current limitations
-- V1.33 remains owner-only under the current Phase 1 Firestore rules.
-- Simultaneous editing of the exact same record on different devices is still effectively last-write-wins. Multi-user roles and stronger conflict/audit handling belong to the next collaboration phase.
-- Public/customer payment links are not yet opened through anonymous/public Firestore access.
-- The browser's existing Masul localStorage remains the local working/safety copy. Firestore persistent disk cache is not automatically enabled because fee/student data may be used on shared devices.
+### V1.34 fix
+- Cloud status refresh now updates only save/cloud indicators.
+- It no longer calls the full dashboard renderer.
+- Added a re-entry guard around the cloud status UI.
+- Firebase Authentication, live Firestore listeners, automatic cloud loading and automatic cloud saving remain enabled.
+- Firebase data is not modified merely by installing this file.
+- No Firestore rule change is required.
 
 ## Deployment
-Replace only GitHub Pages `index.html`. The existing `masul-icon.png` can remain unchanged. No Firestore rules change is required for V1.33 under the current owner-only rules.
+Replace only GitHub Pages `index.html`.
+
+Then:
+1. Close all old V1.33 Masul tabs.
+2. Wait for GitHub Pages to redeploy.
+3. Open Chrome first and hard refresh with Ctrl+F5.
+4. Confirm the version badge says V1.34 Live Sync Stability.
+5. Wait for the cloud state to reach Synced.
+6. Only then open Edge and hard refresh there.

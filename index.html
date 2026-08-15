@@ -1757,7 +1757,7 @@
       </div>
     </div>
     <div class="top-actions">
-      <span class="chip" id="modeChip">V1.33 Live Cloud Sync</span>
+      <span class="chip" id="modeChip">V1.34 Live Sync Stability</span>
       <button class="btn ghost small" id="homeBtn">Home</button>
     </div>
   </header>
@@ -3032,6 +3032,9 @@ window.MasulLocalBridge = {
   getOrgDisplayName(){
     const n=String(state.org?.name||"").trim();
     return n && n!=="Masul Demo Organisation" ? n : "My Masul Organisation";
+  },
+  refreshSaveIndicators(){
+    updateSaveIndicators();
   },
   refreshUI(){
     updateSaveIndicators();
@@ -7960,7 +7963,7 @@ handlePaymentRequestFromUrl();
     if(cloud.syncing){
       return {mode:"syncing",title:"Syncing with Firebase…",text:"Please keep this tab open while Masul confirms the latest changes.",icon:"↻"};
     }
-    if(cloud.pendingLocal){
+    if(cloud.pendingLocal && cloud.initialHydrated){
       return {mode:"syncing",title:"Changes waiting to sync",text:"Masul is preparing the latest browser changes for Firebase.",icon:"↻"};
     }
     if(!cloud.initialHydrated){
@@ -7991,7 +7994,11 @@ handlePaymentRequestFromUrl();
     });
   }
 
+  let cloudUiRefreshing=false;
   function refreshCloudUI(){
+    if(cloudUiRefreshing) return;
+    cloudUiRefreshing=true;
+    try{
     const out=document.getElementById("cloudSignedOutPanel");
     const inn=document.getElementById("cloudSignedInPanel");
     const email=document.getElementById("cloudAccountEmail");
@@ -8036,7 +8043,12 @@ handlePaymentRequestFromUrl();
       setTextIfChanged(liveIcon,p.icon);
     }
 
-    bridge()?.refreshUI?.();
+    // Cloud status changes must never trigger a full dashboard render.
+    // A dashboard render persists state, which would call the cloud hook again.
+    bridge()?.refreshSaveIndicators?.();
+    }finally{
+      cloudUiRefreshing=false;
+    }
   }
 
   function stopRealtime(){
@@ -8551,7 +8563,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.33"
+        sourceVersion:"1.34"
       };
 
       const ops=[];
@@ -8965,7 +8977,7 @@ handlePaymentRequestFromUrl();
   bindCloudButtons();
   refreshCloudUI();
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.33 Firebase module ready");
+  console.info("Masul V1.34 Firebase module ready");
 
   window.MasulCloud={
     auth,
