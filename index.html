@@ -1551,6 +1551,40 @@
     }
 
 
+
+    .save-status.cloud{background:#edf7f1;color:#147a55;border-color:#d5e6dc}
+    .save-status.syncing{background:#fff7e8;color:#8d6200;border-color:#eadfc6}
+    .save-status.offline{background:#f4f5f7;color:#667085;border-color:#dde1e7}
+    .save-status.error{background:#fff0ed;color:#a3473d;border-color:#efd5d1}
+    .cloud-live-banner{
+      display:flex;align-items:flex-start;gap:10px;
+      border:1px solid #d5e7dc;background:linear-gradient(145deg,#f4fbf7,#fbfefd);
+      border-radius:14px;padding:12px;margin:12px 0
+    }
+    .cloud-live-banner.syncing{border-color:#eadfc6;background:#fffaf0}
+    .cloud-live-banner.offline{border-color:#dde1e7;background:#f7f8fa}
+    .cloud-live-banner.error{border-color:#efd5d1;background:#fff6f4}
+    .cloud-live-icon{
+      width:27px;height:27px;border-radius:50%;display:grid;place-items:center;
+      background:#e4f5eb;color:#177a54;font-weight:950;flex:0 0 auto
+    }
+    .cloud-live-banner.syncing .cloud-live-icon{background:#fff0ce;color:#946200}
+    .cloud-live-banner.offline .cloud-live-icon{background:#eceff3;color:#667085}
+    .cloud-live-banner.error .cloud-live-icon{background:#fde5e1;color:#a3473d}
+    .cloud-live-banner strong{display:block;font-size:11px;color:#304059;margin:1px 0 3px}
+    .cloud-live-banner small{display:block;font-size:9px;line-height:1.45;color:#667085}
+    .cloud-conflict-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0
+    }
+    .cloud-conflict-card{
+      border:1px solid var(--line);border-radius:14px;padding:12px;background:#fbfcfe
+    }
+    .cloud-conflict-card.recommended{border-color:#cfe4d8;background:#f4faf6}
+    .cloud-conflict-card strong{display:block;font-size:11px;margin-bottom:5px;color:#304059}
+    .cloud-conflict-card small{display:block;font-size:9px;line-height:1.5;color:#667085;margin-bottom:10px}
+    .cloud-conflict-stats{font-size:9px;color:#55657a;line-height:1.55;margin:6px 0 10px}
+    @media(max-width:620px){.cloud-conflict-grid{grid-template-columns:1fr}}
+
     .admin-brand-cloud-row{
       display:flex;
       align-items:center;
@@ -1723,7 +1757,7 @@
       </div>
     </div>
     <div class="top-actions">
-      <span class="chip" id="modeChip">V1.32 Firebase Freeze Fix</span>
+      <span class="chip" id="modeChip">V1.33 Live Cloud Sync</span>
       <button class="btn ghost small" id="homeBtn">Home</button>
     </div>
   </header>
@@ -2538,7 +2572,7 @@
           
             <div class="clean-card" style="margin-top:14px">
               <div class="section-title" style="margin-bottom:10px">
-                <div><h3>Data & Backup</h3><p>Protect your data before we connect Firebase.</p></div>
+                <div><h3>Data & Backup</h3><p>Local backups remain available even when cloud sync is active.</p></div>
                 <span class="save-status local" id="settingsSaveStatus">Local browser</span>
               </div>
               <div class="data-tools">
@@ -2554,7 +2588,7 @@
               </div>
               <div class="preview-box" style="margin-top:12px">
                 <strong>Last saved:</strong> <span id="lastSavedText">—</span><br>
-                Until Firebase is connected, Masul saves to this browser only. Download a backup before changing devices or app versions.
+                <span id="settingsSaveNote">Masul is currently using this browser as the local working copy.</span>
               </div>
             </div>
 
@@ -2565,8 +2599,8 @@
               <div class="section-title" style="margin-bottom:10px">
                 <div>
                   <span class="eyebrow">Cloud & Account</span>
-                  <h3 style="margin:6px 0 4px">Firebase Cloud Connection</h3>
-                  <p>Owner sign-in, safe data migration and multi-device foundation.</p>
+                  <h3 style="margin:6px 0 4px">Firebase Live Cloud Sync</h3>
+                  <p>Automatic cloud loading and saving across signed-in devices.</p>
                 </div>
                 <span class="cloud-status-pill offline" id="settingsCloudStatus">
                   <span class="cloud-dot"></span><span id="settingsCloudStatusText">Not signed in</span>
@@ -2575,8 +2609,8 @@
 
               <div id="cloudSignedOutPanel">
                 <div class="legal-strip">
-                  <strong>Your current browser data will remain untouched.</strong>
-                  Signing in does not automatically upload or replace anything. After sign-in, you choose whether to upload this browser's data or restore existing cloud data.
+                  <strong>Existing owner?</strong>
+                  Sign in and Masul will load the organisation from Firebase automatically. A new owner account creates a separate private organisation.
                 </div>
                 <div class="request-action-row">
                   <button class="btn primary small" id="cloudSignInBtn">Sign In</button>
@@ -2604,25 +2638,33 @@
                   </div>
                 </div>
 
-                <div class="cloud-migration-grid">
-                  <div class="cloud-action-card">
-                    <strong>↑ Upload Local Data to Cloud</strong>
-                    <small>Copies the current Masul browser data to your Firebase organisation. Cloud records for this organisation will be replaced by this local copy.</small>
-                    <button class="btn primary small" id="cloudUploadBtn">Upload Current Data</button>
-                  </div>
-                  <div class="cloud-action-card">
-                    <strong>↓ Restore Cloud Data Here</strong>
-                    <small>Downloads the Firebase copy into this browser. You will be prompted to download a local backup before replacement.</small>
-                    <button class="btn ghost small" id="cloudRestoreBtn">Restore from Cloud</button>
+                <div class="cloud-live-banner" id="cloudLiveBanner">
+                  <div class="cloud-live-icon">✓</div>
+                  <div>
+                    <strong id="cloudLiveTitle">Live sync preparing…</strong>
+                    <small id="cloudLiveText">Masul is connecting this browser to the Firebase organisation.</small>
                   </div>
                 </div>
 
-                <div class="legal-strip warning" style="margin-top:10px">
-                  <strong>Phase 1 cloud mode:</strong> synchronization is intentionally manual in this build. This prevents an accidental first-time overwrite while we migrate your existing data. Automatic real-time sync comes after the initial cloud copy is verified.
+                <div class="cloud-migration-grid">
+                  <div class="cloud-action-card">
+                    <strong>↻ Sync Now</strong>
+                    <small>Normally unnecessary. Use this if you want Masul to immediately push any pending local changes.</small>
+                    <button class="btn primary small" id="cloudSyncNowBtn">Sync Now</button>
+                  </div>
+                  <div class="cloud-action-card">
+                    <strong>↓ Reload Cloud Copy</strong>
+                    <small>Recovery tool. Replaces this browser copy with the latest Firebase data after a confirmation.</small>
+                    <button class="btn ghost small" id="cloudReloadBtn">Reload from Cloud</button>
+                  </div>
+                </div>
+
+                <div class="legal-strip cloud-live-note" style="margin-top:10px">
+                  <strong>Live cloud mode:</strong> after the first safe reconciliation, normal Masul changes save automatically to Firebase. Other signed-in browsers receive the latest cloud data automatically. The browser copy remains as an additional local safety layer.
                 </div>
 
                 <div class="request-action-row">
-                  <button class="btn ghost small" id="cloudRefreshBtn">Refresh Cloud Status</button>
+                  <button class="btn ghost small" id="cloudRefreshBtn">Refresh Connection</button>
                   <button class="btn ghost small" id="cloudPasswordResetBtn">Send Password Reset Email</button>
                   <button class="btn danger small" id="cloudSignOutBtn">Sign Out</button>
                 </div>
@@ -2812,7 +2854,48 @@ function updateSaveIndicators(){
   const label=when ? `Saved ${when.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}` : "Saved locally";
   if(typeof saveStatus!=="undefined" && saveStatus) saveStatus.textContent=label;
   if(typeof lastSavedText!=="undefined" && lastSavedText) lastSavedText.textContent=when ? when.toLocaleString("en-IN") : "—";
-  if(typeof settingsSaveStatus!=="undefined" && settingsSaveStatus) settingsSaveStatus.textContent="Local browser";
+
+  const cs=window.MasulCloud?.state;
+  if(typeof settingsSaveStatus!=="undefined" && settingsSaveStatus){
+    settingsSaveStatus.classList.remove("local","cloud","syncing","offline","error");
+    if(cs?.user && cs?.orgId){
+      if(cs.lastError){
+        settingsSaveStatus.textContent="Cloud issue";
+        settingsSaveStatus.classList.add("error");
+      }else if(cs.syncing || cs.pendingLocal){
+        settingsSaveStatus.textContent=cs.syncing?"Syncing…":"Pending sync";
+        settingsSaveStatus.classList.add("syncing");
+      }else if(cs.online===false){
+        settingsSaveStatus.textContent="Offline • local safe";
+        settingsSaveStatus.classList.add("offline");
+      }else if(cs.initialHydrated){
+        settingsSaveStatus.textContent="Cloud synced";
+        settingsSaveStatus.classList.add("cloud");
+      }else{
+        settingsSaveStatus.textContent="Connecting…";
+        settingsSaveStatus.classList.add("syncing");
+      }
+    }else{
+      settingsSaveStatus.textContent="Local browser";
+      settingsSaveStatus.classList.add("local");
+    }
+  }
+
+  if(typeof settingsSaveNote!=="undefined" && settingsSaveNote){
+    if(cs?.user && cs?.orgId){
+      if(cs.online===false){
+        settingsSaveNote.textContent="You are offline. Changes remain in this browser and will sync when the connection returns.";
+      }else if(cs.pendingLocal || cs.syncing){
+        settingsSaveNote.textContent="Masul has local changes waiting to be confirmed by Firebase.";
+      }else if(cs.initialHydrated){
+        settingsSaveNote.textContent="Firebase is the main signed-in data source; this browser also keeps the current Masul working copy.";
+      }else{
+        settingsSaveNote.textContent="Masul is connecting this browser with the Firebase organisation.";
+      }
+    }else{
+      settingsSaveNote.textContent="Masul is currently using this browser as the local working copy. Download JSON backups regularly.";
+    }
+  }
 }
 
 function applySafeLogoFit(img,mode="full"){
@@ -2834,6 +2917,12 @@ function saveState(){
   localStorage.setItem("masul_v1_state",JSON.stringify(state));
   updateSaveIndicators();
   if(typeof renderHomeOverview==="function") renderHomeOverview();
+
+  if(window.__MASUL_SKIP_NEXT_CLOUD_SAVE__){
+    window.__MASUL_SKIP_NEXT_CLOUD_SAVE__=false;
+  }else if(!window.__MASUL_REMOTE_APPLY__ && window.MasulCloudHooks?.localSaved){
+    window.MasulCloudHooks.localSaved();
+  }
 }
 
 function isPrototypeDummyPerson(p){
@@ -2906,7 +2995,7 @@ window.MasulLocalBridge = {
   getDefaultState(){
     return structuredClone(defaultState);
   },
-  applyState(nextState){
+  applyState(nextState,options={}){
     if(!nextState || typeof nextState!=="object") throw new Error("Invalid Masul state");
     state=structuredClone(nextState);
     state.paymentRequests=Array.isArray(state.paymentRequests)?state.paymentRequests:[];
@@ -2925,7 +3014,7 @@ window.MasulLocalBridge = {
     renderDashboard();
     renderCustomer();
     renderHomeOverview();
-    showView("homeView");
+    if(options.navigate!==false) showView(options.view||"homeView");
   },
   saveBackup(){
     downloadBackup();
@@ -5292,7 +5381,10 @@ function openBulkBatchModal(){
 function modal(content){
   modalRoot.innerHTML=`<div class="modal-backdrop"><div class="modal">${content}</div></div>`;
 }
-window.closeModal=()=>modalRoot.innerHTML="";
+window.closeModal=()=>{
+  modalRoot.innerHTML="";
+  if(window.MasulCloudHooks?.modalClosed) window.MasulCloudHooks.modalClosed();
+};
 
 function receiptModal(payment){
   modal(`
@@ -7005,18 +7097,32 @@ function downloadBackup(){
 }
 function doRestoreBackup(file){
   const reader=new FileReader();
-  reader.onload=e=>{
+  reader.onload=async e=>{
     try{
       const payload=JSON.parse(e.target.result);
       const restored=payload?.data||payload;
       if(!restored || !restored.org || !Array.isArray(restored.people)) throw new Error("Invalid backup");
-      if(!confirm("Restore this backup? Current local data will be replaced.")) return;
+
+      const cloudActive=!!window.MasulCloud?.state?.user;
+      const message=cloudActive
+        ?"Restore this JSON backup locally?\n\nFor safety, Masul will first disconnect this browser from live cloud sync so the restored backup cannot automatically overwrite Firebase. You can review the restored data and sign in again afterward."
+        :"Restore this backup? Current local data will be replaced.";
+      if(!confirm(message)) return;
+
+      if(cloudActive && window.MasulCloud?.disconnectForLocalRestore){
+        await window.MasulCloud.disconnectForLocalRestore();
+      }
+
+      window.__MASUL_SKIP_NEXT_CLOUD_SAVE__=true;
       state=restored;
       normalisePeopleData();
       saveState();
       hydrateSetup();renderDashboard();renderCustomer();showView("dashboardView");
-      toast("Backup restored");
-    }catch(err){toast("Could not restore this backup");}
+      toast(cloudActive?"Backup restored locally • cloud copy unchanged":"Backup restored");
+    }catch(err){
+      console.error(err);
+      toast("Could not restore this backup");
+    }
   };
   reader.readAsText(file);
 }
@@ -7041,7 +7147,7 @@ function resetLocalData(){
     <span class="danger-stage">WARNING 1 OF 2</span>
     <div class="danger-alert">
       <div class="danger-title">⚠ Reset will erase the current local Masul setup</div>
-      <p>This includes organisation setup, students, batches, fees, exemptions, opening history, payment requests and payment records stored in this browser.</p>
+      <p>This includes the Masul working copy stored in this browser. If you are signed in to Firebase, Masul will sign out first and keep the cloud copy unchanged.</p>
     </div>
 
     <div class="legal-strip warning">
@@ -7117,17 +7223,22 @@ function openResetFinalWarning(backupTaken=false){
 }
 window.openResetFinalWarning=openResetFinalWarning;
 
-function performResetLocalData(){
+async function performResetLocalData(){
+  const cloudWasActive=!!window.MasulCloud?.state?.user;
+  if(cloudWasActive && window.MasulCloud?.disconnectForLocalRestore){
+    await window.MasulCloud.disconnectForLocalRestore();
+  }
   localStorage.removeItem("masul_v1_state");
   state=structuredClone(defaultState);
   selectedPeopleForBulkDelete.clear();
+  window.__MASUL_SKIP_NEXT_CLOUD_SAVE__=true;
   saveState();
   closeModal();
   hydrateSetup();
   renderDashboard();
   renderCustomer();
   showView("homeView");
-  toast("Local Masul data reset");
+  toast(cloudWasActive?"Local data reset • Firebase copy kept safe • signed out":"Local Masul data reset");
 }
 
 
@@ -7732,7 +7843,8 @@ handlePaymentRequestFromUrl();
     collection,
     getDocs,
     writeBatch,
-    serverTimestamp
+    serverTimestamp,
+    onSnapshot
   } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -7751,18 +7863,41 @@ handlePaymentRequestFromUrl();
   try{
     await setPersistence(auth,browserLocalPersistence);
   }catch(err){
-    console.warn("Masul Firebase persistence warning:",err);
+    console.warn("Masul Firebase auth persistence warning:",err);
   }
 
-  const cloud = {
+  const COLLECTION_NAMES=["batches","people","fees","paymentRequests","payments","historyImports"];
+
+  function blankRealtimeCache(){
+    return {
+      org:null,
+      config:{},
+      collections:Object.fromEntries(COLLECTION_NAMES.map(n=>[n,new Map()])),
+      ready:new Set()
+    };
+  }
+
+  const cloud={
     user:null,
     orgId:"",
     orgName:"",
     role:"",
     ready:false,
     busy:false,
+    syncing:false,
+    pendingLocal:false,
+    initialHydrated:false,
     lastAction:"",
-    lastError:""
+    lastError:"",
+    online:navigator.onLine,
+    listenerUnsubs:[],
+    realtime:blankRealtimeCache(),
+    remoteApplyTimer:null,
+    syncTimer:null,
+    deferredRemote:false,
+    bootstrapFromLocal:false,
+    reconciliationOpen:false,
+    reconciliationPending:false
   };
 
   const bridge=()=>window.MasulLocalBridge;
@@ -7772,8 +7907,71 @@ handlePaymentRequestFromUrl();
     else console.log(msg);
   }
 
+  function cleanForFirestore(obj){
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function safeClone(value){
+    return JSON.parse(JSON.stringify(value));
+  }
+
   function cloudIdFromUid(uid){
     return `org_${uid}`;
+  }
+
+  function safeOrgForCloud(state){
+    const org=safeClone(state.org||{});
+    delete org.batches;
+    delete org.logoSource;
+    if(typeof org.logo==="string" && org.logo.length>500000){
+      delete org.logo;
+      org.cloudLogoOmitted=true;
+    }
+    return org;
+  }
+
+  function setTextIfChanged(el,value){
+    if(el && el.textContent!==value) el.textContent=value;
+  }
+
+  function setClassMode(el,modes,target){
+    if(!el) return;
+    modes.forEach(m=>el.classList.remove(m));
+    if(target) el.classList.add(target);
+  }
+
+  function currentSyncPresentation(){
+    if(cloud.lastError){
+      return {mode:"error",title:"Cloud needs attention",text:cloud.lastError,icon:"!"};
+    }
+    if(!cloud.user){
+      return {mode:"offline",title:"Not signed in",text:"This browser is using its local Masul working copy.",icon:"○"};
+    }
+    if(!cloud.online){
+      return {
+        mode:"offline",
+        title:cloud.pendingLocal?"Offline • changes kept locally":"Offline • cloud copy unavailable",
+        text:cloud.pendingLocal
+          ?"Masul will sync these browser changes automatically when the internet connection returns."
+          :"You can continue using the existing browser copy. Cloud updates resume when the connection returns.",
+        icon:"○"
+      };
+    }
+    if(cloud.syncing){
+      return {mode:"syncing",title:"Syncing with Firebase…",text:"Please keep this tab open while Masul confirms the latest changes.",icon:"↻"};
+    }
+    if(cloud.pendingLocal){
+      return {mode:"syncing",title:"Changes waiting to sync",text:"Masul is preparing the latest browser changes for Firebase.",icon:"↻"};
+    }
+    if(!cloud.initialHydrated){
+      return {mode:"syncing",title:"Loading cloud organisation…",text:"Masul is reconciling this browser with Firebase before live sync starts.",icon:"↻"};
+    }
+    return {
+      mode:"connected",
+      title:"Live cloud sync active",
+      text:"Changes save automatically to Firebase and other signed-in browsers receive the latest cloud data.",
+      icon:"✓"
+    };
   }
 
   function cloudStatus(mode,text){
@@ -7789,12 +7987,8 @@ handlePaymentRequestFromUrl();
         pill.classList.remove("offline","connected","connecting","error");
         pill.classList.add(targetMode);
       }
-      if(label && label.textContent!==text) label.textContent=text;
+      setTextIfChanged(label,text);
     });
-  }
-
-  function setTextIfChanged(el,value){
-    if(el && el.textContent!==value) el.textContent=value;
   }
 
   function refreshCloudUI(){
@@ -7804,6 +7998,12 @@ handlePaymentRequestFromUrl();
     const role=document.getElementById("cloudAccountRole");
     const org=document.getElementById("cloudAccountOrg");
     const action=document.getElementById("cloudLastAction");
+    const banner=document.getElementById("cloudLiveBanner");
+    const liveTitle=document.getElementById("cloudLiveTitle");
+    const liveText=document.getElementById("cloudLiveText");
+    const liveIcon=banner?.querySelector(".cloud-live-icon");
+
+    const p=currentSyncPresentation();
 
     if(cloud.user){
       if(out && !out.classList.contains("hidden")) out.classList.add("hidden");
@@ -7813,10 +8013,14 @@ handlePaymentRequestFromUrl();
       setTextIfChanged(org,cloud.orgName||"Not linked yet");
       setTextIfChanged(action,cloud.lastAction||"—");
 
-      if(cloud.orgId){
-        cloudStatus("connected","Cloud connected");
+      if(cloud.lastError){
+        cloudStatus("error","Cloud issue");
+      }else if(!cloud.online){
+        cloudStatus("offline",cloud.pendingLocal?"Offline • pending":"Offline");
+      }else if(cloud.syncing || cloud.pendingLocal || !cloud.initialHydrated){
+        cloudStatus("connecting",cloud.syncing?"Syncing…":"Connecting…");
       }else{
-        cloudStatus("connecting","Account connected");
+        cloudStatus("connected","Synced");
       }
     }else{
       if(inn && !inn.classList.contains("hidden")) inn.classList.add("hidden");
@@ -7824,30 +8028,182 @@ handlePaymentRequestFromUrl();
       cloudStatus(cloud.lastError?"error":"offline",cloud.lastError?"Cloud error":"Cloud not connected");
       setTextIfChanged(action,"—");
     }
-  }
 
-  function safeClone(value){
-    return JSON.parse(JSON.stringify(value));
-  }
-
-  function safeOrgForCloud(state){
-    const org=safeClone(state.org||{});
-    delete org.batches;
-    delete org.logoSource;
-
-    // Firestore documents are limited in size. Keep a compact logo only when
-    // it is comfortably small; otherwise leave the original logo in the
-    // browser and upload all other organisation data.
-    if(typeof org.logo==="string" && org.logo.length>500000){
-      delete org.logo;
-      org.cloudLogoOmitted=true;
+    if(banner){
+      setClassMode(banner,["syncing","offline","error"],p.mode==="connected"?"":p.mode);
+      setTextIfChanged(liveTitle,p.title);
+      setTextIfChanged(liveText,p.text);
+      setTextIfChanged(liveIcon,p.icon);
     }
-    return org;
+
+    bridge()?.refreshUI?.();
   }
 
-  function cleanForFirestore(obj){
-    // JSON round-trip removes undefined/function values from the existing state.
-    return JSON.parse(JSON.stringify(obj));
+  function stopRealtime(){
+    cloud.listenerUnsubs.forEach(fn=>{
+      try{fn()}catch(_){}
+    });
+    cloud.listenerUnsubs=[];
+    if(cloud.remoteApplyTimer) clearTimeout(cloud.remoteApplyTimer);
+    cloud.remoteApplyTimer=null;
+    cloud.realtime=blankRealtimeCache();
+    cloud.initialHydrated=false;
+    cloud.deferredRemote=false;
+    cloud.reconciliationPending=false;
+  }
+
+  function normalizeForFingerprint(state){
+    const s=safeClone(state||{});
+    delete s.lastSaved;
+    delete s.demoMode;
+
+    if(s.org){
+      delete s.org.logo;
+      delete s.org.logoSource;
+      delete s.org.logoCrop;
+      delete s.org.cloudLogoOmitted;
+    }
+
+    const sortRecords=arr=>(Array.isArray(arr)?arr:[])
+      .map(x=>deepSort(x))
+      .sort((a,b)=>{
+        const ka=String(a?.id||a?.requestId||a?.receipt||a?.name||JSON.stringify(a));
+        const kb=String(b?.id||b?.requestId||b?.receipt||b?.name||JSON.stringify(b));
+        return ka.localeCompare(kb);
+      });
+
+    if(s.org) s.org.batches=sortRecords(s.org.batches);
+    s.people=sortRecords(s.people);
+    s.fees=sortRecords(s.fees);
+    s.paymentRequests=sortRecords(s.paymentRequests);
+    s.payments=sortRecords(s.payments);
+    s.historyImports=sortRecords(s.historyImports);
+
+    return deepSort(s);
+  }
+
+  function deepSort(value){
+    if(Array.isArray(value)) return value.map(deepSort);
+    if(value && typeof value==="object"){
+      const out={};
+      Object.keys(value).sort().forEach(k=>{
+        if(k==="updatedAt" || k==="createdAtServer" || k==="_cloudUpdatedAt") return;
+        out[k]=deepSort(value[k]);
+      });
+      return out;
+    }
+    return value;
+  }
+
+  function stateFingerprint(state){
+    return JSON.stringify(normalizeForFingerprint(state));
+  }
+
+  function stateCounts(state){
+    return {
+      people:(state?.people||[]).length,
+      batches:(state?.org?.batches||[]).length,
+      fees:(state?.fees||[]).length,
+      payments:(state?.payments||[]).length,
+      requests:(state?.paymentRequests||[]).length
+    };
+  }
+
+  function stateHasMeaningfulData(state){
+    const c=stateCounts(state);
+    const name=String(state?.org?.name||"").trim();
+    return c.people>0 || c.batches>0 || c.fees>0 || c.payments>0 || c.requests>0 ||
+      (name && name!=="Masul Demo Organisation" && name!=="My Masul Organisation");
+  }
+
+  function cacheAllReady(){
+    const required=["org","config",...COLLECTION_NAMES];
+    return required.every(x=>cloud.realtime.ready.has(x));
+  }
+
+  function cacheCollectionArray(name){
+    return [...(cloud.realtime.collections[name]?.values?.()||[])].map(safeClone);
+  }
+
+  function buildStateFromRealtime(){
+    const current=bridge()?.getState?.()||{};
+    const base=bridge()?.getDefaultState?.()||{};
+    const orgDoc=cloud.realtime.org||{};
+    const config=cloud.realtime.config||{};
+    const cloudOrg=cleanForFirestore(orgDoc.orgData||{});
+
+    if(!cloudOrg.name && orgDoc.name) cloudOrg.name=orgDoc.name;
+
+    if(cloudOrg.cloudLogoOmitted && current.org?.logo && !cloudOrg.logo){
+      cloudOrg.logo=current.org.logo;
+      if(current.org.logoSource) cloudOrg.logoSource=current.org.logoSource;
+      if(current.org.logoCrop) cloudOrg.logoCrop=current.org.logoCrop;
+    }
+    delete cloudOrg.cloudLogoOmitted;
+
+    return {
+      ...base,
+      setupComplete:!!config.setupComplete,
+      demoMode:false,
+      lastSaved:new Date().toISOString(),
+      org:{
+        ...base.org,
+        ...cloudOrg,
+        batches:cacheCollectionArray("batches")
+      },
+      fees:cacheCollectionArray("fees"),
+      late:{...base.late,...(config.late||{})},
+      paymentsConfig:{...base.paymentsConfig,...(config.paymentsConfig||{})},
+      people:cacheCollectionArray("people"),
+      paymentRequests:cacheCollectionArray("paymentRequests"),
+      payments:cacheCollectionArray("payments"),
+      historyImports:cacheCollectionArray("historyImports")
+    };
+  }
+
+  function applyRemoteState(nextState,{toastMessage="",force=false}={}){
+    if(!bridge()?.applyState) return false;
+
+    if(!force && document.getElementById("modalRoot")?.children?.length){
+      cloud.deferredRemote=true;
+      return false;
+    }
+
+    window.__MASUL_REMOTE_APPLY__=true;
+    try{
+      bridge().applyState(nextState,{navigate:false});
+    }finally{
+      window.__MASUL_REMOTE_APPLY__=false;
+    }
+    cloud.deferredRemote=false;
+    if(toastMessage) cloudToast(toastMessage);
+    return true;
+  }
+
+  function deferOrApplyRealtime(){
+    if(!cloud.initialHydrated || cloud.pendingLocal || cloud.syncing || !cacheAllReady()) return;
+
+    if(document.getElementById("modalRoot")?.children?.length){
+      cloud.deferredRemote=true;
+      return;
+    }
+
+    if(cloud.remoteApplyTimer) clearTimeout(cloud.remoteApplyTimer);
+    cloud.remoteApplyTimer=setTimeout(()=>{
+      cloud.remoteApplyTimer=null;
+      if(cloud.pendingLocal || cloud.syncing || !cacheAllReady()) return;
+      const remote=buildStateFromRealtime();
+      const local=bridge()?.getState?.();
+      if(!local) return;
+
+      if(stateFingerprint(remote)!==stateFingerprint(local)){
+        const applied=applyRemoteState(remote,{toastMessage:"Masul updated from Firebase"});
+        if(applied){
+          cloud.lastAction=`Cloud update received ${new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}`;
+          refreshCloudUI();
+        }
+      }
+    },320);
   }
 
   async function getUserProfile(uid){
@@ -7872,7 +8228,7 @@ handlePaymentRequestFromUrl();
       name:orgName,
       createdAt:serverTimestamp(),
       updatedAt:serverTimestamp(),
-      cloudSchemaVersion:1
+      cloudSchemaVersion:2
     },{merge:true});
 
     await setDoc(doc(db,"users",user.uid),{
@@ -7886,7 +8242,8 @@ handlePaymentRequestFromUrl();
     cloud.orgId=orgId;
     cloud.orgName=orgName;
     cloud.role="Owner";
-    cloud.lastAction="Cloud organisation created";
+    cloud.bootstrapFromLocal=true;
+    cloud.lastAction="Owner account created";
     refreshCloudUI();
     return orgId;
   }
@@ -7896,15 +8253,7 @@ handlePaymentRequestFromUrl();
     cloud.lastError="";
     cloudStatus("connecting","Connecting…");
 
-    let profile=null;
-    try{
-      profile=await getUserProfile(user.uid);
-    }catch(err){
-      console.error(err);
-      cloud.lastError="Could not read cloud profile";
-      refreshCloudUI();
-      return;
-    }
+    const profile=await getUserProfile(user.uid);
 
     if(profile?.orgId){
       cloud.orgId=profile.orgId;
@@ -7912,14 +8261,396 @@ handlePaymentRequestFromUrl();
       const org=await getOrgDoc(profile.orgId);
       cloud.orgName=org?.name||bridge()?.getOrgDisplayName?.()||"Masul Organisation";
       cloud.lastAction="Signed in";
+      startRealtime(profile.orgId);
     }else{
       cloud.orgId="";
       cloud.orgName="";
       cloud.role="Owner";
       cloud.lastAction="Account needs organisation link";
     }
+
     cloud.ready=true;
     refreshCloudUI();
+  }
+
+  function startRealtime(orgId){
+    stopRealtime();
+    cloud.realtime=blankRealtimeCache();
+    cloud.lastError="";
+    cloud.initialHydrated=false;
+
+    const handleError=err=>{
+      console.error("Masul realtime listener error:",err);
+      cloud.lastError=err?.message||"Firebase live sync listener failed.";
+      refreshCloudUI();
+    };
+
+    cloud.listenerUnsubs.push(
+      onSnapshot(
+        doc(db,"organizations",orgId),
+        {includeMetadataChanges:true},
+        snap=>{
+          cloud.realtime.org=snap.exists()?snap.data():null;
+          cloud.realtime.ready.add("org");
+          if(!snap.metadata.fromCache) cloud.lastError="";
+          handleRealtimeSnapshot("org");
+        },
+        handleError
+      )
+    );
+
+    cloud.listenerUnsubs.push(
+      onSnapshot(
+        doc(db,"organizations",orgId,"config","app"),
+        {includeMetadataChanges:true},
+        snap=>{
+          cloud.realtime.config=snap.exists()?snap.data():{};
+          cloud.realtime.ready.add("config");
+          handleRealtimeSnapshot("config");
+        },
+        handleError
+      )
+    );
+
+    COLLECTION_NAMES.forEach(name=>{
+      cloud.listenerUnsubs.push(
+        onSnapshot(
+          collection(db,"organizations",orgId,name),
+          {includeMetadataChanges:true},
+          qs=>{
+            const map=new Map();
+            qs.docs.forEach(d=>map.set(d.id,cleanForFirestore(d.data())));
+            cloud.realtime.collections[name]=map;
+            cloud.realtime.ready.add(name);
+            handleRealtimeSnapshot(name);
+          },
+          handleError
+        )
+      );
+    });
+
+    refreshCloudUI();
+  }
+
+  function handleRealtimeSnapshot(source){
+    if(!cacheAllReady()){
+      refreshCloudUI();
+      return;
+    }
+
+    if(!cloud.initialHydrated){
+      reconcileInitialCloudAndLocal();
+      return;
+    }
+
+    if(cloud.syncing || cloud.pendingLocal) return;
+    deferOrApplyRealtime();
+  }
+
+  async function reconcileInitialCloudAndLocal(){
+    if(cloud.reconciliationOpen || cloud.reconciliationPending || !cacheAllReady() || cloud.initialHydrated) return;
+    cloud.reconciliationOpen=true;
+
+    try{
+      const remote=buildStateFromRealtime();
+      const local=bridge()?.getState?.();
+      if(!local) return;
+
+      if(cloud.bootstrapFromLocal){
+        cloud.initialHydrated=true;
+        cloud.pendingLocal=true;
+        cloud.bootstrapFromLocal=false;
+        refreshCloudUI();
+        await syncLocalNow({force:true,reason:"Initial owner setup"});
+        return;
+      }
+
+      const localFp=stateFingerprint(local);
+      const remoteFp=stateFingerprint(remote);
+
+      if(localFp===remoteFp){
+        cloud.initialHydrated=true;
+        cloud.pendingLocal=false;
+        cloud.lastAction="Live sync ready";
+        refreshCloudUI();
+        return;
+      }
+
+      if(!stateHasMeaningfulData(local)){
+        applyRemoteState(remote,{force:true});
+        cloud.initialHydrated=true;
+        cloud.pendingLocal=false;
+        cloud.lastAction="Cloud data loaded automatically";
+        refreshCloudUI();
+        cloudToast("Masul loaded from Firebase");
+        return;
+      }
+
+      showReconciliationModal(local,remote);
+    }finally{
+      cloud.reconciliationOpen=false;
+    }
+  }
+
+  function statsHtml(c){
+    return `${c.people} people • ${c.batches} batches • ${c.fees} fees • ${c.payments} payments`;
+  }
+
+  function showReconciliationModal(local,remote){
+    cloud.reconciliationPending=true;
+    const lc=stateCounts(local), rc=stateCounts(remote);
+    window.modal(`
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">Cloud Safety Check</span>
+          <h3 style="margin:7px 0 0">This browser and Firebase are different</h3>
+        </div>
+      </div>
+      <div class="legal-strip warning">
+        <strong>Masul has paused automatic sync.</strong>
+        Choose which copy should become the working version. Nothing will be deleted until you choose.
+      </div>
+      <div class="cloud-conflict-grid">
+        <div class="cloud-conflict-card recommended">
+          <strong>✓ Use Firebase copy — recommended</strong>
+          <small>Best when this organisation has already been migrated to Firebase or you are opening Masul in another browser/device.</small>
+          <div class="cloud-conflict-stats">${statsHtml(rc)}</div>
+          <button class="btn primary" id="reconcileUseCloudBtn">Backup Browser & Use Cloud</button>
+        </div>
+        <div class="cloud-conflict-card">
+          <strong>Use this browser copy</strong>
+          <small>Choose only if you know this browser has newer/correct data that should replace the Firebase records.</small>
+          <div class="cloud-conflict-stats">${statsHtml(lc)}</div>
+          <button class="btn ghost" id="reconcileUseLocalBtn">Keep Browser Copy</button>
+        </div>
+      </div>
+      <div id="reconcileLocalConfirm" class="hidden">
+        <div class="danger-alert">
+          <div class="danger-title">⚠ Replace Firebase with this browser?</div>
+          <p>This is an advanced recovery action. A JSON backup will be downloaded first. Type <strong>CLOUD</strong> to continue.</p>
+        </div>
+        <div class="field">
+          <label>Type CLOUD</label>
+          <input id="reconcileCloudWord" autocomplete="off" placeholder="CLOUD">
+        </div>
+        <div class="request-action-row">
+          <button class="btn danger" id="reconcileOverwriteBtn" disabled>Backup & Replace Cloud</button>
+          <button class="btn ghost" id="reconcileBackBtn">Back</button>
+        </div>
+      </div>
+    `);
+
+    document.getElementById("reconcileUseCloudBtn").onclick=()=>{
+      bridge()?.saveBackup?.();
+      setTimeout(()=>{
+        applyRemoteState(remote,{force:true});
+        cloud.initialHydrated=true;
+        cloud.pendingLocal=false;
+        cloud.reconciliationPending=false;
+        cloud.lastAction="Firebase copy selected";
+        window.closeModal();
+        refreshCloudUI();
+        cloudToast("Firebase copy is now live");
+      },180);
+    };
+
+    document.getElementById("reconcileUseLocalBtn").onclick=()=>{
+      document.querySelector(".cloud-conflict-grid")?.classList.add("hidden");
+      document.getElementById("reconcileLocalConfirm")?.classList.remove("hidden");
+      const input=document.getElementById("reconcileCloudWord");
+      const btn=document.getElementById("reconcileOverwriteBtn");
+      input.addEventListener("input",()=>btn.disabled=input.value.trim().toUpperCase()!=="CLOUD");
+      btn.onclick=async()=>{
+        bridge()?.saveBackup?.();
+        cloud.initialHydrated=true;
+        cloud.pendingLocal=true;
+        cloud.reconciliationPending=false;
+        window.closeModal();
+        await syncLocalNow({force:true,reason:"Browser recovery copy"});
+      };
+      document.getElementById("reconcileBackBtn").onclick=()=>{
+        document.getElementById("reconcileLocalConfirm")?.classList.add("hidden");
+        document.querySelector(".cloud-conflict-grid")?.classList.remove("hidden");
+      };
+      input.focus();
+    };
+  }
+
+  function recordId(name,record,index){
+    const raw=record?.id || record?.requestId || record?.receipt || `${name}_${index}`;
+    return String(raw).replace(/\//g,"_");
+  }
+
+  function comparable(value){
+    return JSON.stringify(deepSort(cleanForFirestore(value)));
+  }
+
+  function buildCollectionOperations(orgId,name,records){
+    const localArr=Array.isArray(records)?records:[];
+    const localMap=new Map();
+    localArr.forEach((record,index)=>localMap.set(recordId(name,record,index),cleanForFirestore(record)));
+    const cloudMap=cloud.realtime.collections[name]||new Map();
+    const ops=[];
+
+    localMap.forEach((record,id)=>{
+      const old=cloudMap.get(id);
+      if(!old || comparable(old)!==comparable(record)){
+        ops.push({type:"set",ref:doc(db,"organizations",orgId,name,id),data:record});
+      }
+    });
+
+    cloudMap.forEach((_,id)=>{
+      if(!localMap.has(id)){
+        ops.push({type:"delete",ref:doc(db,"organizations",orgId,name,id)});
+      }
+    });
+
+    return ops;
+  }
+
+  async function commitOperations(ops){
+    for(let i=0;i<ops.length;i+=400){
+      const batch=writeBatch(db);
+      ops.slice(i,i+400).forEach(op=>{
+        if(op.type==="delete") batch.delete(op.ref);
+        else batch.set(op.ref,op.data);
+      });
+      await batch.commit();
+    }
+  }
+
+  async function syncLocalNow({force=false,reason="Automatic sync"}={}){
+    if(!cloud.user || !cloud.orgId) return false;
+    if(cloud.syncing) return false;
+
+    if(!navigator.onLine){
+      cloud.online=false;
+      cloud.pendingLocal=true;
+      refreshCloudUI();
+      return false;
+    }
+
+    if(!cloud.initialHydrated && !force){
+      cloud.pendingLocal=true;
+      refreshCloudUI();
+      return false;
+    }
+
+    const local=bridge()?.getState?.();
+    if(!local) return false;
+
+    cloud.syncing=true;
+    cloud.pendingLocal=true;
+    cloud.lastError="";
+    refreshCloudUI();
+
+    try{
+      const orgId=cloud.orgId;
+      const orgData=safeOrgForCloud(local);
+      const configData={
+        setupComplete:!!local.setupComplete,
+        late:cleanForFirestore(local.late||{}),
+        paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
+        sourceVersion:"1.33"
+      };
+
+      const ops=[];
+
+      const cachedOrg=cloud.realtime.org||{};
+      const cachedOrgData=cleanForFirestore(cachedOrg.orgData||{});
+      const orgChanged=
+        force ||
+        comparable(cachedOrgData)!==comparable(orgData) ||
+        String(cachedOrg.name||"")!==String(orgData.name||bridge()?.getOrgDisplayName?.()||"");
+
+      if(orgChanged){
+        ops.push({
+          type:"setMerge",
+          ref:doc(db,"organizations",orgId),
+          data:{
+            ownerUid:cloud.user.uid,
+            name:orgData.name||bridge()?.getOrgDisplayName?.()||"Masul Organisation",
+            orgData:cleanForFirestore(orgData),
+            updatedAt:serverTimestamp(),
+            cloudSchemaVersion:2
+          }
+        });
+      }
+
+      const cachedConfig=cloud.realtime.config||{};
+      const cachedComparable={
+        setupComplete:!!cachedConfig.setupComplete,
+        late:cachedConfig.late||{},
+        paymentsConfig:cachedConfig.paymentsConfig||{},
+        sourceVersion:cachedConfig.sourceVersion||""
+      };
+      if(force || comparable(cachedComparable)!==comparable(configData)){
+        ops.push({
+          type:"setMerge",
+          ref:doc(db,"organizations",orgId,"config","app"),
+          data:{...configData,updatedAt:serverTimestamp()}
+        });
+      }
+
+      const dataByName={
+        batches:local.org?.batches||[],
+        people:local.people||[],
+        fees:local.fees||[],
+        paymentRequests:local.paymentRequests||[],
+        payments:local.payments||[],
+        historyImports:local.historyImports||[]
+      };
+
+      COLLECTION_NAMES.forEach(name=>{
+        ops.push(...buildCollectionOperations(orgId,name,dataByName[name]));
+      });
+
+      if(!ops.length){
+        cloud.pendingLocal=false;
+        cloud.syncing=false;
+        cloud.lastAction="Already up to date";
+        refreshCloudUI();
+        return true;
+      }
+
+      // setMerge operations are committed separately because writeBatch.set supports merge options.
+      for(let i=0;i<ops.length;i+=400){
+        const batch=writeBatch(db);
+        ops.slice(i,i+400).forEach(op=>{
+          if(op.type==="delete") batch.delete(op.ref);
+          else if(op.type==="setMerge") batch.set(op.ref,op.data,{merge:true});
+          else batch.set(op.ref,op.data);
+        });
+        await batch.commit();
+      }
+
+      cloud.pendingLocal=false;
+      cloud.syncing=false;
+      cloud.initialHydrated=true;
+      cloud.orgName=orgData.name||cloud.orgName;
+      cloud.lastAction=`Synced ${new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}`;
+      refreshCloudUI();
+      return true;
+    }catch(err){
+      console.error("Masul live sync error:",err);
+      cloud.syncing=false;
+      cloud.pendingLocal=true;
+      cloud.lastError=err?.message||"Could not sync with Firebase.";
+      refreshCloudUI();
+      return false;
+    }
+  }
+
+  function scheduleLocalSync(){
+    if(!cloud.user || !cloud.orgId) return;
+    cloud.pendingLocal=true;
+    refreshCloudUI();
+
+    if(cloud.syncTimer) clearTimeout(cloud.syncTimer);
+    cloud.syncTimer=setTimeout(()=>{
+      cloud.syncTimer=null;
+      syncLocalNow();
+    },900);
   }
 
   function authModal(mode="signin"){
@@ -7927,8 +8658,8 @@ handlePaymentRequestFromUrl();
     const title=create?"Create Masul Owner Account":"Sign In to Masul Cloud";
     const button=create?"Create Owner Account":"Sign In";
     const note=create
-      ?"This creates the owner login and an isolated Firebase organisation. Your current browser data is not uploaded until you explicitly choose Upload Current Data."
-      :"Sign in to your existing Masul owner account. No local data is automatically overwritten.";
+      ?"This creates a new private Masul organisation. After creation, the current browser setup becomes its first cloud copy."
+      :"Sign in to your existing organisation. Masul will safely reconcile this browser with Firebase and then enable live sync.";
 
     window.modal(`
       <div class="modal-head">
@@ -7982,21 +8713,19 @@ handlePaymentRequestFromUrl();
         if(create){
           const cred=await createUserWithEmailAndPassword(auth,email,password);
           await provisionOwner(cred.user);
-          cloud.lastAction="Owner account created";
           window.closeModal();
-          refreshCloudUI();
-          cloudToast("Owner account created • Cloud connected");
-        }else{
-          const cred=await signInWithEmailAndPassword(auth,email,password);
           await loadProfileForUser(cred.user);
+          cloudToast("Owner account created • live cloud setup starting");
+        }else{
+          await signInWithEmailAndPassword(auth,email,password);
           window.closeModal();
-          cloudToast("Signed in to Masul Cloud");
+          cloudToast("Signed in • loading Firebase organisation");
         }
       }catch(err){
         console.error(err);
         msg.textContent=friendlyAuthError(err);
         cloud.lastError=friendlyAuthError(err);
-        cloudStatus("error","Sign-in error");
+        refreshCloudUI();
       }finally{
         submit.disabled=false;
       }
@@ -8034,290 +8763,74 @@ handlePaymentRequestFromUrl();
     return map[code]||err?.message||"Firebase authentication failed.";
   }
 
-  async function ensureLinkedOrg(){
-    if(!cloud.user) throw new Error("Please sign in first.");
-    if(cloud.orgId) return cloud.orgId;
-    return provisionOwner(cloud.user);
-  }
+  async function pullCloudSnapshotOnce(){
+    if(!cloud.orgId) throw new Error("No cloud organisation is connected.");
 
-  async function deleteCollectionDocs(orgId,name){
-    const ref=collection(db,"organizations",orgId,name);
-    const snap=await getDocs(ref);
-    const docs=snap.docs;
-    for(let i=0;i<docs.length;i+=400){
-      const batch=writeBatch(db);
-      docs.slice(i,i+400).forEach(d=>batch.delete(d.ref));
-      await batch.commit();
+    const orgSnap=await getDoc(doc(db,"organizations",cloud.orgId));
+    if(!orgSnap.exists()) throw new Error("Cloud organisation was not found.");
+    const configSnap=await getDoc(doc(db,"organizations",cloud.orgId,"config","app"));
+
+    cloud.realtime.org=orgSnap.data();
+    cloud.realtime.config=configSnap.exists()?configSnap.data():{};
+    cloud.realtime.ready.add("org");
+    cloud.realtime.ready.add("config");
+
+    for(const name of COLLECTION_NAMES){
+      const qs=await getDocs(collection(db,"organizations",cloud.orgId,name));
+      const map=new Map();
+      qs.docs.forEach(d=>map.set(d.id,cleanForFirestore(d.data())));
+      cloud.realtime.collections[name]=map;
+      cloud.realtime.ready.add(name);
     }
+
+    return buildStateFromRealtime();
   }
 
-  async function writeCollectionDocs(orgId,name,records){
-    const arr=Array.isArray(records)?records:[];
-    for(let i=0;i<arr.length;i+=350){
-      const batch=writeBatch(db);
-      arr.slice(i,i+350).forEach((record,index)=>{
-        const rawId=String(record?.id||`${name}_${i+index}`);
-        const id=rawId.replace(/\//g,"_");
-        batch.set(doc(db,"organizations",orgId,name,id),cleanForFirestore(record));
-      });
-      await batch.commit();
-    }
-  }
-
-  function showCloudProgress(title){
-    window.modal(`
-      <div class="modal-head">
-        <div><span class="eyebrow">Masul Cloud</span><h3 style="margin:7px 0 0">${title}</h3></div>
-      </div>
-      <div class="cloud-progress">
-        <strong id="cloudProgressText">Preparing…</strong>
-        <div class="cloud-progress-track"><span id="cloudProgressBar"></span></div>
-      </div>
-      <div class="report-note">Keep this tab open until the operation finishes.</div>
-    `);
-  }
-
-  function updateCloudProgress(text,pct){
-    const label=document.getElementById("cloudProgressText");
-    const bar=document.getElementById("cloudProgressBar");
-    if(label) label.textContent=text;
-    if(bar) bar.style.width=`${Math.max(0,Math.min(100,pct))}%`;
-  }
-
-  async function uploadLocalToCloud(){
-    if(cloud.busy) return;
-    if(!cloud.user){authModal("signin");return}
-
-    const local=bridge()?.getState?.();
-    if(!local) return;
-
-    window.modal(`
-      <div class="modal-head">
-        <div><span class="eyebrow">Cloud Migration</span><h3 style="margin:7px 0 0">Upload this browser's data?</h3></div>
-        <button class="close" onclick="closeModal()">×</button>
-      </div>
-      <div class="danger-alert">
-        <div class="danger-title">⚠ This local copy will become the Firebase copy</div>
-        <p>Masul will replace the cloud people, batches, fees, payment requests, payments and opening-history records for your organisation with the data currently stored in this browser.</p>
-      </div>
-      <div class="legal-strip warning">
-        <strong>Recommended:</strong> download a JSON backup first. Uploading does not delete the local browser data.
-      </div>
-      <div class="danger-choice-grid">
-        <div class="danger-choice">
-          <strong>🛡 Backup, then upload</strong>
-          <small>Download the complete local JSON backup before cloud migration.</small>
-          <button class="btn primary small" id="cloudBackupUploadBtn">Backup & Upload</button>
-        </div>
-        <div class="danger-choice">
-          <strong>Upload without backup</strong>
-          <small>Proceed using the current local copy without downloading another backup.</small>
-          <button class="btn ghost small" id="cloudDirectUploadBtn">Upload Now</button>
-        </div>
-      </div>
-      <div class="context-actions"><button class="btn ghost" onclick="closeModal()">Cancel</button></div>
-    `);
-
-    document.getElementById("cloudBackupUploadBtn").onclick=()=>{
-      bridge()?.saveBackup?.();
-      setTimeout(()=>performUploadLocalToCloud(),180);
-    };
-    document.getElementById("cloudDirectUploadBtn").onclick=performUploadLocalToCloud;
-  }
-
-  async function performUploadLocalToCloud(){
-    if(cloud.busy) return;
-    cloud.busy=true;
-    showCloudProgress("Uploading Masul data to Firebase");
-
-    try{
-      const orgId=await ensureLinkedOrg();
-      const local=bridge().getState();
-      const orgData=safeOrgForCloud(local);
-      const collections=[
-        ["batches",local.org?.batches||[]],
-        ["people",local.people||[]],
-        ["fees",local.fees||[]],
-        ["paymentRequests",local.paymentRequests||[]],
-        ["payments",local.payments||[]],
-        ["historyImports",local.historyImports||[]]
-      ];
-
-      updateCloudProgress("Saving organisation settings…",8);
-      await setDoc(doc(db,"organizations",orgId),{
-        ownerUid:cloud.user.uid,
-        name:orgData.name||bridge().getOrgDisplayName(),
-        orgData:cleanForFirestore(orgData),
-        updatedAt:serverTimestamp(),
-        cloudSchemaVersion:1
-      },{merge:true});
-
-      await setDoc(doc(db,"organizations",orgId,"config","app"),{
-        setupComplete:!!local.setupComplete,
-        late:cleanForFirestore(local.late||{}),
-        paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.32",
-        updatedAt:serverTimestamp()
-      },{merge:true});
-
-      let step=0;
-      for(const [name,records] of collections){
-        step++;
-        const base=10+Math.round((step-1)/collections.length*82);
-        updateCloudProgress(`Replacing ${name}…`,base);
-        await deleteCollectionDocs(orgId,name);
-        await writeCollectionDocs(orgId,name,records);
-      }
-
-      updateCloudProgress("Finalising cloud profile…",96);
-      await setDoc(doc(db,"users",cloud.user.uid),{
-        email:cloud.user.email||"",
-        orgId,
-        role:"owner",
-        updatedAt:serverTimestamp()
-      },{merge:true});
-
-      cloud.orgName=orgData.name||bridge().getOrgDisplayName();
-      cloud.lastAction=`Uploaded ${new Date().toLocaleString("en-IN")}`;
-      cloud.lastError="";
-      updateCloudProgress("Upload complete ✓",100);
-      setTimeout(()=>{
-        window.closeModal();
-        refreshCloudUI();
-        cloudToast("Masul data uploaded to Firebase");
-      },550);
-    }catch(err){
-      console.error("Masul cloud upload error:",err);
-      cloud.lastError=err?.message||"Cloud upload failed";
-      updateCloudProgress("Upload failed — no local data was deleted.",100);
-      setTimeout(()=>refreshCloudUI(),100);
-    }finally{
-      cloud.busy=false;
-    }
-  }
-
-  async function readCollection(orgId,name){
-    const snap=await getDocs(collection(db,"organizations",orgId,name));
-    return snap.docs.map(d=>d.data());
-  }
-
-  async function restoreFromCloud(){
-    if(cloud.busy) return;
-    if(!cloud.user){authModal("signin");return}
-    if(!cloud.orgId){
-      cloudToast("This account does not have a cloud organisation yet.");
+  async function reloadCloudRecovery(){
+    if(!cloud.user || !cloud.orgId){
+      authModal("signin");
       return;
     }
 
     window.modal(`
       <div class="modal-head">
-        <div><span class="eyebrow">Cloud Restore</span><h3 style="margin:7px 0 0">Replace this browser's local data?</h3></div>
+        <div><span class="eyebrow">Cloud Recovery</span><h3 style="margin:7px 0 0">Reload Firebase copy?</h3></div>
         <button class="close" onclick="closeModal()">×</button>
       </div>
       <div class="danger-alert">
-        <div class="danger-title">⚠ Firebase data will replace this browser copy</div>
-        <p>The local Masul data currently visible in this browser will be replaced by the cloud organisation data.</p>
+        <div class="danger-title">This replaces the current browser working copy</div>
+        <p>Firebase will not be changed. Masul will first download a JSON backup of this browser, then load the current Firebase organisation.</p>
       </div>
-      <div class="legal-strip warning">
-        <strong>Strongly recommended:</strong> download the current local JSON backup first so you can reverse the migration if needed.
+      <div class="request-action-row">
+        <button class="btn primary" id="reloadCloudConfirmBtn">Backup & Reload Cloud</button>
+        <button class="btn ghost" onclick="closeModal()">Cancel</button>
       </div>
-      <div class="danger-choice-grid">
-        <div class="danger-choice">
-          <strong>🛡 Backup, then restore</strong>
-          <small>Download this browser's current data before loading Firebase.</small>
-          <button class="btn primary small" id="cloudBackupRestoreBtn">Backup & Restore</button>
-        </div>
-        <div class="danger-choice">
-          <strong>Restore without backup</strong>
-          <small>Replace the browser copy immediately.</small>
-          <button class="btn danger small" id="cloudDirectRestoreBtn">Restore Now</button>
-        </div>
-      </div>
-      <div class="context-actions"><button class="btn ghost" onclick="closeModal()">Cancel</button></div>
     `);
 
-    document.getElementById("cloudBackupRestoreBtn").onclick=()=>{
+    document.getElementById("reloadCloudConfirmBtn").onclick=async()=>{
       bridge()?.saveBackup?.();
-      setTimeout(()=>performRestoreFromCloud(),180);
-    };
-    document.getElementById("cloudDirectRestoreBtn").onclick=performRestoreFromCloud;
-  }
-
-  async function performRestoreFromCloud(){
-    if(cloud.busy) return;
-    cloud.busy=true;
-    showCloudProgress("Restoring Masul data from Firebase");
-
-    try{
-      const orgId=cloud.orgId;
-      updateCloudProgress("Reading organisation…",8);
-      const orgSnap=await getDoc(doc(db,"organizations",orgId));
-      if(!orgSnap.exists()) throw new Error("Cloud organisation record was not found.");
-      const orgDoc=orgSnap.data();
-
-      const configSnap=await getDoc(doc(db,"organizations",orgId,"config","app"));
-      const config=configSnap.exists()?configSnap.data():{};
-
-      const names=["batches","people","fees","paymentRequests","payments","historyImports"];
-      const data={};
-      for(let i=0;i<names.length;i++){
-        updateCloudProgress(`Downloading ${names[i]}…`,15+Math.round(i/names.length*70));
-        data[names[i]]=await readCollection(orgId,names[i]);
-      }
-
-      const current=bridge().getState();
-      const base=bridge().getDefaultState();
-      const cloudOrg=cleanForFirestore(orgDoc.orgData||{});
-
-      // Preserve the current local logo only when it was intentionally omitted
-      // from Firestore because of document-size safety.
-      if(cloudOrg.cloudLogoOmitted && current.org?.logo && !cloudOrg.logo){
-        cloudOrg.logo=current.org.logo;
-        if(current.org.logoSource) cloudOrg.logoSource=current.org.logoSource;
-        if(current.org.logoCrop) cloudOrg.logoCrop=current.org.logoCrop;
-      }
-      delete cloudOrg.cloudLogoOmitted;
-
-      const restored={
-        ...base,
-        setupComplete:!!config.setupComplete,
-        demoMode:false,
-        lastSaved:new Date().toISOString(),
-        org:{
-          ...base.org,
-          ...cloudOrg,
-          batches:data.batches||[]
-        },
-        fees:data.fees||[],
-        late:{...base.late,...(config.late||{})},
-        paymentsConfig:{...base.paymentsConfig,...(config.paymentsConfig||{})},
-        people:data.people||[],
-        paymentRequests:data.paymentRequests||[],
-        payments:data.payments||[],
-        historyImports:data.historyImports||[]
-      };
-
-      updateCloudProgress("Applying cloud data to this browser…",92);
-      bridge().applyState(restored);
-
-      cloud.orgName=restored.org?.name||cloud.orgName;
-      cloud.lastAction=`Restored ${new Date().toLocaleString("en-IN")}`;
-      cloud.lastError="";
-      updateCloudProgress("Restore complete ✓",100);
-
-      setTimeout(()=>{
+      cloud.busy=true;
+      cloud.syncing=true;
+      refreshCloudUI();
+      try{
+        const remote=await pullCloudSnapshotOnce();
+        applyRemoteState(remote,{force:true});
+        cloud.initialHydrated=true;
+        cloud.pendingLocal=false;
+        cloud.lastAction="Firebase copy reloaded";
         window.closeModal();
         refreshCloudUI();
-        cloudToast("Firebase data restored to this browser");
-      },550);
-    }catch(err){
-      console.error("Masul cloud restore error:",err);
-      cloud.lastError=err?.message||"Cloud restore failed";
-      updateCloudProgress("Restore failed — local data was not replaced.",100);
-      setTimeout(()=>refreshCloudUI(),100);
-    }finally{
-      cloud.busy=false;
-    }
+        cloudToast("Latest Firebase copy loaded");
+      }catch(err){
+        console.error(err);
+        cloud.lastError=err?.message||"Could not reload Firebase.";
+        refreshCloudUI();
+      }finally{
+        cloud.busy=false;
+        cloud.syncing=false;
+        refreshCloudUI();
+      }
+    };
   }
 
   async function refreshProfile(){
@@ -8326,8 +8839,9 @@ handlePaymentRequestFromUrl();
       return;
     }
     try{
+      cloud.lastError="";
       await loadProfileForUser(auth.currentUser);
-      cloudToast("Cloud status refreshed");
+      cloudToast("Cloud connection refreshed");
     }catch(err){
       cloud.lastError=err?.message||"Refresh failed";
       refreshCloudUI();
@@ -8347,24 +8861,41 @@ handlePaymentRequestFromUrl();
     }
   }
 
-  async function signOutCloud(){
+  async function signOutCloud({silent=false}={}){
+    stopRealtime();
+    if(cloud.syncTimer) clearTimeout(cloud.syncTimer);
+    cloud.syncTimer=null;
+    cloud.pendingLocal=false;
+    cloud.syncing=false;
     try{
       await signOut(auth);
-      cloudToast("Signed out of Masul Cloud");
+      if(!silent) cloudToast("Signed out of Masul Cloud");
     }catch(err){
-      cloudToast("Could not sign out. Try again.");
+      if(!silent) cloudToast("Could not sign out. Try again.");
+      throw err;
     }
+  }
+
+  async function disconnectForLocalRestore(){
+    await signOutCloud({silent:true});
+    cloud.lastAction="";
+    cloud.lastError="";
+    cloud.user=null;
+    cloud.orgId="";
+    cloud.orgName="";
+    cloud.role="";
+    refreshCloudUI();
   }
 
   function bindCloudButtons(){
     const map=[
       ["cloudSignInBtn",()=>authModal("signin")],
       ["cloudCreateOwnerBtn",()=>authModal("create")],
-      ["cloudUploadBtn",uploadLocalToCloud],
-      ["cloudRestoreBtn",restoreFromCloud],
+      ["cloudSyncNowBtn",()=>syncLocalNow({force:true,reason:"Manual sync"})],
+      ["cloudReloadBtn",reloadCloudRecovery],
       ["cloudRefreshBtn",refreshProfile],
       ["cloudPasswordResetBtn",resetPasswordForCurrent],
-      ["cloudSignOutBtn",signOutCloud],
+      ["cloudSignOutBtn",()=>signOutCloud()],
       ["homeCloudStatusBtn",()=>bridge()?.openSettings?.()]
     ];
     map.forEach(([id,fn])=>{
@@ -8376,9 +8907,21 @@ handlePaymentRequestFromUrl();
     });
   }
 
-  // V1.32: Cloud controls are static in this single-page build.
-  // Do NOT watch the whole DOM: updating cloud status itself mutates the DOM
-  // and previously caused a self-triggering MutationObserver loop.
+  window.addEventListener("online",()=>{
+    cloud.online=true;
+    cloud.lastError="";
+    refreshCloudUI();
+    if(cloud.user && cloud.orgId){
+      if(cloud.pendingLocal) setTimeout(()=>syncLocalNow(),700);
+      else if(!cloud.listenerUnsubs.length) startRealtime(cloud.orgId);
+    }
+  });
+
+  window.addEventListener("offline",()=>{
+    cloud.online=false;
+    refreshCloudUI();
+  });
+
   onAuthStateChanged(auth,async user=>{
     cloud.user=user||null;
     cloud.ready=true;
@@ -8386,29 +8929,68 @@ handlePaymentRequestFromUrl();
     cloud.orgId="";
     cloud.orgName="";
     cloud.role="";
+    cloud.pendingLocal=false;
+    cloud.syncing=false;
+    cloud.initialHydrated=false;
+
     if(user){
-      await loadProfileForUser(user);
+      try{
+        await loadProfileForUser(user);
+      }catch(err){
+        console.error(err);
+        cloud.lastError=err?.message||"Could not load Masul cloud profile.";
+        refreshCloudUI();
+      }
     }else{
+      stopRealtime();
       cloud.lastAction="";
       refreshCloudUI();
     }
+
     bindCloudButtons();
   });
+
+  window.MasulCloudHooks={
+    localSaved(){
+      if(!cloud.user || !cloud.orgId) return;
+      scheduleLocalSync();
+    },
+    modalClosed(){
+      if(cloud.deferredRemote && cloud.initialHydrated && !cloud.pendingLocal && !cloud.syncing){
+        deferOrApplyRealtime();
+      }
+    }
+  };
 
   bindCloudButtons();
   refreshCloudUI();
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.32 Firebase module ready");
+  console.info("Masul V1.33 Firebase module ready");
 
   window.MasulCloud={
     auth,
     db,
-    get state(){return {...cloud}},
+    get state(){
+      return {
+        user:cloud.user,
+        orgId:cloud.orgId,
+        orgName:cloud.orgName,
+        role:cloud.role,
+        ready:cloud.ready,
+        syncing:cloud.syncing,
+        pendingLocal:cloud.pendingLocal,
+        initialHydrated:cloud.initialHydrated,
+        lastAction:cloud.lastAction,
+        lastError:cloud.lastError,
+        online:cloud.online
+      };
+    },
     signIn:()=>authModal("signin"),
     createOwner:()=>authModal("create"),
-    uploadLocalToCloud,
-    restoreFromCloud,
-    refreshProfile
+    syncNow:()=>syncLocalNow({force:true,reason:"Manual sync"}),
+    reloadCloud:reloadCloudRecovery,
+    refreshProfile,
+    disconnectForLocalRestore
   };
 </script>
 </body>
