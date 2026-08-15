@@ -1,68 +1,24 @@
-# Masul V1.31 — Firebase Cloud Foundation
+# Masul V1.32 — Firebase Freeze Fix
 
-Firebase project:
-- Project ID: `masul-900d7`
-- Web app: Masul Web
-- Authentication: Email/Password
-- Firestore: Production mode
-- Security: owner-only Phase 1 rules
+## Critical fix
+V1.31 could make Chrome show **Page Unresponsive** immediately after loading the GitHub Pages build.
 
-## What this build adds
+### Cause
+A `MutationObserver` watched the entire page. Its callback called `refreshCloudUI()`, which changed DOM classes/text. Those changes triggered the same observer again, creating a continuous feedback loop.
 
-### Owner authentication
-Admin Dashboard → Settings → Cloud & Account
+### V1.32 fix
+- Removed the whole-page MutationObserver.
+- Cloud buttons are bound directly once.
+- Cloud status updates are idempotent: text/classes are changed only when necessary.
+- Firebase Authentication and Firestore features from V1.31 are retained.
+- Local Masul browser data is not reset by this update.
 
-- Sign In
-- Create Owner Account
-- Password reset
-- Sign Out
+## After uploading
+1. Replace GitHub `index.html` with the V1.32 file.
+2. Keep `masul-icon.png`.
+3. Wait for GitHub Pages to redeploy.
+4. Hard refresh the live page (`Ctrl + F5`).
+5. Confirm the dashboard opens normally.
+6. Only then continue to Cloud & Account setup.
 
-Creating an owner account also creates an isolated Firebase organisation owned by that Firebase UID.
-
-### Safe first migration
-Cloud sync is deliberately **manual** in V1.31.
-
-- **Upload Current Data**: current browser data becomes the Firebase copy.
-- **Restore from Cloud**: Firebase data replaces this browser's local copy.
-- Both workflows offer a JSON backup first.
-- Signing in by itself does not upload, download or overwrite data.
-
-### Cloud structure
-
-`users/{uid}`
-
-`organizations/{orgId}`
-- owner UID
-- organisation settings
-- cloud schema metadata
-
-Subcollections:
-- `batches`
-- `people`
-- `fees`
-- `paymentRequests`
-- `payments`
-- `historyImports`
-- `config/app`
-
-### Logo safety
-Firestore documents have a size limit. A very large base64 organisation logo is therefore omitted from the organisation Firestore document rather than risking a failed migration. The browser copy is preserved. A later Storage/asset strategy can provide full cross-device logo sync.
-
-### Phase 1 limitation
-V1.31 does NOT yet enable automatic real-time two-way synchronization. The first objective is to:
-1. create the owner account,
-2. upload the trusted local copy,
-3. verify it,
-4. restore it in another browser/device,
-5. then enable automatic synchronization in a subsequent build.
-
-## Next after successful migration
-- automatic cloud writes
-- multi-device live sync
-- role model beyond owner
-- secure customer payment-link access
-- App Check
-- backend functions for sensitive operations
-- provider webhook verification
-
-The published Phase 1 Firestore rules are also included as `firestore.rules.txt` for reference.
+Do not upload/restore cloud data until the live page is stable.

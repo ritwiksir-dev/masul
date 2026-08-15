@@ -1723,7 +1723,7 @@
       </div>
     </div>
     <div class="top-actions">
-      <span class="chip" id="modeChip">V1.31 Firebase Cloud Foundation</span>
+      <span class="chip" id="modeChip">V1.32 Firebase Freeze Fix</span>
       <button class="btn ghost small" id="homeBtn">Home</button>
     </div>
   </header>
@@ -7777,6 +7777,7 @@ handlePaymentRequestFromUrl();
   }
 
   function cloudStatus(mode,text){
+    const targetMode=mode||"offline";
     const ids=[
       ["homeCloudStatusBtn","homeCloudStatusText"],
       ["settingsCloudStatus","settingsCloudStatusText"]
@@ -7784,12 +7785,16 @@ handlePaymentRequestFromUrl();
     ids.forEach(([pillId,textId])=>{
       const pill=document.getElementById(pillId);
       const label=document.getElementById(textId);
-      if(pill){
+      if(pill && !pill.classList.contains(targetMode)){
         pill.classList.remove("offline","connected","connecting","error");
-        pill.classList.add(mode||"offline");
+        pill.classList.add(targetMode);
       }
-      if(label) label.textContent=text;
+      if(label && label.textContent!==text) label.textContent=text;
     });
+  }
+
+  function setTextIfChanged(el,value){
+    if(el && el.textContent!==value) el.textContent=value;
   }
 
   function refreshCloudUI(){
@@ -7801,12 +7806,12 @@ handlePaymentRequestFromUrl();
     const action=document.getElementById("cloudLastAction");
 
     if(cloud.user){
-      out?.classList.add("hidden");
-      inn?.classList.remove("hidden");
-      if(email) email.textContent=cloud.user.email||"Signed-in user";
-      if(role) role.textContent=cloud.role||"Owner";
-      if(org) org.textContent=cloud.orgName||"Not linked yet";
-      if(action) action.textContent=cloud.lastAction||"—";
+      if(out && !out.classList.contains("hidden")) out.classList.add("hidden");
+      if(inn && inn.classList.contains("hidden")) inn.classList.remove("hidden");
+      setTextIfChanged(email,cloud.user.email||"Signed-in user");
+      setTextIfChanged(role,cloud.role||"Owner");
+      setTextIfChanged(org,cloud.orgName||"Not linked yet");
+      setTextIfChanged(action,cloud.lastAction||"—");
 
       if(cloud.orgId){
         cloudStatus("connected","Cloud connected");
@@ -7814,10 +7819,10 @@ handlePaymentRequestFromUrl();
         cloudStatus("connecting","Account connected");
       }
     }else{
-      inn?.classList.add("hidden");
-      out?.classList.remove("hidden");
+      if(inn && !inn.classList.contains("hidden")) inn.classList.add("hidden");
+      if(out && out.classList.contains("hidden")) out.classList.remove("hidden");
       cloudStatus(cloud.lastError?"error":"offline",cloud.lastError?"Cloud error":"Cloud not connected");
-      if(action) action.textContent="—";
+      setTextIfChanged(action,"—");
     }
   }
 
@@ -8151,7 +8156,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.31",
+        sourceVersion:"1.32",
         updatedAt:serverTimestamp()
       },{merge:true});
 
@@ -8371,13 +8376,9 @@ handlePaymentRequestFromUrl();
     });
   }
 
-  // Re-bind after sections are re-rendered, and keep status current.
-  const observer=new MutationObserver(()=>{
-    bindCloudButtons();
-    refreshCloudUI();
-  });
-  observer.observe(document.body,{childList:true,subtree:true});
-
+  // V1.32: Cloud controls are static in this single-page build.
+  // Do NOT watch the whole DOM: updating cloud status itself mutates the DOM
+  // and previously caused a self-triggering MutationObserver loop.
   onAuthStateChanged(auth,async user=>{
     cloud.user=user||null;
     cloud.ready=true;
@@ -8396,6 +8397,8 @@ handlePaymentRequestFromUrl();
 
   bindCloudButtons();
   refreshCloudUI();
+  document.documentElement.dataset.masulCloudReady="1";
+  console.info("Masul V1.32 Firebase module ready");
 
   window.MasulCloud={
     auth,
