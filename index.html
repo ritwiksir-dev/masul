@@ -1554,6 +1554,21 @@
 
 
 
+
+    .signed-out-privacy{
+      margin:0 0 14px;padding:12px 15px;
+      border:1px solid #dbe4ee;border-radius:16px;background:#fbfcfe;
+      display:flex;align-items:center;gap:11px;color:#46566d;
+      box-shadow:0 7px 22px rgba(35,50,73,.035)
+    }
+    .signed-out-privacy.hidden{display:none}
+    .signed-out-privacy-icon{
+      width:34px;height:34px;border-radius:11px;display:grid;place-items:center;
+      background:#eef3f8;font-size:16px;flex:0 0 auto
+    }
+    .signed-out-privacy strong{display:block;font-size:11px;color:#34435b;margin-bottom:2px}
+    .signed-out-privacy span{display:block;font-size:9px;line-height:1.45;color:#6b7789}
+
     /* V1.36 — restrained built-in SVG icon language */
     .ui-icon{
       width:18px;height:18px;display:block;flex:0 0 auto;
@@ -1891,7 +1906,7 @@
       </div>
     </div>
     <div class="top-actions">
-      <span class="chip" id="modeChip">V1.36 Icon Navigation Polish</span>
+      <span class="chip" id="modeChip">V1.37 Private Sign-Out</span>
       <div class="top-auth signed-out" id="topAuthControls">
         <button class="btn ghost small icon-btn" id="topSignInBtn"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg><span>Sign In</span></button>
         <button class="btn primary small icon-btn" id="topCreateOrgBtn"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 6V4h8v2"/><path d="M12 10v6"/><path d="M9 13h6"/></svg><span>Create Organisation</span></button>
@@ -1908,6 +1923,13 @@
   <main>
     <!-- HOME -->
     <section id="homeView" class="container">
+      <div class="signed-out-privacy hidden" id="signedOutPrivacyBanner">
+        <div class="signed-out-privacy-icon">🔒</div>
+        <div>
+          <strong>Signed out — organisation data hidden</strong>
+          <span>Sign in to load your organisation from Firebase, or create a new organisation.</span>
+        </div>
+      </div>
       <div class="home-admin-hub">
         <div class="admin-overview-card">
           <div class="admin-hub-head">
@@ -3152,7 +3174,7 @@ function updateSaveIndicators(){
       }else if(cs.pendingLocal || cs.syncing){
         settingsSaveNote.textContent="Masul has local changes waiting to be confirmed by Firebase.";
       }else if(cs.initialHydrated){
-        settingsSaveNote.textContent="Firebase is the main signed-in data source; this browser also keeps the current Masul working copy.";
+        settingsSaveNote.textContent="Firebase is the main signed-in data source. Signing out removes the active private browser copy.";
       }else{
         settingsSaveNote.textContent="Masul is connecting this browser with the Firebase organisation.";
       }
@@ -3296,6 +3318,46 @@ window.MasulLocalBridge = {
   getOrgDisplayName(){
     const n=String(state.org?.name||"").trim();
     return n && n!=="Masul Demo Organisation" ? n : "My Masul Organisation";
+  },
+  clearPrivateSession(){
+    // V1.37 privacy boundary: signed-out users must not keep seeing
+    // the previous organisation's students, fees, payments or settings.
+    window.__MASUL_SKIP_NEXT_CLOUD_SAVE__=true;
+
+    // Remove the active private working copy. Firebase remains authoritative.
+    localStorage.removeItem("masul_v1_state");
+
+    state=structuredClone(defaultState);
+    state.demoMode=false;
+    state.setupComplete=false;
+    state.people=[];
+    state.fees=[];
+    state.payments=[];
+    state.paymentRequests=[];
+    state.historyImports=[];
+    state.org=structuredClone(defaultState.org);
+    state.org.name="";
+    state.org.short="";
+    state.org.email="";
+    state.org.phone="";
+    state.org.address="";
+    state.org.city="";
+    state.org.logo="";
+    state.org.logoSource="";
+    state.org.batches=[];
+    state.late=structuredClone(defaultState.late);
+    state.paymentsConfig=structuredClone(defaultState.paymentsConfig);
+    state.lastSaved="";
+
+    // Persist only the blank shell so a page reload cannot reveal prior data.
+    localStorage.setItem("masul_v1_state",JSON.stringify(state));
+
+    hydrateSetup();
+    renderDashboard();
+    renderCustomer();
+    renderHomeOverview();
+    updateSaveIndicators();
+    showView("homeView");
   },
   refreshSaveIndicators(){
     updateSaveIndicators();
@@ -8148,6 +8210,8 @@ handlePaymentRequestFromUrl();
     };
   }
 
+  let previouslyAuthenticated=false;
+
   const cloud={
     user:null,
     orgId:"",
@@ -8843,7 +8907,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.36"
+        sourceVersion:"1.37"
       };
 
       const ops=[];
@@ -9154,17 +9218,36 @@ handlePaymentRequestFromUrl();
   }
 
   async function signOutCloud({silent=false}={}){
+    const hadUser=!!cloud.user;
+
+    // Stop incoming cloud activity first, but do not clear the organisation
+    // until Firebase confirms that authentication has ended.
     stopRealtime();
     stopAccessListeners();
     if(cloud.syncTimer) clearTimeout(cloud.syncTimer);
     cloud.syncTimer=null;
     cloud.pendingLocal=false;
     cloud.syncing=false;
+
     try{
       await signOut(auth);
-      if(!silent) cloudToast("Signed out of Masul Cloud");
+
+      if(hadUser){
+        bridge()?.clearPrivateSession?.();
+      }
+
+      cloud.user=null;
+      cloud.orgId="";
+      cloud.orgName="";
+      cloud.role="";
+      cloud.lastAction="";
+      cloud.lastError="";
+      cloud.initialHydrated=false;
+      refreshCloudUI();
+
+      if(!silent) cloudToast("Signed out • organisation data hidden");
     }catch(err){
-      if(!silent) cloudToast("Could not sign out. Try again.");
+      if(!silent) cloudToast("Could not sign out. Your organisation remains open.");
       throw err;
     }
   }
@@ -9221,15 +9304,18 @@ handlePaymentRequestFromUrl();
     const account=document.getElementById("topAccountBtn");
     const org=document.getElementById("topAccountOrg");
     const meta=document.getElementById("topAccountMeta");
+    const privacyBanner=document.getElementById("signedOutPrivacyBanner");
     if(cloud.user){
       signedOut?.classList.add("hidden");
       account?.classList.remove("hidden");
+      privacyBanner?.classList.add("hidden");
       setTextIfChanged(org,cloud.orgName||"Masul Organisation");
       const sync=cloud.lastError?"Cloud issue":(!cloud.online?"Offline":(cloud.initialHydrated?"Synced":"Connecting"));
       setTextIfChanged(meta,`${displayRole(String(cloud.role||"owner").toLowerCase())} • ${sync}`);
     }else{
       account?.classList.add("hidden");
       signedOut?.classList.remove("hidden");
+      privacyBanner?.classList.remove("hidden");
     }
   }
 
@@ -9895,6 +9981,8 @@ handlePaymentRequestFromUrl();
   });
 
   onAuthStateChanged(auth,async user=>{
+    const wasAuthenticated=previouslyAuthenticated;
+    previouslyAuthenticated=!!user;
     cloud.user=user||null;
     cloud.ready=true;
     cloud.lastError="";
@@ -9915,6 +10003,14 @@ handlePaymentRequestFromUrl();
       }
     }else{
       stopRealtime();
+      stopAccessListeners();
+
+      // Covers session expiry or sign-out in another tab. Idempotent if the
+      // explicit Sign Out button already cleared the private shell.
+      if(wasAuthenticated){
+        bridge()?.clearPrivateSession?.();
+      }
+
       cloud.lastAction="";
       refreshCloudUI();
     }
@@ -9939,7 +10035,7 @@ handlePaymentRequestFromUrl();
   renderAccessCentre();
   processEmailLinkLanding().catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.36 Firebase module ready");
+  console.info("Masul V1.37 Firebase module ready");
 
   window.MasulCloud={
     auth,
