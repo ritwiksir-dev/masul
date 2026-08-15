@@ -1,33 +1,33 @@
-# Masul V1.34 — Live Sync Stability
+# Masul V1.36 — Icon Navigation Polish
 
-## Critical hotfix
-V1.33 could freeze with `Maximum call stack size exceeded`.
+This version adds a built-in SVG icon language to the actual Masul interface.
 
-### Root cause
-Cloud status refresh called the full dashboard renderer:
+## Design approach
+- No external icon CDN.
+- No separate generated images.
+- Icons live directly inside `index.html`.
+- Thin, clean line icons matching Masul's restrained navy/saffron visual language.
+- Text remains visible on primary navigation so icons improve recognition rather than replace meaning.
+- Mobile header compresses selected buttons to icon-only controls.
 
-Cloud status refresh
-→ full dashboard render
-→ saveState()
-→ cloud save hook
-→ cloud status refresh
-→ …
+## Where icons were added
+- Top header: Sign In, Create Organisation, Home
+- Dashboard sidebar:
+  - Overview
+  - People
+  - Batches
+  - Fees & Rules
+  - Pending Dues
+  - Collect Payment
+  - Payments
+  - Reports & Analytics
+  - Users & Roles
+  - Customer Access
+  - Settings
+- Main overview feature cards
+- Sync Now control
 
-### V1.34 fix
-- Cloud status refresh now updates only save/cloud indicators.
-- It no longer calls the full dashboard renderer.
-- Added a re-entry guard around the cloud status UI.
-- Firebase Authentication, live Firestore listeners, automatic cloud loading and automatic cloud saving remain enabled.
-- Firebase data is not modified merely by installing this file.
-- No Firestore rule change is required.
+## Styling
+Overview cards now use a small elevated icon tile above the title, giving them more visual identity while keeping the interface professional.
 
-## Deployment
-Replace only GitHub Pages `index.html`.
-
-Then:
-1. Close all old V1.33 Masul tabs.
-2. Wait for GitHub Pages to redeploy.
-3. Open Chrome first and hard refresh with Ctrl+F5.
-4. Confirm the version badge says V1.34 Live Sync Stability.
-5. Wait for the cloud state to reach Synced.
-6. Only then open Edge and hard refresh there.
+V1.35 access-control functionality and the V1.34 live-sync stability core are retained.
