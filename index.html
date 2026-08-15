@@ -2789,7 +2789,7 @@
 
             <div class="legal-strip">
               <strong>Customer access is separate from staff access.</strong>
-              Customers are linked only to selected student/member records. They are not organisation admins and must not receive access to reports, staff or unrelated students.
+              Customers are linked only to selected student/member records. Staff-role invitation claiming is active in V1.40; customer portal invitation claiming will be activated immediately after the staff-role/ownership test.
             </div>
 
             <div class="access-summary-grid" style="margin-top:14px">
@@ -2981,9 +2981,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.39</span>
+                <span class="chip">V1.40</span>
               </div>
-              <div class="request-meta">Masul V1.39 • Header Account Controls</div>
+              <div class="request-meta">Masul V1.40 • Secure Staff Invitations & Roles</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -8671,19 +8671,58 @@ handlePaymentRequestFromUrl();
     const profile=await getUserProfile(user.uid);
 
     if(profile?.orgId){
-      cloud.orgId=profile.orgId;
-      cloud.role=profile.role==="owner"?"Owner":profile.role||"Owner";
-      const org=await getOrgDoc(profile.orgId);
+      const orgId=profile.orgId;
+
+      // Membership document, not the editable user profile, is the role authority.
+      const memberSnap=await getDoc(doc(db,"organizations",orgId,"members",user.uid));
+      let member=memberSnap.exists()?memberSnap.data():null;
+      let org=null;
+
+      if(member && member.status!=="active"){
+        throw new Error(`Organisation access is ${member.status||"disabled"}. Contact the organisation owner.`);
+      }
+
+      if(!member){
+        // Existing Phase-1 owner accounts may not yet have a member document.
+        // The true owner can still read the organisation and bootstrap it safely.
+        try{
+          org=await getOrgDoc(orgId);
+        }catch(_){}
+        if(org?.ownerUid===user.uid){
+          cloud.orgId=orgId;
+          await ensureOwnerMember();
+          const refreshed=await getDoc(doc(db,"organizations",orgId,"members",user.uid));
+          member=refreshed.exists()?refreshed.data():{role:"owner",status:"active",email:user.email};
+        }else{
+          throw new Error("This account is not an active member of the organisation.");
+        }
+      }
+
+      if(!org) org=await getOrgDoc(orgId);
+
+      const effectiveRole=org?.ownerUid===user.uid ? "owner" : String(member.role||"read-only").toLowerCase();
+
+      cloud.orgId=orgId;
+      cloud.role=displayRole(effectiveRole);
       cloud.orgName=org?.name||bridge()?.getOrgDisplayName?.()||"Masul Organisation";
       cloud.lastAction="Signed in";
-      startRealtime(profile.orgId);
-      await ensureOwnerMember();
+
+      // Keep the user's own convenience profile aligned with authoritative membership.
+      await setDoc(doc(db,"users",user.uid),{
+        email:user.email||"",
+        orgId,
+        role:effectiveRole,
+        userType:"staff",
+        updatedAt:serverTimestamp()
+      },{merge:true});
+
+      startRealtime(orgId);
       startAccessListeners();
     }else{
       cloud.orgId="";
       cloud.orgName="";
-      cloud.role="Owner";
-      cloud.lastAction="Account needs organisation link";
+      cloud.role="";
+      cloud.lastAction="Account has no organisation membership";
     }
 
     cloud.ready=true;
@@ -8994,7 +9033,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.39"
+        sourceVersion:"1.40"
       };
 
       const ops=[];
@@ -9002,9 +9041,11 @@ handlePaymentRequestFromUrl();
       const cachedOrg=cloud.realtime.org||{};
       const cachedOrgData=cleanForFirestore(cachedOrg.orgData||{});
       const orgChanged=
-        force ||
-        comparable(cachedOrgData)!==comparable(orgData) ||
-        String(cachedOrg.name||"")!==String(orgData.name||bridge()?.getOrgDisplayName?.()||"");
+        roleCanWriteOrg() && (
+          force ||
+          comparable(cachedOrgData)!==comparable(orgData) ||
+          String(cachedOrg.name||"")!==String(orgData.name||bridge()?.getOrgDisplayName?.()||"")
+        );
 
       if(orgChanged){
         ops.push({
@@ -9027,7 +9068,7 @@ handlePaymentRequestFromUrl();
         paymentsConfig:cachedConfig.paymentsConfig||{},
         sourceVersion:cachedConfig.sourceVersion||""
       };
-      if(force || comparable(cachedComparable)!==comparable(configData)){
+      if(roleCanWriteConfig() && (force || comparable(cachedComparable)!==comparable(configData))){
         ops.push({
           type:"setMerge",
           ref:doc(db,"organizations",orgId,"config","app"),
@@ -9045,7 +9086,9 @@ handlePaymentRequestFromUrl();
       };
 
       COLLECTION_NAMES.forEach(name=>{
-        ops.push(...buildCollectionOperations(orgId,name,dataByName[name]));
+        if(roleCanWriteCollection(name)){
+          ops.push(...buildCollectionOperations(orgId,name,dataByName[name]));
+        }
       });
 
       if(!ops.length){
@@ -9134,7 +9177,7 @@ handlePaymentRequestFromUrl();
       </div>
       <div class="request-action-row">
         <button class="btn primary" id="cloudAuthSubmitBtn">${button}</button>
-        ${!create?`<button class="btn ghost" id="cloudForgotBtn">Forgot password?</button>`:""}
+        ${!create?`<button class="btn ghost" id="cloudEmailLinkBtn">Email me a sign-in link</button><button class="btn ghost" id="cloudForgotBtn">Forgot password?</button>`:""}
         <button class="btn ghost" onclick="closeModal()">Cancel</button>
       </div>
       <div id="cloudAuthMessage" class="report-note"></div>
@@ -9177,6 +9220,24 @@ handlePaymentRequestFromUrl();
         submit.disabled=false;
       }
     };
+
+    const emailLinkBtn=document.getElementById("cloudEmailLinkBtn");
+    if(emailLinkBtn){
+      emailLinkBtn.onclick=async()=>{
+        const email=safeEmail(document.getElementById("cloudAuthEmail")?.value||"");
+        if(!email){msg.textContent="Enter your email address first.";return}
+        try{
+          emailLinkBtn.disabled=true;
+          msg.textContent="Sending secure sign-in link…";
+          await sendGenericEmailSignIn(email);
+          msg.textContent="Sign-in link sent. Open the email link to enter Masul.";
+        }catch(err){
+          msg.textContent=inviteDeliveryError(err);
+        }finally{
+          emailLinkBtn.disabled=false;
+        }
+      };
+    }
 
     const forgot=document.getElementById("cloudForgotBtn");
     if(forgot){
@@ -9418,8 +9479,27 @@ handlePaymentRequestFromUrl();
     }catch(_){}
     return "—";
   }
+  function normalizedCloudRole(){
+    return String(cloud.role||"").toLowerCase();
+  }
   function accessCanManage(){
-    return cloud.role==="Owner" || String(cloud.role).toLowerCase()==="owner";
+    return normalizedCloudRole()==="owner";
+  }
+  function accessCanViewAdmin(){
+    return ["owner","admin"].includes(normalizedCloudRole());
+  }
+  function roleCanWriteCollection(name){
+    const role=normalizedCloudRole();
+    if(role==="owner" || role==="admin") return true;
+    if(role==="accountant") return ["fees","paymentRequests","payments","historyImports"].includes(name);
+    if(role==="collector") return ["paymentRequests","payments"].includes(name);
+    return false;
+  }
+  function roleCanWriteOrg(){
+    return ["owner","admin"].includes(normalizedCloudRole());
+  }
+  function roleCanWriteConfig(){
+    return ["owner","admin"].includes(normalizedCloudRole());
   }
 
   function updateTopAuthUI(){
@@ -9462,6 +9542,7 @@ handlePaymentRequestFromUrl();
       role:"owner",
       status:"active",
       addedByUid:cloud.user.uid,
+      addedAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     },{merge:true});
   }
@@ -9477,6 +9558,15 @@ handlePaymentRequestFromUrl();
     if(!cloud.user || !cloud.orgId) return;
     const orgId=cloud.orgId;
 
+    const updateSelfRoleFromMembers=()=>{
+      const self=cloud.access.members.find(x=>x.id===cloud.user?.uid);
+      if(self?.status==="active"){
+        const role=String(self.role||"read-only").toLowerCase();
+        cloud.role=displayRole(role);
+        refreshCloudUI();
+      }
+    };
+
     const listen=(name,pathRef,handler)=>{
       cloud.accessUnsubs.push(onSnapshot(pathRef,snap=>{
         handler(snap);
@@ -9487,31 +9577,48 @@ handlePaymentRequestFromUrl();
       }));
     };
 
-    listen("members",collection(db,"organizations",orgId,"members"),qs=>{
-      cloud.access.members=qs.docs.map(d=>({id:d.id,...d.data()}));
-    });
-    listen("staffInvites",collection(db,"organizations",orgId,"staffInvites"),qs=>{
-      cloud.access.staffInvites=qs.docs.map(d=>({id:d.id,...d.data()}));
-    });
-    listen("customers",collection(db,"organizations",orgId,"customers"),qs=>{
-      cloud.access.customers=qs.docs.map(d=>({id:d.id,...d.data()}));
-    });
-    listen("customerInvites",collection(db,"organizations",orgId,"customerInvites"),qs=>{
-      cloud.access.customerInvites=qs.docs.map(d=>({id:d.id,...d.data()}));
-    });
-    listen("audit",collection(db,"organizations",orgId,"auditLogs"),qs=>{
-      cloud.access.audit=qs.docs.map(d=>({id:d.id,...d.data()}))
-        .sort((a,b)=>{
-          const aa=a.createdAt?.seconds||0, bb=b.createdAt?.seconds||0;
-          return bb-aa;
-        }).slice(0,100);
-    });
+    if(accessCanViewAdmin()){
+      listen("members",collection(db,"organizations",orgId,"members"),qs=>{
+        cloud.access.members=qs.docs.map(d=>({id:d.id,...d.data()}));
+        updateSelfRoleFromMembers();
+      });
+      listen("staffInvites",collection(db,"organizations",orgId,"staffInvites"),qs=>{
+        cloud.access.staffInvites=qs.docs.map(d=>({id:d.id,...d.data()}));
+      });
+      listen("customers",collection(db,"organizations",orgId,"customers"),qs=>{
+        cloud.access.customers=qs.docs.map(d=>({id:d.id,...d.data()}));
+      });
+      listen("customerInvites",collection(db,"organizations",orgId,"customerInvites"),qs=>{
+        cloud.access.customerInvites=qs.docs.map(d=>({id:d.id,...d.data()}));
+      });
+      listen("audit",collection(db,"organizations",orgId,"auditLogs"),qs=>{
+        cloud.access.audit=qs.docs.map(d=>({id:d.id,...d.data()}))
+          .sort((a,b)=>{
+            const aa=a.createdAt?.seconds||0, bb=b.createdAt?.seconds||0;
+            return bb-aa;
+          }).slice(0,100);
+      });
+    }else{
+      cloud.accessUnsubs.push(onSnapshot(
+        doc(db,"organizations",orgId,"members",cloud.user.uid),
+        snap=>{
+          cloud.access.members=snap.exists()?[{id:snap.id,...snap.data()}]:[];
+          updateSelfRoleFromMembers();
+          renderAccessCentre();
+        },
+        err=>console.warn("Masul self membership listener:",err)
+      ));
+    }
 
     cloud.accessUnsubs.push(onSnapshot(doc(db,"organizations",orgId),snap=>{
       if(snap.exists()){
         const d=snap.data();
         cloud.access.ownershipTransfer=d.ownershipTransfer||null;
+        if(d.ownerUid===cloud.user?.uid){
+          cloud.role="Owner";
+        }
         renderAccessCentre();
+        refreshCloudUI();
       }
     },()=>{}));
   }
@@ -9616,7 +9723,8 @@ handlePaymentRequestFromUrl();
           <div class="request-meta" style="margin-top:4px">Status: ${escapeHtml(t.status||"pending")} • Initiated ${escapeHtml(accessDate(t.initiatedAt))}</div>
           <div class="request-action-row">
             ${t.toUid===cloud.user?.uid && t.status==="pending"?'<button class="btn primary small" id="acceptOwnershipBtn">Accept Ownership</button>':""}
-            ${canManage?'<button class="btn danger small" id="cancelOwnershipBtn">Cancel Transfer</button>':""}
+            ${t.fromUid===cloud.user?.uid && t.status==="accepted"?'<button class="btn primary small" id="finalizeOwnershipBtn">Finalise Ownership Transfer</button>':""}
+            ${canManage && ["pending","accepted"].includes(t.status)?'<button class="btn danger small" id="cancelOwnershipBtn">Cancel Transfer</button>':""}
           </div>`;
       }
     }
@@ -9686,16 +9794,27 @@ handlePaymentRequestFromUrl();
       btn.addEventListener("click",()=>handleAccessAction(btn.dataset.accessAction,btn.dataset.accessId));
     });
     document.getElementById("acceptOwnershipBtn")?.addEventListener("click",acceptOwnership);
+    document.getElementById("finalizeOwnershipBtn")?.addEventListener("click",finalizeOwnershipTransfer);
     document.getElementById("cancelOwnershipBtn")?.addEventListener("click",cancelOwnershipTransfer);
   }
 
   async function sendInviteEmail(type,invite){
     const param=type==="staff"?"staffInvite":"customerInvite";
     const url=new URL(window.location.origin+window.location.pathname);
+    url.searchParams.set("org",invite.orgId||cloud.orgId||"");
     url.searchParams.set(param,invite.id);
     const actionCodeSettings={url:url.toString(),handleCodeInApp:true};
     await sendSignInLinkToEmail(auth,invite.email,actionCodeSettings);
     return url.toString();
+  }
+
+  async function sendGenericEmailSignIn(email){
+    const clean=safeEmail(email);
+    if(!clean) throw new Error("Enter an email address first.");
+    const url=new URL(window.location.origin+window.location.pathname);
+    url.searchParams.set("emailLogin","1");
+    localStorage.setItem("masul_email_for_signin",clean);
+    await sendSignInLinkToEmail(auth,clean,{url:url.toString(),handleCodeInApp:true});
   }
 
   function inviteDeliveryError(err){
@@ -9732,11 +9851,17 @@ handlePaymentRequestFromUrl();
         cloud.access.staffInvites.some(i=>safeEmail(i.email)===email && i.status==="pending");
       if(duplicate){msg.textContent="This email is already an active user or has a pending invitation.";return}
       const id=randomToken("staff");
-      const data={id,email,displayName:name,role,status:"pending",orgId:cloud.orgId,orgName:cloud.orgName,invitedByUid:cloud.user.uid,invitedByEmail:safeEmail(cloud.user.email),createdAt:serverTimestamp()};
+      const data={
+        id,email,displayName:name,role,status:"pending",
+        orgId:cloud.orgId,orgName:cloud.orgName,
+        invitedByUid:cloud.user.uid,invitedByEmail:safeEmail(cloud.user.email),
+        createdAt:serverTimestamp(),
+        expiresAt:new Date(Date.now()+7*24*60*60*1000)
+      };
       await setDoc(doc(db,"organizations",cloud.orgId,"staffInvites",id),data);
       await logAccess("Staff invitation created",{email,type:"staff"},`Role: ${displayRole(role)}`);
       try{
-        await sendInviteEmail("staff",{id,email});
+        await sendInviteEmail("staff",{id,email,orgId:cloud.orgId});
         msg.textContent="Invitation created and email sign-in link sent.";
         cloudToast("Staff invitation sent");
       }catch(err){
@@ -9796,9 +9921,66 @@ handlePaymentRequestFromUrl();
   async function acceptOwnership(){
     const t=cloud.access.ownershipTransfer;
     if(!t || t.toUid!==cloud.user?.uid || t.status!=="pending") return;
-    await setDoc(doc(db,"organizations",cloud.orgId),{ownershipTransfer:{...t,status:"accepted",acceptedAt:new Date().toISOString()},updatedAt:serverTimestamp()},{merge:true});
+    await setDoc(doc(db,"organizations",cloud.orgId),{
+      ownershipTransfer:{...t,status:"accepted",acceptedAt:serverTimestamp()},
+      updatedAt:serverTimestamp()
+    },{merge:true});
     await logAccess("Ownership transfer accepted",{uid:cloud.user.uid,email:cloud.user.email,type:"staff"},"Awaiting current owner finalisation");
     cloudToast("Ownership accepted • current owner must finalise");
+  }
+
+  async function finalizeOwnershipTransfer(){
+    const t=cloud.access.ownershipTransfer;
+    if(!t || t.fromUid!==cloud.user?.uid || t.status!=="accepted") return;
+
+    const target=cloud.access.members.find(m=>m.id===t.toUid);
+    if(!target || target.status!=="active"){
+      cloudToast("The new owner must be an active organisation user.");
+      return;
+    }
+
+    window.modal(`
+      <div class="modal-head">
+        <div><span class="eyebrow">Final Ownership Transfer</span><h3 style="margin:7px 0 0">Make ${escapeHtml(target.email||"this user")} the Owner?</h3></div>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div class="danger-alert">
+        <div class="danger-title">Your role will become Admin</div>
+        <p>The organisation data will not move. Only the access roles change. Type <strong>FINALISE</strong> to complete the transfer.</p>
+      </div>
+      <div class="field"><label>Type FINALISE</label><input id="finaliseOwnerWord" autocomplete="off"></div>
+      <div class="request-action-row">
+        <button class="btn danger" id="finaliseOwnerBtn" disabled>Finalise Transfer</button>
+        <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      </div>
+    `);
+
+    const input=document.getElementById("finaliseOwnerWord");
+    const btn=document.getElementById("finaliseOwnerBtn");
+    input.oninput=()=>btn.disabled=input.value.trim().toUpperCase()!=="FINALISE";
+    btn.onclick=async()=>{
+      btn.disabled=true;
+      const batch=writeBatch(db);
+      batch.set(doc(db,"organizations",cloud.orgId),{
+        ownerUid:t.toUid,
+        ownershipTransfer:{...t,status:"completed",completedAt:serverTimestamp()},
+        updatedAt:serverTimestamp()
+      },{merge:true});
+      batch.set(doc(db,"organizations",cloud.orgId,"members",t.fromUid),{
+        role:"admin",status:"active",updatedAt:serverTimestamp()
+      },{merge:true});
+      batch.set(doc(db,"organizations",cloud.orgId,"members",t.toUid),{
+        role:"owner",status:"active",updatedAt:serverTimestamp()
+      },{merge:true});
+      await batch.commit();
+
+      await setDoc(doc(db,"users",cloud.user.uid),{role:"admin",updatedAt:serverTimestamp()},{merge:true});
+      cloud.role="Admin";
+      await logAccess("Ownership transferred",{uid:t.toUid,email:t.toEmail,type:"staff"},"Previous owner became Admin");
+      closeModal();
+      refreshCloudUI();
+      cloudToast("Ownership transferred • your role is now Admin");
+    };
   }
 
   async function cancelOwnershipTransfer(){
@@ -9850,12 +10032,22 @@ handlePaymentRequestFromUrl();
       }return;
     }
     if(action==="resend-staff" && staffInv){
-      try{await sendInviteEmail("staff",staffInv);await setDoc(doc(db,"organizations",cloud.orgId,"staffInvites",id),{resentAt:serverTimestamp()},{merge:true});await logAccess("Staff invitation resent",{email:staffInv.email,type:"staff"});cloudToast("Invitation resent")}
-      catch(err){cloudToast(inviteDeliveryError(err))}return;
+      try{
+        const expiresAt=new Date(Date.now()+7*24*60*60*1000);
+        await setDoc(doc(db,"organizations",cloud.orgId,"staffInvites",id),{resentAt:serverTimestamp(),expiresAt},{merge:true});
+        await sendInviteEmail("staff",{...staffInv,orgId:cloud.orgId});
+        await logAccess("Staff invitation resent",{email:staffInv.email,type:"staff"});
+        cloudToast("Invitation resent");
+      }catch(err){cloudToast(inviteDeliveryError(err))}
+      return;
     }
     if(action==="copy-staff" && staffInv){
-      const url=new URL(window.location.origin+window.location.pathname);url.searchParams.set("staffInvite",id);
-      await navigator.clipboard.writeText(url.toString());cloudToast("Invitation link copied");return;
+      const url=new URL(window.location.origin+window.location.pathname);
+      url.searchParams.set("org",cloud.orgId);
+      url.searchParams.set("staffInvite",id);
+      await navigator.clipboard.writeText(url.toString());
+      cloudToast("Invitation link copied");
+      return;
     }
     if(action==="cancel-staff" && staffInv){
       await setDoc(doc(db,"organizations",cloud.orgId,"staffInvites",id),{status:"cancelled",cancelledAt:serverTimestamp()},{merge:true});
@@ -10005,12 +10197,122 @@ handlePaymentRequestFromUrl();
     };
   }
 
+  function inviteParamFromUrl(name){
+    const u=new URL(window.location.href);
+    const direct=u.searchParams.get(name);
+    if(direct) return direct;
+    const cont=u.searchParams.get("continueUrl");
+    if(cont){
+      try{return new URL(cont).searchParams.get(name)||""}catch(_){}
+    }
+    return "";
+  }
+
+  function cleanInvitationUrl(){
+    const clean=window.location.origin+window.location.pathname;
+    history.replaceState({},document.title,clean);
+  }
+
+  async function claimPendingInvite(){
+    if(!auth.currentUser) return false;
+
+    const orgId=inviteParamFromUrl("org");
+    const staffToken=inviteParamFromUrl("staffInvite");
+    const customerToken=inviteParamFromUrl("customerInvite");
+
+    if(customerToken){
+      cloudToast("Customer portal invitation claiming will be activated after the staff-role test.");
+      return false;
+    }
+
+    if(!staffToken) return false;
+    if(!orgId) throw new Error("The invitation is missing its organisation reference.");
+
+    const inviteRef=doc(db,"organizations",orgId,"staffInvites",staffToken);
+    const inviteSnap=await getDoc(inviteRef);
+    if(!inviteSnap.exists()) throw new Error("This Masul invitation was not found.");
+
+    const invite=inviteSnap.data();
+    const signedEmail=safeEmail(auth.currentUser.email);
+
+    if(invite.status!=="pending"){
+      if(invite.status==="accepted" && invite.acceptedByUid===auth.currentUser.uid){
+        await loadProfileForUser(auth.currentUser);
+        cleanInvitationUrl();
+        return true;
+      }
+      throw new Error(`This invitation is ${invite.status||"no longer active"}.`);
+    }
+
+    const expiry=invite.expiresAt?.toDate?.() || (invite.expiresAt?new Date(invite.expiresAt):null);
+    if(expiry && expiry.getTime()<Date.now()) throw new Error("This invitation has expired. Ask the owner to resend it.");
+
+    if(safeEmail(invite.email)!==signedEmail){
+      throw new Error("This invitation belongs to a different email address.");
+    }
+
+    const memberRef=doc(db,"organizations",orgId,"members",auth.currentUser.uid);
+    const userRef=doc(db,"users",auth.currentUser.uid);
+    const batch=writeBatch(db);
+
+    batch.set(memberRef,{
+      uid:auth.currentUser.uid,
+      email:signedEmail,
+      displayName:invite.displayName||auth.currentUser.displayName||"",
+      role:invite.role,
+      status:"active",
+      inviteId:staffToken,
+      addedByUid:invite.invitedByUid||"",
+      addedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+
+    batch.update(inviteRef,{
+      status:"accepted",
+      acceptedByUid:auth.currentUser.uid,
+      acceptedAt:serverTimestamp()
+    });
+
+    batch.set(userRef,{
+      email:signedEmail,
+      orgId,
+      role:invite.role,
+      userType:"staff",
+      updatedAt:serverTimestamp()
+    },{merge:true});
+
+    await batch.commit();
+
+    cleanInvitationUrl();
+    await loadProfileForUser(auth.currentUser);
+    await logAccess("Staff invitation accepted",{uid:auth.currentUser.uid,email:signedEmail,type:"staff"},`Role: ${displayRole(invite.role)}`);
+
+    window.modal(`
+      <div class="modal-head">
+        <div><span class="eyebrow">Invitation Accepted</span><h3 style="margin:7px 0 0">Welcome to ${escapeHtml(invite.orgName||cloud.orgName||"Masul")}</h3></div>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div class="legal-strip">
+        <strong>${escapeHtml(displayRole(invite.role))} access is active.</strong>
+        You are using your own login but the same organisation data. No student or fee data needs to be entered again.
+      </div>
+      <div class="request-action-row">
+        <button class="btn primary" id="inviteAcceptedOpenBtn">Open Dashboard</button>
+      </div>
+    `);
+    document.getElementById("inviteAcceptedOpenBtn")?.addEventListener("click",()=>{
+      closeModal();
+      openAdminDashboard("overview");
+    });
+    return true;
+  }
+
   async function processEmailLinkLanding(){
     if(!isSignInWithEmailLink(auth,window.location.href)) return false;
 
     let email=localStorage.getItem("masul_email_for_signin")||"";
     if(!email){
-      email=prompt("Enter the email address to which this Masul invitation was sent:")||"";
+      email=prompt("Enter the email address to which this Masul sign-in link was sent:")||"";
     }
     email=safeEmail(email);
     if(!email) return false;
@@ -10018,43 +10320,28 @@ handlePaymentRequestFromUrl();
     try{
       await signInWithEmailLink(auth,email,window.location.href);
       localStorage.removeItem("masul_email_for_signin");
-      cloudToast("Email link verified");
+
+      const claimed=await claimPendingInvite();
+      if(!claimed){
+        cleanInvitationUrl();
+        if(auth.currentUser) await loadProfileForUser(auth.currentUser);
+        cloudToast("Signed in with email link");
+      }
       return true;
     }catch(err){
-      console.error("Email-link sign-in failed:",err);
-      cloudToast(friendlyAuthError(err));
+      console.error("Email-link sign-in / invitation claim failed:",err);
+      cloud.lastError=err?.message||"Could not complete the invitation.";
+      refreshCloudUI();
+      window.modal(`
+        <div class="modal-head">
+          <div><span class="eyebrow">Masul Invitation</span><h3 style="margin:7px 0 0">Could not complete access</h3></div>
+          <button class="close" onclick="closeModal()">×</button>
+        </div>
+        <div class="danger-alert"><div class="danger-title">Invitation could not be accepted</div><p>${escapeHtml(err?.message||"Please ask the organisation owner to resend the invitation.")}</p></div>
+        <div class="request-action-row"><button class="btn ghost" onclick="closeModal()">Close</button></div>
+      `);
       return false;
     }
-  }
-
-  function inviteTokenFromUrl(kind){
-    const u=new URL(window.location.href);
-    const direct=u.searchParams.get(kind);
-    if(direct) return direct;
-    const cont=u.searchParams.get("continueUrl");
-    if(cont){
-      try{return new URL(cont).searchParams.get(kind)||""}catch(_){}
-    }
-    return "";
-  }
-
-  async function claimPendingInvite(){
-    if(!auth.currentUser) return false;
-    const staffToken=inviteTokenFromUrl("staffInvite");
-    const customerToken=inviteTokenFromUrl("customerInvite");
-    if(!staffToken && !customerToken) return false;
-
-    if(staffToken){
-      // Search likely orgs is not safe/possible. The invite continuation URL is
-      // paired with a local pending-org hint when sent from the same app.
-      // The secure rules file supports claim once orgId is known.
-      const orgHint=localStorage.getItem(`masul_staff_org_${staffToken}`)||"";
-      if(!orgHint){
-        cloudToast("Invitation verified. Open the invitation link again after the organisation invitation claim update is deployed.");
-        return false;
-      }
-    }
-    return false;
   }
 
   // Access panel buttons
@@ -10162,7 +10449,7 @@ handlePaymentRequestFromUrl();
   renderAccessCentre();
   processEmailLinkLanding().catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.39 Firebase module ready");
+  console.info("Masul V1.40 Firebase module ready");
 
   window.MasulCloud={
     auth,
