@@ -1906,7 +1906,7 @@
       </div>
     </div>
     <div class="top-actions">
-      <span class="chip" id="modeChip">V1.37 Private Sign-Out</span>
+      <span class="chip" id="modeChip">V1.38 Cloud-First Login</span>
       <div class="top-auth signed-out" id="topAuthControls">
         <button class="btn ghost small icon-btn" id="topSignInBtn"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg><span>Sign In</span></button>
         <button class="btn primary small icon-btn" id="topCreateOrgBtn"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 6V4h8v2"/><path d="M12 10v6"/><path d="M9 13h6"/></svg><span>Create Organisation</span></button>
@@ -7443,6 +7443,7 @@ function doRestoreBackup(file){
       }
 
       window.__MASUL_SKIP_NEXT_CLOUD_SAVE__=true;
+      localStorage.setItem("masul_local_recovery_pending","1");
       state=restored;
       normalisePeopleData();
       saveState();
@@ -8247,6 +8248,35 @@ handlePaymentRequestFromUrl();
 
   const bridge=()=>window.MasulLocalBridge;
 
+  const CLOUD_SYNCED_ORG_KEY="masul_last_synced_org";
+  const CLOUD_PENDING_ORG_KEY="masul_pending_sync_org";
+  const CLOUD_RECOVERY_KEY="masul_local_recovery_pending";
+
+  function markCloudSynced(){
+    if(cloud.orgId){
+      localStorage.setItem(CLOUD_SYNCED_ORG_KEY,cloud.orgId);
+      if(localStorage.getItem(CLOUD_PENDING_ORG_KEY)===cloud.orgId){
+        localStorage.removeItem(CLOUD_PENDING_ORG_KEY);
+      }
+    }
+  }
+
+  function markCloudPending(){
+    if(cloud.orgId) localStorage.setItem(CLOUD_PENDING_ORG_KEY,cloud.orgId);
+  }
+
+  function hasPendingLocalForOrg(orgId){
+    return !!orgId && localStorage.getItem(CLOUD_PENDING_ORG_KEY)===orgId;
+  }
+
+  function hasExplicitRecoveryPending(){
+    return localStorage.getItem(CLOUD_RECOVERY_KEY)==="1";
+  }
+
+  function clearRecoveryPending(){
+    localStorage.removeItem(CLOUD_RECOVERY_KEY);
+  }
+
   function cloudToast(msg){
     if(bridge()?.toast) bridge().toast(msg);
     else console.log(msg);
@@ -8553,6 +8583,8 @@ handlePaymentRequestFromUrl();
       if(stateFingerprint(remote)!==stateFingerprint(local)){
         const applied=applyRemoteState(remote,{toastMessage:"Masul updated from Firebase"});
         if(applied){
+          markCloudSynced();
+          clearRecoveryPending();
           cloud.lastAction=`Cloud update received ${new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}`;
           refreshCloudUI();
         }
@@ -8723,10 +8755,15 @@ handlePaymentRequestFromUrl();
 
       const localFp=stateFingerprint(local);
       const remoteFp=stateFingerprint(remote);
+      const previouslySyncedOrg=localStorage.getItem(CLOUD_SYNCED_ORG_KEY);
+      const pendingLocal=hasPendingLocalForOrg(cloud.orgId);
+      const recoveryPending=hasExplicitRecoveryPending();
 
       if(localFp===remoteFp){
         cloud.initialHydrated=true;
         cloud.pendingLocal=false;
+        markCloudSynced();
+        clearRecoveryPending();
         cloud.lastAction="Live sync ready";
         refreshCloudUI();
         return;
@@ -8736,9 +8773,27 @@ handlePaymentRequestFromUrl();
         applyRemoteState(remote,{force:true});
         cloud.initialHydrated=true;
         cloud.pendingLocal=false;
+        markCloudSynced();
+        clearRecoveryPending();
         cloud.lastAction="Cloud data loaded automatically";
         refreshCloudUI();
         cloudToast("Masul loaded from Firebase");
+        return;
+      }
+
+      // Once an organisation has been successfully synced on this browser,
+      // Firebase is the normal source of truth at login. Harmless schema/default
+      // differences must not repeatedly interrupt the user.
+      //
+      // We pause only if this browser has a durable pending-sync marker or an
+      // explicit recovery/restore marker indicating potentially newer local data.
+      if(previouslySyncedOrg===cloud.orgId && !pendingLocal && !recoveryPending){
+        applyRemoteState(remote,{force:true});
+        cloud.initialHydrated=true;
+        cloud.pendingLocal=false;
+        markCloudSynced();
+        cloud.lastAction="Cloud data loaded automatically";
+        refreshCloudUI();
         return;
       }
 
@@ -8803,6 +8858,8 @@ handlePaymentRequestFromUrl();
         cloud.initialHydrated=true;
         cloud.pendingLocal=false;
         cloud.reconciliationPending=false;
+        markCloudSynced();
+        clearRecoveryPending();
         cloud.lastAction="Firebase copy selected";
         window.closeModal();
         refreshCloudUI();
@@ -8820,6 +8877,7 @@ handlePaymentRequestFromUrl();
         bridge()?.saveBackup?.();
         cloud.initialHydrated=true;
         cloud.pendingLocal=true;
+        markCloudPending();
         cloud.reconciliationPending=false;
         window.closeModal();
         await syncLocalNow({force:true,reason:"Browser recovery copy"});
@@ -8907,7 +8965,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.37"
+        sourceVersion:"1.38"
       };
 
       const ops=[];
@@ -8964,6 +9022,7 @@ handlePaymentRequestFromUrl();
       if(!ops.length){
         cloud.pendingLocal=false;
         cloud.syncing=false;
+        markCloudSynced();
         cloud.lastAction="Already up to date";
         refreshCloudUI();
         return true;
@@ -8983,6 +9042,8 @@ handlePaymentRequestFromUrl();
       cloud.pendingLocal=false;
       cloud.syncing=false;
       cloud.initialHydrated=true;
+      markCloudSynced();
+      clearRecoveryPending();
       cloud.orgName=orgData.name||cloud.orgName;
       cloud.lastAction=`Synced ${new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}`;
       refreshCloudUI();
@@ -9000,6 +9061,7 @@ handlePaymentRequestFromUrl();
   function scheduleLocalSync(){
     if(!cloud.user || !cloud.orgId) return;
     cloud.pendingLocal=true;
+    markCloudPending();
     refreshCloudUI();
 
     if(cloud.syncTimer) clearTimeout(cloud.syncTimer);
@@ -9220,8 +9282,39 @@ handlePaymentRequestFromUrl();
   async function signOutCloud({silent=false}={}){
     const hadUser=!!cloud.user;
 
-    // Stop incoming cloud activity first, but do not clear the organisation
-    // until Firebase confirms that authentication has ended.
+    // Never discard genuinely pending browser changes during a privacy sign-out.
+    if(hadUser && cloud.orgId && (cloud.pendingLocal || hasPendingLocalForOrg(cloud.orgId))){
+      if(navigator.onLine){
+        const ok=await syncLocalNow({force:false,reason:"Sign-out safety sync"});
+        if(!ok && (cloud.pendingLocal || hasPendingLocalForOrg(cloud.orgId))){
+          if(!silent){
+            cloudToast("Sign out paused • unsynced changes are still in this browser");
+          }
+          return false;
+        }
+      }else{
+        if(!silent){
+          window.modal(`
+            <div class="modal-head">
+              <div><span class="eyebrow">Sign-out Safety</span><h3 style="margin:7px 0 0">Unsynced changes are still on this device</h3></div>
+              <button class="close" onclick="closeModal()">×</button>
+            </div>
+            <div class="danger-alert">
+              <div class="danger-title">You are offline</div>
+              <p>Signing out now would clear the private browser copy before these changes reach Firebase.</p>
+            </div>
+            <div class="request-action-row">
+              <button class="btn primary" id="signoutBackupBtn">Download Backup</button>
+              <button class="btn ghost" onclick="closeModal()">Stay Signed In</button>
+            </div>
+            <div class="report-note">Reconnect to the internet and allow Masul to sync before signing out.</div>
+          `);
+          document.getElementById("signoutBackupBtn")?.addEventListener("click",()=>bridge()?.saveBackup?.());
+        }
+        return false;
+      }
+    }
+
     stopRealtime();
     stopAccessListeners();
     if(cloud.syncTimer) clearTimeout(cloud.syncTimer);
@@ -9246,6 +9339,7 @@ handlePaymentRequestFromUrl();
       refreshCloudUI();
 
       if(!silent) cloudToast("Signed out • organisation data hidden");
+      return true;
     }catch(err){
       if(!silent) cloudToast("Could not sign out. Your organisation remains open.");
       throw err;
@@ -10035,7 +10129,7 @@ handlePaymentRequestFromUrl();
   renderAccessCentre();
   processEmailLinkLanding().catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.37 Firebase module ready");
+  console.info("Masul V1.38 Firebase module ready");
 
   window.MasulCloud={
     auth,
