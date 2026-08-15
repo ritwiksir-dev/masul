@@ -1,22 +1,68 @@
-# Masul V1.30 — Business Branding Header
+# Masul V1.31 — Firebase Cloud Foundation
 
-## Dashboard branding update
+Firebase project:
+- Project ID: `masul-900d7`
+- Web app: Masul Web
+- Authentication: Email/Password
+- Firestore: Production mode
+- Security: owner-only Phase 1 rules
 
-The Admin Dashboard Overview now gives visual priority to the organisation/business identity.
+## What this build adds
 
-### Organisation logo
-- Larger and more prominent beside the organisation name.
-- 118px desktop logo area.
-- Responsive 84px / 72px sizes for tablet and mobile.
-- Full saved logo uses contain mode so it is not cropped.
-- Clicking the logo still opens Organisation Setup for editing.
-- If no organisation logo exists, the business initial is used as fallback.
+### Owner authentication
+Admin Dashboard → Settings → Cloud & Account
 
-### Masul branding
-- Masul branding is deliberately secondary.
-- A small minimal Masul icon/name badge appears on the opposite side of the dashboard header.
-- On very small screens, only the small Masul icon remains.
+- Sign In
+- Create Owner Account
+- Password reset
+- Sign Out
 
-This keeps the owner's organisation as the primary brand while still identifying Masul as the platform.
+Creating an owner account also creates an isolated Firebase organisation owned by that Firebase UID.
 
-All V1.29, V1.28 Manual Logo Crop and Reports & Analytics features are retained.
+### Safe first migration
+Cloud sync is deliberately **manual** in V1.31.
+
+- **Upload Current Data**: current browser data becomes the Firebase copy.
+- **Restore from Cloud**: Firebase data replaces this browser's local copy.
+- Both workflows offer a JSON backup first.
+- Signing in by itself does not upload, download or overwrite data.
+
+### Cloud structure
+
+`users/{uid}`
+
+`organizations/{orgId}`
+- owner UID
+- organisation settings
+- cloud schema metadata
+
+Subcollections:
+- `batches`
+- `people`
+- `fees`
+- `paymentRequests`
+- `payments`
+- `historyImports`
+- `config/app`
+
+### Logo safety
+Firestore documents have a size limit. A very large base64 organisation logo is therefore omitted from the organisation Firestore document rather than risking a failed migration. The browser copy is preserved. A later Storage/asset strategy can provide full cross-device logo sync.
+
+### Phase 1 limitation
+V1.31 does NOT yet enable automatic real-time two-way synchronization. The first objective is to:
+1. create the owner account,
+2. upload the trusted local copy,
+3. verify it,
+4. restore it in another browser/device,
+5. then enable automatic synchronization in a subsequent build.
+
+## Next after successful migration
+- automatic cloud writes
+- multi-device live sync
+- role model beyond owner
+- secure customer payment-link access
+- App Check
+- backend functions for sensitive operations
+- provider webhook verification
+
+The published Phase 1 Firestore rules are also included as `firestore.rules.txt` for reference.
