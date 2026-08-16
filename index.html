@@ -2256,7 +2256,176 @@
       .summary .btn{padding:11px 13px}
       .bulk-row{grid-template-columns:1fr 1fr}.bulk-row>div:nth-child(3){display:none}
     }
-  </style>
+  
+    /* ========================================================
+       V1.61 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
+       ======================================================== */
+    .developer-entry{
+      margin-top:10px;border-top:1px solid var(--line);padding-top:10px
+    }
+    .developer-entry .nav-icon{color:#b06f11}
+    .developer-shell{
+      display:grid;grid-template-columns:235px minmax(0,1fr);gap:16px;align-items:start
+    }
+    .developer-sidebar{
+      position:sticky;top:96px;border:1px solid var(--line);border-radius:20px;background:#fff;
+      padding:14px;box-shadow:0 12px 30px rgba(28,39,58,.05)
+    }
+    .developer-brand{
+      padding:8px 8px 13px;border-bottom:1px solid var(--line);margin-bottom:10px
+    }
+    .developer-brand .dev-lockup{display:flex;align-items:center;gap:9px}
+    .developer-brand img{width:34px;height:34px;border-radius:10px}
+    .developer-brand strong{display:block;font-size:13px;color:#253148}
+    .developer-brand small{display:block;font-size:8px;line-height:1.4;color:#7b8798;margin-top:2px}
+    .dev-nav{
+      width:100%;display:flex;align-items:center;gap:9px;border:0;background:transparent;
+      border-radius:12px;padding:10px 10px;text-align:left;cursor:pointer;color:#5d697d;
+      font-weight:850;font-size:10px;margin:2px 0
+    }
+    .dev-nav:hover{background:#f7f9fc;color:#27354b}
+    .dev-nav.active{background:#192945;color:#fff}
+    .dev-nav .dev-nav-icon{
+      width:25px;height:25px;border-radius:8px;display:grid;place-items:center;
+      border:1px solid currentColor;opacity:.75;font-size:11px
+    }
+    .developer-main{min-width:0}
+    .developer-hero{
+      border:1px solid #d5dfeb;border-radius:24px;
+      background:linear-gradient(135deg,#12233f,#1b3a63 72%,#255077);
+      color:#fff;padding:22px;margin-bottom:14px;position:relative;overflow:hidden
+    }
+    .developer-hero:after{
+      content:"";position:absolute;right:-70px;top:-95px;width:250px;height:250px;border-radius:50%;
+      background:rgba(255,255,255,.07)
+    }
+    .developer-hero-row{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;position:relative;z-index:1}
+    .developer-hero .eyebrow{color:#f1b44b}
+    .developer-hero h1{font-size:25px;margin:7px 0 6px}
+    .developer-hero p{font-size:10px;line-height:1.55;color:#d8e3f0;max-width:720px;margin:0}
+    .dev-admin-chip{
+      display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:7px 10px;
+      font-size:8px;font-weight:900;white-space:nowrap
+    }
+    .dev-admin-chip .dot{width:7px;height:7px;border-radius:50%;background:#58d69a}
+    .developer-tab{display:none}
+    .developer-tab.active{display:block}
+    .dev-stat-grid{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px
+    }
+    .dev-stat{
+      border:1px solid var(--line);border-radius:16px;background:#fff;padding:14px;
+      box-shadow:0 5px 16px rgba(33,47,69,.025)
+    }
+    .dev-stat span{display:block;font-size:8px;font-weight:850;text-transform:uppercase;letter-spacing:.04em;color:#778399}
+    .dev-stat strong{display:block;font-size:22px;color:#202d42;margin-top:6px}
+    .dev-stat small{display:block;font-size:8px;color:#8b96a6;margin-top:4px;line-height:1.4}
+    .dev-stat.attention{background:#fffaf1;border-color:#ead9b8}
+    .dev-stat.good{background:#f5fbf7;border-color:#d6e8dc}
+    .dev-grid-2{display:grid;grid-template-columns:1.05fr .95fr;gap:12px}
+    .dev-card{
+      border:1px solid var(--line);border-radius:18px;background:#fff;padding:15px;margin-bottom:12px
+    }
+    .dev-card-head{
+      display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+      padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:10px
+    }
+    .dev-card-head h3{margin:0;font-size:14px;color:#263348}
+    .dev-card-head p{margin:3px 0 0;font-size:9px;color:#7b8798;line-height:1.4}
+    .dev-toolbar{
+      display:grid;grid-template-columns:minmax(200px,1fr) 170px 170px auto;gap:8px;margin-bottom:11px
+    }
+    .dev-toolbar input,.dev-toolbar select,
+    .dev-form-grid input,.dev-form-grid select,.dev-form-grid textarea{
+      width:100%;border:1px solid #d8e1ec;border-radius:11px;background:#fff;padding:9px 10px;
+      font:inherit;font-size:10px;color:#29364a;outline:none
+    }
+    .dev-toolbar input:focus,.dev-toolbar select:focus,
+    .dev-form-grid input:focus,.dev-form-grid select:focus,.dev-form-grid textarea:focus{
+      border-color:#8fa9c8;box-shadow:0 0 0 3px rgba(76,116,161,.08)
+    }
+    .dev-form-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px
+    }
+    .dev-form-grid .full{grid-column:1/-1}
+    .dev-form-grid label{display:block;font-size:8px;font-weight:900;color:#536177;margin-bottom:4px}
+    .dev-form-grid textarea{min-height:88px;resize:vertical}
+    .dev-table-wrap{overflow:auto;border:1px solid #e0e6ee;border-radius:14px}
+    .dev-table{width:100%;border-collapse:collapse;min-width:920px}
+    .dev-table th{
+      position:sticky;top:0;background:#f7f9fc;color:#778398;font-size:7px;text-transform:uppercase;
+      letter-spacing:.05em;text-align:left;padding:9px;border-bottom:1px solid #dfe5ed;z-index:1
+    }
+    .dev-table td{padding:10px 9px;border-bottom:1px solid #edf0f4;font-size:9px;color:#445167;vertical-align:top}
+    .dev-table tr:last-child td{border-bottom:0}
+    .dev-table strong{color:#263348;font-size:10px}
+    .dev-sub{display:block;color:#8490a0;font-size:7.5px;margin-top:2px;line-height:1.35}
+    .dev-badge{
+      display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;font-size:7px;font-weight:900;
+      border:1px solid #dbe3ed;background:#f7f9fb;color:#5e6d81;white-space:nowrap
+    }
+    .dev-badge.pilot{background:#fff7e8;border-color:#edd9ae;color:#8a6118}
+    .dev-badge.paid,.dev-badge.live,.dev-badge.active{background:#eef9f3;border-color:#cfe6d8;color:#337454}
+    .dev-badge.free{background:#f6f7f9;color:#657184}
+    .dev-badge.paused,.dev-badge.closed,.dev-badge.urgent{background:#fff2ef;border-color:#efd5d0;color:#9a5047}
+    .dev-badge.testing,.dev-badge.setup,.dev-badge.attention{background:#f0f6fc;border-color:#d6e3ef;color:#476987}
+    .dev-badge.normal{background:#f7f9fb}
+    .dev-balance{font-weight:900}
+    .dev-balance.due{color:#9a554c}
+    .dev-balance.clear{color:#317153}
+    .dev-attention-list{display:grid;gap:8px}
+    .dev-attention-item{
+      border:1px solid #e1e6ed;border-radius:12px;padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:center
+    }
+    .dev-attention-item strong{display:block;font-size:10px;color:#2c394e}
+    .dev-attention-item span{display:block;font-size:8px;color:#7f8b9b;margin-top:2px}
+    .dev-version-row{
+      display:grid;grid-template-columns:95px 1fr 45px;gap:8px;align-items:center;margin:8px 0
+    }
+    .dev-version-row strong{font-size:9px;color:#344258}
+    .dev-version-bar{height:8px;border-radius:999px;background:#edf1f5;overflow:hidden}
+    .dev-version-bar span{display:block;height:100%;background:#627fa2;border-radius:999px}
+    .dev-version-row small{text-align:right;font-size:8px;color:#738094}
+    .dev-health-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .dev-health{
+      border:1px solid #dee5ee;border-radius:14px;padding:12px;background:#fafbfd
+    }
+    .dev-health strong{display:block;font-size:11px;color:#2c3a4f}
+    .dev-health span{display:block;font-size:8px;line-height:1.5;color:#778397;margin-top:4px}
+    .dev-kv{display:grid;grid-template-columns:145px 1fr;gap:7px 12px;font-size:9px;padding:3px 0}
+    .dev-kv span{color:#798598}.dev-kv strong{color:#354258;word-break:break-word}
+    .dev-empty{padding:24px;text-align:center;color:#7d899a;font-size:10px}
+    .dev-loading{
+      border:1px dashed #d6dfe9;border-radius:16px;padding:28px;text-align:center;background:#fafbfd;color:#6e7b8e
+    }
+    .dev-privacy-strip{
+      border:1px solid #dce4ee;background:#f8fafc;border-radius:14px;padding:10px 12px;
+      font-size:8.5px;line-height:1.55;color:#647286;margin-bottom:12px
+    }
+    .dev-privacy-strip strong{color:#344258}
+    .dev-metric-line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed #e2e7ed;font-size:9px}
+    .dev-metric-line:last-child{border-bottom:0}
+    .dev-metric-line span{color:#788496}.dev-metric-line strong{color:#344157}
+    .dev-danger-note{border:1px solid #efd9d2;background:#fff7f4;color:#855149;border-radius:12px;padding:10px;font-size:8.5px;line-height:1.5}
+    .dev-secure-note{border:1px solid #d5e8dc;background:#f4fbf7;color:#3b6d53;border-radius:12px;padding:10px;font-size:8.5px;line-height:1.5}
+    @media(max-width:1040px){
+      .developer-shell{grid-template-columns:1fr}
+      .developer-sidebar{position:static;display:flex;gap:6px;overflow:auto;align-items:center}
+      .developer-brand{min-width:180px;border-bottom:0;border-right:1px solid var(--line);margin:0 4px 0 0;padding:6px 12px 6px 4px}
+      .dev-nav{width:auto;min-width:max-content}
+      .dev-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .dev-health-grid{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:680px){
+      .developer-hero-row{display:block}.dev-admin-chip{margin-top:12px}
+      .dev-stat-grid,.dev-grid-2,.dev-health-grid,.dev-form-grid{grid-template-columns:1fr}
+      .dev-form-grid .full{grid-column:auto}
+      .dev-toolbar{grid-template-columns:1fr 1fr}
+      .dev-toolbar input{grid-column:1/-1}
+      .developer-hero{padding:17px}.developer-hero h1{font-size:21px}
+    }
+</style>
 </head>
 <body>
 <div class="app-shell">
@@ -2794,6 +2963,12 @@
           <button class="nav-btn access-nav" data-dash="access"><span class="nav-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.7 3.1 8 7.5 9.5 4.4-1.5 7.5-4.8 7.5-9.5V6L12 3Z"/><circle cx="12" cy="10" r="2.3"/><path d="M8.8 16c.7-1.7 1.8-2.5 3.2-2.5s2.5.8 3.2 2.5"/></svg></span><span class="nav-label">Users & Roles</span></button>
           <button class="nav-btn access-nav" data-dash="customer-access"><span class="nav-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20v-1.5A5.5 5.5 0 0 1 8.5 13h1A5.5 5.5 0 0 1 15 18.5V20"/><path d="m17 11 2 2 3-4"/></svg></span><span class="nav-label">Customer Access</span></button>
           <button class="nav-btn" data-dash="settings"><span class="nav-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10"/><path d="M18 7h2"/><circle cx="16" cy="7" r="2"/><path d="M4 17h2"/><path d="M10 17h10"/><circle cx="8" cy="17" r="2"/></svg></span><span class="nav-label">Settings</span></button>
+          <div class="developer-entry hidden" id="developerConsoleNavWrap">
+            <button class="nav-btn" id="developerConsoleNavBtn" type="button" onclick="openDeveloperConsole()">
+              <span class="nav-icon">◇</span>
+              <span class="nav-label">Developer Console</span>
+            </button>
+          </div>
         </aside>
 
         <div>
@@ -3369,9 +3544,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.60</span>
+                <span class="chip">V1.61</span>
               </div>
-              <div class="request-meta">Masul V1.60 • Customer Receipt Link</div>
+              <div class="request-meta">Masul V1.61 • Developer / Super Admin Console</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3423,7 +3598,201 @@
     </section>
 
     <!-- CUSTOMER -->
-    <section id="customerView" class="container hidden">
+    
+    <section id="developerView" class="container hidden">
+      <div class="developer-shell">
+        <aside class="developer-sidebar">
+          <div class="developer-brand">
+            <div class="dev-lockup">
+              <img src="masul-icon.png" alt="Masul">
+              <div>
+                <strong>Masul Platform</strong>
+                <small>Developer / Super Admin<br>V1.61</small>
+              </div>
+            </div>
+          </div>
+
+          <button class="dev-nav active" data-dev-tab="overview"><span class="dev-nav-icon">⌂</span>Overview</button>
+          <button class="dev-nav" data-dev-tab="organisations"><span class="dev-nav-icon">▦</span>Organisations</button>
+          <button class="dev-nav" data-dev-tab="billing"><span class="dev-nav-icon">₹</span>Pilot & Billing</button>
+          <button class="dev-nav" data-dev-tab="health"><span class="dev-nav-icon">◇</span>Platform Health</button>
+          <button class="dev-nav" data-dev-tab="audit"><span class="dev-nav-icon">≡</span>Audit Trail</button>
+          <button class="dev-nav" data-dev-tab="settings"><span class="dev-nav-icon">⚙</span>Platform Settings</button>
+
+          <div style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
+            <button class="dev-nav" type="button" onclick="goBackFromView('developerView')"><span class="dev-nav-icon">←</span>Back to Organisation</button>
+          </div>
+        </aside>
+
+        <div class="developer-main">
+          <div class="developer-hero">
+            <div class="developer-hero-row">
+              <div>
+                <span class="eyebrow">Masul Platform Control</span>
+                <h1>Developer / Super Admin Console</h1>
+                <p>Manage pilot organisations, onboarding, Masul setup fees, release health and platform metadata without casually opening customer/student records.</p>
+              </div>
+              <div class="dev-admin-chip"><span class="dot"></span><span id="developerAdminIdentity">Checking platform access…</span></div>
+            </div>
+          </div>
+
+          <div class="dev-privacy-strip">
+            <strong>Privacy boundary:</strong> the console shows organisation identity, owner, version and aggregate usage counts. It does not display student/member names or individual payment details by default. Platform billing refers to what an organisation pays <em>Masul</em>, not the fees that organisation collects from its customers.
+          </div>
+
+          <div id="developerLoading" class="dev-loading">Loading secure platform data from Firebase…</div>
+          <div id="developerContent" class="hidden">
+
+            <section class="developer-tab active" id="devtab-overview">
+              <div class="dev-stat-grid">
+                <div class="dev-stat"><span>Organisations</span><strong id="devStatOrgs">0</strong><small>Firebase organisations detected</small></div>
+                <div class="dev-stat good"><span>Pilot / Paid</span><strong id="devStatCommercial">0</strong><small>Commercially tracked organisations</small></div>
+                <div class="dev-stat"><span>Active people</span><strong id="devStatPeople">0</strong><small>Aggregate count only</small></div>
+                <div class="dev-stat"><span>Payment records</span><strong id="devStatPayments">0</strong><small>Aggregate count only</small></div>
+                <div class="dev-stat good"><span>Setup fees received</span><strong id="devStatSetupPaid">₹0</strong><small>Masul onboarding/setup revenue</small></div>
+                <div class="dev-stat attention"><span>Setup fees due</span><strong id="devStatSetupDue">₹0</strong><small>Outstanding pilot setup amounts</small></div>
+                <div class="dev-stat"><span>Current release</span><strong>V1.61</strong><small>Developer Console foundation</small></div>
+                <div class="dev-stat attention"><span>Needs attention</span><strong id="devStatAttention">0</strong><small>Follow-up / old version / incomplete onboarding</small></div>
+              </div>
+
+              <div class="dev-grid-2">
+                <div class="dev-card">
+                  <div class="dev-card-head">
+                    <div><h3>Organisations needing attention</h3><p>Pilot follow-ups, incomplete onboarding, billing balance or older Masul versions.</p></div>
+                    <button class="btn ghost small" onclick="developerSelectTab('organisations')">View all</button>
+                  </div>
+                  <div id="developerAttentionList" class="dev-attention-list"></div>
+                </div>
+
+                <div class="dev-card">
+                  <div class="dev-card-head">
+                    <div><h3>Version adoption</h3><p>Source version reported by each organisation's Firebase config.</p></div>
+                    <span class="dev-badge active">Current V1.61</span>
+                  </div>
+                  <div id="developerVersionChart"></div>
+                </div>
+              </div>
+
+              <div class="dev-card">
+                <div class="dev-card-head">
+                  <div><h3>Quick platform actions</h3><p>Safe administrative actions for an early-stage pilot SaaS.</p></div>
+                </div>
+                <div class="request-action-row">
+                  <button class="btn primary" onclick="window.MasulPlatform?.refresh?.()">Refresh Platform Data</button>
+                  <button class="btn ghost" onclick="window.MasulPlatform?.exportCsv?.()">Export Organisation Registry CSV</button>
+                  <button class="btn ghost" onclick="developerSelectTab('billing')">Review Pilot Billing</button>
+                  <button class="btn ghost" onclick="developerSelectTab('health')">Check Version Health</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="developer-tab" id="devtab-organisations">
+              <div class="dev-card">
+                <div class="dev-card-head">
+                  <div><h3>Organisation Registry</h3><p>Every Firebase organisation with owner identity, lifecycle metadata and aggregate usage.</p></div>
+                  <button class="btn primary small" onclick="window.MasulPlatform?.refresh?.()">Refresh</button>
+                </div>
+                <div class="dev-toolbar">
+                  <input id="developerOrgSearch" placeholder="Search organisation, owner email or org ID" oninput="renderDeveloperOrganisationTable()">
+                  <select id="developerPlanFilter" onchange="renderDeveloperOrganisationTable()">
+                    <option value="all">All plans</option>
+                    <option value="pilot">Pilot</option>
+                    <option value="paid">Paid</option>
+                    <option value="free">Free</option>
+                  </select>
+                  <select id="developerOnboardingFilter" onchange="renderDeveloperOrganisationTable()">
+                    <option value="all">All onboarding</option>
+                    <option value="not-started">Not started</option>
+                    <option value="setup">Setup</option>
+                    <option value="testing">Testing</option>
+                    <option value="live">Live</option>
+                    <option value="paused">Paused</option>
+                  </select>
+                  <button class="btn ghost small" onclick="window.MasulPlatform?.exportCsv?.()">Export CSV</button>
+                </div>
+                <div id="developerOrgTableWrap"></div>
+              </div>
+            </section>
+
+            <section class="developer-tab" id="devtab-billing">
+              <div class="dev-stat-grid">
+                <div class="dev-stat good"><span>Setup fee billed</span><strong id="devBillSetupBilled">₹0</strong><small>Manually configured Masul setup fees</small></div>
+                <div class="dev-stat good"><span>Setup fee received</span><strong id="devBillSetupReceived">₹0</strong><small>Manually recorded as received</small></div>
+                <div class="dev-stat attention"><span>Setup fee outstanding</span><strong id="devBillSetupOutstanding">₹0</strong><small>Amount still due to Masul</small></div>
+                <div class="dev-stat"><span>Tracked monthly value</span><strong id="devBillMonthly">₹0</strong><small>Manual pilot/subscription pricing metadata</small></div>
+              </div>
+              <div class="dev-card">
+                <div class="dev-card-head">
+                  <div><h3>Pilot & Masul Billing</h3><p>This is your SaaS/onboarding billing ledger—not customer fee collection.</p></div>
+                </div>
+                <div id="developerBillingTableWrap"></div>
+              </div>
+            </section>
+
+            <section class="developer-tab" id="devtab-health">
+              <div class="dev-health-grid">
+                <div class="dev-health"><strong>Firebase Project</strong><span>masul-900d7<br>Production cloud data layer</span></div>
+                <div class="dev-health"><strong>Current Web Release</strong><span>Masul V1.61<br>Developer Console foundation</span></div>
+                <div class="dev-health"><strong>Platform Admin Security</strong><span>Protected UID registry<br>No hard-coded super-admin email</span></div>
+                <div class="dev-health"><strong>Organisation Privacy</strong><span>Aggregate usage counts<br>No default student/payment-detail browsing</span></div>
+                <div class="dev-health"><strong>Public Payments</strong><span>Secure token mirror<br>Manual verification before receipt</span></div>
+                <div class="dev-health"><strong>Backups / Recovery</strong><span>Firebase + local safety copy<br>Per-organisation recovery model</span></div>
+              </div>
+              <div class="dev-card" style="margin-top:12px">
+                <div class="dev-card-head"><div><h3>Organisation Version Health</h3><p>Use this before rolling out a change to paying pilots.</p></div></div>
+                <div id="developerHealthTableWrap"></div>
+              </div>
+              <div class="dev-secure-note">
+                <strong>Architecture note:</strong> this console intentionally avoids Firebase Admin SDK impersonation in the browser. Operations requiring secret credentials, automated subscription billing, webhook verification or privileged account creation should later move to Cloud Functions / a secure backend.
+              </div>
+            </section>
+
+            <section class="developer-tab" id="devtab-audit">
+              <div class="dev-card">
+                <div class="dev-card-head">
+                  <div><h3>Platform Audit Trail</h3><p>Changes made through Developer Console: billing metadata, onboarding state, plan and notes.</p></div>
+                  <button class="btn ghost small" onclick="window.MasulPlatform?.refreshAudit?.()">Refresh Audit</button>
+                </div>
+                <div id="developerAuditTableWrap"></div>
+              </div>
+            </section>
+
+            <section class="developer-tab" id="devtab-settings">
+              <div class="dev-grid-2">
+                <div class="dev-card">
+                  <div class="dev-card-head"><div><h3>Onboarding Defaults</h3><p>Defaults used when you start tracking a new pilot organisation.</p></div></div>
+                  <div class="dev-form-grid">
+                    <div><label>Default plan</label><select id="devSettingDefaultPlan"><option value="pilot">Pilot</option><option value="free">Free</option><option value="paid">Paid</option></select></div>
+                    <div><label>Default setup fee (₹)</label><input id="devSettingSetupFee" type="number" min="0" step="1"></div>
+                    <div><label>Default monthly price (₹)</label><input id="devSettingMonthlyPrice" type="number" min="0" step="1"></div>
+                    <div><label>Pilot organisation limit</label><input id="devSettingPilotLimit" type="number" min="1" step="1"></div>
+                    <div class="full"><label>Support email</label><input id="devSettingSupportEmail" type="email"></div>
+                    <div class="full"><label>Internal release / onboarding note</label><textarea id="devSettingNotes"></textarea></div>
+                  </div>
+                  <div class="request-action-row">
+                    <button class="btn primary" onclick="window.MasulPlatform?.saveSettings?.()">Save Platform Settings</button>
+                  </div>
+                </div>
+
+                <div class="dev-card">
+                  <div class="dev-card-head"><div><h3>Developer Access</h3><p>Your platform authority is tied to Firebase UID, not an email string in the source code.</p></div></div>
+                  <div class="dev-kv"><span>Signed-in email</span><strong id="devAccessEmail">—</strong></div>
+                  <div class="dev-kv"><span>Firebase UID</span><strong id="devAccessUid">—</strong></div>
+                  <div class="dev-kv"><span>Authority document</span><strong id="devAccessPath">platformAdmins/{uid}</strong></div>
+                  <div class="dev-kv"><span>Access state</span><strong id="devAccessState">—</strong></div>
+                  <div class="dev-danger-note" style="margin-top:12px">
+                    <strong>Do not loosen this.</strong> The app never lets a normal user create or edit their own platform-admin authority document. The first platform admin is bootstrapped manually in Firebase Console.
+                  </div>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+<section id="customerView" class="container hidden">
       <div class="page-back-bar">
         <button type="button" class="page-back-btn" onclick="goBackFromView('customerView')"><span class="back-arrow">←</span><span>Back</span></button>
         <span class="page-back-context">Return to previous menu</span>
@@ -3727,11 +4096,12 @@ let dashNavHistory=[];
 let dashboardOriginState={view:"homeView",dash:null};
 const auxiliaryViewOrigins={
   setupView:{view:"homeView",dash:null},
-  customerView:{view:"homeView",dash:null}
+  customerView:{view:"homeView",dash:null},
+  developerView:{view:"dashboardView",dash:"overview"}
 };
 
 function visibleMainView(){
-  return ["homeView","setupView","dashboardView","customerView"]
+  return ["homeView","setupView","dashboardView","customerView","developerView"]
     .find(id=>!document.getElementById(id)?.classList.contains("hidden")) || "homeView";
 }
 
@@ -3745,6 +4115,7 @@ function navigationLabel(stateObj){
   if(stateObj.view==="homeView") return "Home";
   if(stateObj.view==="setupView") return "Setup";
   if(stateObj.view==="customerView") return "Customer Preview";
+  if(stateObj.view==="developerView") return "Developer Console";
   if(stateObj.view==="dashboardView") return dashPageLabel(stateObj.dash||"overview");
   return "Previous";
 }
@@ -3753,7 +4124,7 @@ function showView(id,options={}){
   const current=visibleMainView();
   if(options.record!==false && current && current!==id){
     const origin={view:current,dash:current==="dashboardView"?currentDashTarget:null};
-    if(id==="setupView" || id==="customerView"){
+    if(id==="setupView" || id==="customerView" || id==="developerView"){
       auxiliaryViewOrigins[id]=origin;
     }
     if(id==="dashboardView"){
@@ -3762,7 +4133,7 @@ function showView(id,options={}){
     }
   }
 
-  ["homeView","setupView","dashboardView","customerView"].forEach(v=>document.getElementById(v).classList.add("hidden"));
+  ["homeView","setupView","dashboardView","customerView","developerView"].forEach(v=>document.getElementById(v)?.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 
   if(id==="dashboardView") updateDashboardBackButton();
@@ -3778,6 +4149,272 @@ window.goBackFromView=(viewId)=>{
     showView(origin.view||"homeView",{record:false});
   }
 };
+
+const developerUiState={
+  tab:"overview",
+  data:null
+};
+
+window.openDeveloperConsole=()=>{
+  if(window.MasulPlatform?.open){
+    window.MasulPlatform.open();
+  }else{
+    toast("Developer Console is still connecting to Firebase");
+  }
+};
+
+window.developerSelectTab=(tab)=>{
+  developerUiState.tab=tab||"overview";
+  document.querySelectorAll(".dev-nav[data-dev-tab]").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.devTab===developerUiState.tab);
+  });
+  document.querySelectorAll(".developer-tab").forEach(section=>{
+    section.classList.toggle("active",section.id===`devtab-${developerUiState.tab}`);
+  });
+};
+
+document.addEventListener("click",event=>{
+  const btn=event.target.closest?.(".dev-nav[data-dev-tab]");
+  if(btn) developerSelectTab(btn.dataset.devTab);
+});
+
+function developerMoney(value){
+  try{
+    return new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(Number(value||0));
+  }catch(_){
+    return `₹${Number(value||0).toLocaleString("en-IN")}`;
+  }
+}
+
+function developerDate(value){
+  if(!value) return "—";
+  try{
+    const d=value?.toDate?.() || new Date(value);
+    if(Number.isNaN(d.getTime())) return "—";
+    return d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  }catch(_){return "—"}
+}
+
+function developerAttentionReasons(org){
+  const reasons=[];
+  const meta=org.meta||{};
+  if(["urgent","attention"].includes(meta.priority)) reasons.push(meta.priority==="urgent"?"Urgent support priority":"Needs attention");
+  if((meta.onboardingStatus||"not-started")!=="live") reasons.push(`Onboarding: ${meta.onboardingStatus||"not-started"}`);
+  const balance=Math.max(0,(+meta.setupFeeAmount||0)-(+meta.setupFeePaid||0));
+  if(balance>0) reasons.push(`Setup fee due ${developerMoney(balance)}`);
+  if(org.sourceVersion && org.sourceVersion!=="1.61") reasons.push(`Version V${org.sourceVersion}`);
+  if(!org.sourceVersion) reasons.push("Version not reported");
+  if(meta.nextFollowUp){
+    const d=new Date(meta.nextFollowUp+"T00:00:00");
+    if(!Number.isNaN(d.getTime()) && d.getTime()<=Date.now()+24*60*60*1000) reasons.push("Follow-up due");
+  }
+  return reasons;
+}
+
+window.renderDeveloperOrganisationTable=()=>{
+  const data=developerUiState.data;
+  const wrap=document.getElementById("developerOrgTableWrap");
+  if(!wrap || !data) return;
+
+  const q=String(document.getElementById("developerOrgSearch")?.value||"").trim().toLowerCase();
+  const plan=document.getElementById("developerPlanFilter")?.value||"all";
+  const onboarding=document.getElementById("developerOnboardingFilter")?.value||"all";
+
+  const rows=(data.orgs||[]).filter(org=>{
+    const meta=org.meta||{};
+    const hay=`${org.name} ${org.orgId} ${org.ownerEmail||""}`.toLowerCase();
+    return (!q || hay.includes(q))
+      && (plan==="all" || (meta.plan||"pilot")===plan)
+      && (onboarding==="all" || (meta.onboardingStatus||"not-started")===onboarding);
+  });
+
+  if(!rows.length){
+    wrap.innerHTML=`<div class="dev-empty">No organisations match the current filters.</div>`;
+    return;
+  }
+
+  wrap.innerHTML=`<div class="dev-table-wrap"><table class="dev-table">
+    <thead><tr>
+      <th>Organisation</th><th>Plan</th><th>Onboarding</th><th>Version</th>
+      <th>Usage</th><th>Setup fee</th><th>Follow-up</th><th>Action</th>
+    </tr></thead>
+    <tbody>${rows.map(org=>{
+      const m=org.meta||{};
+      const billed=+m.setupFeeAmount||0;
+      const paid=+m.setupFeePaid||0;
+      const due=Math.max(0,billed-paid);
+      return `<tr>
+        <td><strong>${escapeHtml(org.name||"Unnamed Organisation")}</strong>
+          <span class="dev-sub">${escapeHtml(org.ownerEmail||"Owner email unavailable")}</span>
+          <span class="dev-sub">${escapeHtml(org.orgId)}</span></td>
+        <td><span class="dev-badge ${escapeHtml(m.plan||"pilot")}">${escapeHtml((m.plan||"pilot").toUpperCase())}</span>
+          <span class="dev-sub">${escapeHtml(m.lifecycleStatus||"active")}</span></td>
+        <td><span class="dev-badge ${escapeHtml(m.onboardingStatus||"not-started")}">${escapeHtml(m.onboardingStatus||"not-started")}</span>
+          <span class="dev-sub">${escapeHtml(m.priority||"normal")} priority</span></td>
+        <td><strong>${org.sourceVersion?`V${escapeHtml(org.sourceVersion)}`:"—"}</strong>
+          <span class="dev-sub">${org.sourceVersion==="1.61"?"Current":"Review before rollout"}</span></td>
+        <td><strong>${org.counts?.people||0}</strong> people
+          <span class="dev-sub">${org.counts?.members||0} staff • ${org.counts?.payments||0} payments • ${org.counts?.fees||0} fees</span></td>
+        <td><span class="dev-balance ${due>0?"due":"clear"}">${due>0?`${developerMoney(due)} due`:"Clear"}</span>
+          <span class="dev-sub">${developerMoney(paid)} received / ${developerMoney(billed)} billed</span></td>
+        <td><strong>${developerDate(m.nextFollowUp)}</strong>
+          <span class="dev-sub">${m.renewalDate?`Renewal ${developerDate(m.renewalDate)}`:"No renewal date"}</span></td>
+        <td><button class="btn ghost small" onclick="window.MasulPlatform?.openOrg?.('${escapeHtml(org.orgId)}')">Manage</button></td>
+      </tr>`;
+    }).join("")}</tbody>
+  </table></div>`;
+};
+
+function renderDeveloperBillingTable(){
+  const wrap=document.getElementById("developerBillingTableWrap");
+  const data=developerUiState.data;
+  if(!wrap || !data) return;
+  const rows=[...(data.orgs||[])].sort((a,b)=>{
+    const ad=Math.max(0,(+a.meta?.setupFeeAmount||0)-(+a.meta?.setupFeePaid||0));
+    const bd=Math.max(0,(+b.meta?.setupFeeAmount||0)-(+b.meta?.setupFeePaid||0));
+    return bd-ad;
+  });
+  if(!rows.length){wrap.innerHTML=`<div class="dev-empty">No organisations detected.</div>`;return}
+  wrap.innerHTML=`<div class="dev-table-wrap"><table class="dev-table">
+    <thead><tr><th>Organisation</th><th>Plan</th><th>Setup billed</th><th>Received</th><th>Outstanding</th><th>Monthly price</th><th>Renewal</th><th></th></tr></thead>
+    <tbody>${rows.map(org=>{
+      const m=org.meta||{};
+      const billed=+m.setupFeeAmount||0, paid=+m.setupFeePaid||0, due=Math.max(0,billed-paid);
+      return `<tr>
+        <td><strong>${escapeHtml(org.name)}</strong><span class="dev-sub">${escapeHtml(org.ownerEmail||"")}</span></td>
+        <td><span class="dev-badge ${escapeHtml(m.plan||"pilot")}">${escapeHtml(m.plan||"pilot")}</span></td>
+        <td>${developerMoney(billed)}</td><td>${developerMoney(paid)}</td>
+        <td><strong class="dev-balance ${due?"due":"clear"}">${developerMoney(due)}</strong></td>
+        <td>${developerMoney(+m.monthlyPrice||0)}</td>
+        <td>${developerDate(m.renewalDate)}</td>
+        <td><button class="btn ghost small" onclick="window.MasulPlatform?.openOrg?.('${escapeHtml(org.orgId)}')">Edit billing</button></td>
+      </tr>`;
+    }).join("")}</tbody></table></div>`;
+}
+
+function renderDeveloperHealthTable(){
+  const wrap=document.getElementById("developerHealthTableWrap");
+  const data=developerUiState.data;
+  if(!wrap||!data)return;
+  const rows=[...(data.orgs||[])].sort((a,b)=>{
+    const ac=a.sourceVersion==="1.61"?1:0, bc=b.sourceVersion==="1.61"?1:0;
+    return ac-bc || String(a.name).localeCompare(String(b.name));
+  });
+  wrap.innerHTML=rows.length?`<div class="dev-table-wrap"><table class="dev-table">
+    <thead><tr><th>Organisation</th><th>Source Version</th><th>Cloud Schema</th><th>Last Org Update</th><th>Staff</th><th>People</th><th>Payment Requests</th><th>Health</th></tr></thead>
+    <tbody>${rows.map(org=>{
+      const current=org.sourceVersion==="1.61";
+      return `<tr>
+        <td><strong>${escapeHtml(org.name)}</strong><span class="dev-sub">${escapeHtml(org.orgId)}</span></td>
+        <td><strong>${org.sourceVersion?`V${escapeHtml(org.sourceVersion)}`:"—"}</strong></td>
+        <td>${escapeHtml(String(org.cloudSchemaVersion||"—"))}</td>
+        <td>${developerDate(org.updatedAt)}</td>
+        <td>${org.counts?.members||0}</td><td>${org.counts?.people||0}</td><td>${org.counts?.paymentRequests||0}</td>
+        <td><span class="dev-badge ${current?"active":"attention"}">${current?"Current":"Review"}</span></td>
+      </tr>`;
+    }).join("")}</tbody></table></div>`:`<div class="dev-empty">No organisation health data.</div>`;
+}
+
+function renderDeveloperAudit(){
+  const wrap=document.getElementById("developerAuditTableWrap");
+  const data=developerUiState.data;
+  if(!wrap||!data)return;
+  const rows=data.audit||[];
+  wrap.innerHTML=rows.length?`<div class="dev-table-wrap"><table class="dev-table">
+    <thead><tr><th>Date</th><th>Action</th><th>Organisation</th><th>Actor</th><th>Details</th></tr></thead>
+    <tbody>${rows.map(a=>`<tr>
+      <td>${developerDate(a.at)}</td>
+      <td><strong>${escapeHtml(a.action||"Platform update")}</strong></td>
+      <td>${escapeHtml(a.orgName||a.orgId||"Platform")}</td>
+      <td>${escapeHtml(a.actorEmail||"")}</td>
+      <td>${escapeHtml(a.details||"")}</td>
+    </tr>`).join("")}</tbody></table></div>`:`<div class="dev-empty">No Developer Console changes recorded yet.</div>`;
+}
+
+window.renderDeveloperData=(data)=>{
+  developerUiState.data=data;
+  const loading=document.getElementById("developerLoading");
+  const content=document.getElementById("developerContent");
+  if(loading) loading.classList.add("hidden");
+  if(content) content.classList.remove("hidden");
+
+  const orgs=data.orgs||[];
+  const sum=(fn)=>orgs.reduce((a,o)=>a+(Number(fn(o))||0),0);
+  const setupBilled=sum(o=>o.meta?.setupFeeAmount);
+  const setupPaid=sum(o=>o.meta?.setupFeePaid);
+  const setupDue=Math.max(0,setupBilled-setupPaid);
+  const monthly=sum(o=>o.meta?.monthlyPrice);
+  const attention=orgs.filter(o=>developerAttentionReasons(o).length);
+
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+  set("devStatOrgs",orgs.length);
+  set("devStatCommercial",orgs.filter(o=>["pilot","paid"].includes(o.meta?.plan||"pilot")).length);
+  set("devStatPeople",sum(o=>o.counts?.people));
+  set("devStatPayments",sum(o=>o.counts?.payments));
+  set("devStatSetupPaid",developerMoney(setupPaid));
+  set("devStatSetupDue",developerMoney(setupDue));
+  set("devStatAttention",attention.length);
+  set("devBillSetupBilled",developerMoney(setupBilled));
+  set("devBillSetupReceived",developerMoney(setupPaid));
+  set("devBillSetupOutstanding",developerMoney(setupDue));
+  set("devBillMonthly",developerMoney(monthly));
+
+  const att=document.getElementById("developerAttentionList");
+  if(att){
+    const items=attention.slice(0,8);
+    att.innerHTML=items.length?items.map(org=>{
+      const reasons=developerAttentionReasons(org);
+      return `<div class="dev-attention-item">
+        <div><strong>${escapeHtml(org.name)}</strong><span>${escapeHtml(reasons.slice(0,3).join(" • "))}</span></div>
+        <button class="btn ghost small" onclick="window.MasulPlatform?.openOrg?.('${escapeHtml(org.orgId)}')">Open</button>
+      </div>`;
+    }).join(""):`<div class="dev-empty">No organisation currently needs attention.</div>`;
+  }
+
+  const versions={};
+  orgs.forEach(o=>{const v=o.sourceVersion?`V${o.sourceVersion}`:"Unknown";versions[v]=(versions[v]||0)+1});
+  const verWrap=document.getElementById("developerVersionChart");
+  if(verWrap){
+    const entries=Object.entries(versions).sort((a,b)=>b[1]-a[1]);
+    const max=Math.max(1,...entries.map(x=>x[1]));
+    verWrap.innerHTML=entries.length?entries.map(([v,n])=>`
+      <div class="dev-version-row"><strong>${escapeHtml(v)}</strong><div class="dev-version-bar"><span style="width:${Math.round(n/max*100)}%"></span></div><small>${n}</small></div>
+    `).join(""):`<div class="dev-empty">No version data yet.</div>`;
+  }
+
+  renderDeveloperOrganisationTable();
+  renderDeveloperBillingTable();
+  renderDeveloperHealthTable();
+  renderDeveloperAudit();
+
+  const settings=data.settings||{};
+  const byId=id=>document.getElementById(id);
+  if(byId("devSettingDefaultPlan")) byId("devSettingDefaultPlan").value=settings.defaultPlan||"pilot";
+  if(byId("devSettingSetupFee")) byId("devSettingSetupFee").value=settings.defaultSetupFee??499;
+  if(byId("devSettingMonthlyPrice")) byId("devSettingMonthlyPrice").value=settings.defaultMonthlyPrice??0;
+  if(byId("devSettingPilotLimit")) byId("devSettingPilotLimit").value=settings.pilotLimit??10;
+  if(byId("devSettingSupportEmail")) byId("devSettingSupportEmail").value=settings.supportEmail||"";
+  if(byId("devSettingNotes")) byId("devSettingNotes").value=settings.notes||"";
+
+  set("devAccessEmail",data.admin?.email||"—");
+  set("devAccessUid",data.admin?.uid||"—");
+  set("devAccessPath",data.admin?.uid?`platformAdmins/${data.admin.uid}`:"platformAdmins/{uid}");
+  set("devAccessState",data.admin?.active===false?"Disabled":"Active");
+  set("developerAdminIdentity",data.admin?.email||"Platform Admin");
+
+  developerSelectTab(developerUiState.tab||"overview");
+};
+
+window.renderDeveloperError=(message)=>{
+  const loading=document.getElementById("developerLoading");
+  const content=document.getElementById("developerContent");
+  if(content) content.classList.add("hidden");
+  if(loading){
+    loading.classList.remove("hidden");
+    loading.innerHTML=`<strong>Developer Console could not load.</strong><br><span style="font-size:9px">${escapeHtml(message||"Unknown error")}</span>`;
+  }
+};
+
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
 function uuid(prefix="id"){return prefix+"_"+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4)}
 function money(n){
@@ -3887,7 +4524,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.60: cloud/status refreshes must never render the full dashboard
+    // V1.61: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -5461,7 +6098,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.60: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.61: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 
@@ -6927,7 +7564,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.60 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.61 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -6951,7 +7588,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.60 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.61 secure link.");
     },100);
     return true;
   }
@@ -9704,7 +10341,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.60: payment history no longer prevents removal of a student profile.
+  // V1.61: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -9842,7 +10479,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.60",
+    version:"1.61",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -10628,6 +11265,7 @@ handlePaymentRequestFromUrl();
     getDoc,
     collection,
     getDocs,
+    getCountFromServer,
     writeBatch,
     deleteDoc,
     serverTimestamp,
@@ -11460,7 +12098,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.60"
+        sourceVersion:"1.61"
       };
 
       const ops=[];
@@ -12940,7 +13578,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.60 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.61 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -13240,7 +13878,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.60 will claim the still-pending invitation after authentication.
+      // V1.61 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -13323,6 +13961,463 @@ handlePaymentRequestFromUrl();
     });
   }
 
+
+
+  // ==========================================================
+  // V1.61 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
+  // ==========================================================
+  const platform={
+    isAdmin:false,
+    adminDoc:null,
+    orgs:[],
+    registry:new Map(),
+    settings:{},
+    audit:[],
+    loading:false
+  };
+
+  function platformAdminRef(uid){
+    return doc(db,"platformAdmins",uid);
+  }
+
+  function platformOrgRef(orgId){
+    return doc(db,"platformOrganisations",orgId);
+  }
+
+  function platformSettingsRef(){
+    return doc(db,"platformSettings","config");
+  }
+
+  function platformAuditRef(){
+    return doc(collection(db,"platformAudit"));
+  }
+
+  function tsToIsoOrValue(v){
+    return v?.toDate?.()?.toISOString?.() || v || null;
+  }
+
+  function showPlatformNav(show){
+    const wrap=document.getElementById("developerConsoleNavWrap");
+    if(wrap) wrap.classList.toggle("hidden",!show);
+  }
+
+  async function checkPlatformAdmin(user){
+    platform.isAdmin=false;
+    platform.adminDoc=null;
+    showPlatformNav(false);
+    if(!user) return false;
+
+    try{
+      const snap=await getDoc(platformAdminRef(user.uid));
+      if(!snap.exists()) return false;
+      const d=snap.data()||{};
+      if(d.active===false) return false;
+      platform.isAdmin=true;
+      platform.adminDoc={uid:user.uid,email:user.email||d.email||"",...d};
+      showPlatformNav(true);
+
+      const params=new URLSearchParams(location.search);
+      if(params.get("developer")==="1"){
+        setTimeout(()=>openPlatformConsole(),80);
+      }
+      return true;
+    }catch(err){
+      console.warn("Masul platform-admin check:",err);
+      return false;
+    }
+  }
+
+  async function safeCount(orgId,name){
+    try{
+      const snap=await getCountFromServer(collection(db,"organizations",orgId,name));
+      return snap.data().count||0;
+    }catch(err){
+      console.warn(`Platform count failed ${orgId}/${name}:`,err);
+      return 0;
+    }
+  }
+
+  async function loadOwnerEmail(ownerUid){
+    if(!ownerUid) return "";
+    try{
+      const snap=await getDoc(doc(db,"users",ownerUid));
+      return snap.exists()?String(snap.data()?.email||""):"";
+    }catch(_){
+      return "";
+    }
+  }
+
+  async function loadOrgPlatformSummary(orgDoc,registryMap){
+    const d=orgDoc.data()||{};
+    const orgId=orgDoc.id;
+    const orgData=d.orgData||{};
+    const [ownerEmail,configSnap,members,people,fees,payments,paymentRequests]=await Promise.all([
+      loadOwnerEmail(d.ownerUid),
+      getDoc(doc(db,"organizations",orgId,"config","app")).catch(()=>null),
+      safeCount(orgId,"members"),
+      safeCount(orgId,"people"),
+      safeCount(orgId,"fees"),
+      safeCount(orgId,"payments"),
+      safeCount(orgId,"paymentRequests")
+    ]);
+
+    const config=configSnap?.exists?.()?configSnap.data():{};
+    const existing=registryMap.get(orgId)||null;
+    const defaults={
+      orgId,
+      plan:platform.settings.defaultPlan||"pilot",
+      lifecycleStatus:"active",
+      onboardingStatus:"not-started",
+      setupFeeAmount:Number(platform.settings.defaultSetupFee||0),
+      setupFeePaid:0,
+      monthlyPrice:Number(platform.settings.defaultMonthlyPrice||0),
+      renewalDate:"",
+      nextFollowUp:"",
+      priority:"normal",
+      notes:"",
+      tags:[]
+    };
+
+    return {
+      orgId,
+      name:String(orgData.name||d.name||"Unnamed Organisation"),
+      type:String(orgData.type||"Organisation"),
+      ownerUid:String(d.ownerUid||""),
+      ownerEmail,
+      sourceVersion:String(config.sourceVersion||""),
+      cloudSchemaVersion:d.cloudSchemaVersion||"",
+      createdAt:tsToIsoOrValue(d.createdAt),
+      updatedAt:tsToIsoOrValue(d.updatedAt),
+      counts:{members,people,fees,payments,paymentRequests},
+      meta:{...defaults,...(existing||{})},
+      platformRegistered:!!existing
+    };
+  }
+
+  async function loadPlatformAudit(){
+    try{
+      const snap=await getDocs(collection(db,"platformAudit"));
+      platform.audit=snap.docs.map(d=>({id:d.id,...d.data()}))
+        .sort((a,b)=>{
+          const at=a.at?.toMillis?.()||new Date(a.at||0).getTime()||0;
+          const bt=b.at?.toMillis?.()||new Date(b.at||0).getTime()||0;
+          return bt-at;
+        }).slice(0,150);
+    }catch(err){
+      console.warn("Platform audit load:",err);
+      platform.audit=[];
+    }
+    return platform.audit;
+  }
+
+  async function loadPlatformSettings(){
+    try{
+      const snap=await getDoc(platformSettingsRef());
+      platform.settings=snap.exists()?snap.data():{
+        defaultPlan:"pilot",
+        defaultSetupFee:499,
+        defaultMonthlyPrice:0,
+        pilotLimit:10,
+        supportEmail:"",
+        notes:""
+      };
+    }catch(err){
+      console.warn("Platform settings load:",err);
+      platform.settings={defaultPlan:"pilot",defaultSetupFee:499,defaultMonthlyPrice:0,pilotLimit:10,supportEmail:"",notes:""};
+    }
+  }
+
+  async function loadPlatformRegistry(){
+    const map=new Map();
+    try{
+      const snap=await getDocs(collection(db,"platformOrganisations"));
+      snap.docs.forEach(d=>map.set(d.id,{id:d.id,...d.data()}));
+    }catch(err){
+      console.warn("Platform registry load:",err);
+    }
+    platform.registry=map;
+    return map;
+  }
+
+  async function loadPlatformData(){
+    if(!platform.isAdmin) throw new Error("This Firebase account is not an active Masul platform administrator.");
+    if(platform.loading) return;
+    platform.loading=true;
+    window.renderDeveloperError?.("Loading secure platform data…");
+
+    try{
+      await loadPlatformSettings();
+      const [registry,orgSnap]=await Promise.all([
+        loadPlatformRegistry(),
+        getDocs(collection(db,"organizations"))
+      ]);
+
+      platform.orgs=await Promise.all(orgSnap.docs.map(d=>loadOrgPlatformSummary(d,registry)));
+      platform.orgs.sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
+      await loadPlatformAudit();
+
+      window.renderDeveloperData?.({
+        admin:platform.adminDoc,
+        orgs:platform.orgs,
+        settings:platform.settings,
+        audit:platform.audit
+      });
+    }finally{
+      platform.loading=false;
+    }
+  }
+
+  async function platformAudit(action,{orgId="",orgName="",details=""}={}){
+    if(!platform.isAdmin || !auth.currentUser) return;
+    try{
+      await setDoc(platformAuditRef(),{
+        action:String(action||"Platform update"),
+        orgId:String(orgId||""),
+        orgName:String(orgName||""),
+        details:String(details||"").slice(0,1000),
+        actorUid:auth.currentUser.uid,
+        actorEmail:auth.currentUser.email||"",
+        at:serverTimestamp()
+      });
+    }catch(err){
+      console.warn("Platform audit write:",err);
+    }
+  }
+
+  function platformOrgById(orgId){
+    return platform.orgs.find(o=>o.orgId===orgId)||null;
+  }
+
+  async function savePlatformOrgFromModal(orgId){
+    const org=platformOrgById(orgId);
+    if(!org) return;
+
+    const value=id=>document.getElementById(id)?.value||"";
+    const setupFeeAmount=Math.max(0,Number(value("devOrgSetupFee"))||0);
+    const setupFeePaid=Math.max(0,Number(value("devOrgSetupPaid"))||0);
+    const monthlyPrice=Math.max(0,Number(value("devOrgMonthlyPrice"))||0);
+
+    const existing=platform.registry.get(orgId);
+    const payload={
+      orgId,
+      orgName:org.name,
+      ownerUid:org.ownerUid,
+      plan:value("devOrgPlan")||"pilot",
+      lifecycleStatus:value("devOrgLifecycle")||"active",
+      onboardingStatus:value("devOrgOnboarding")||"not-started",
+      setupFeeAmount,
+      setupFeePaid,
+      monthlyPrice,
+      renewalDate:value("devOrgRenewal"),
+      nextFollowUp:value("devOrgFollowUp"),
+      priority:value("devOrgPriority")||"normal",
+      notes:String(value("devOrgNotes")).slice(0,5000),
+      tags:String(value("devOrgTags")).split(",").map(x=>x.trim()).filter(Boolean).slice(0,30),
+      updatedAt:serverTimestamp(),
+      updatedByUid:auth.currentUser.uid,
+      updatedByEmail:auth.currentUser.email||""
+    };
+    if(!existing) payload.createdAt=serverTimestamp();
+
+    await setDoc(platformOrgRef(orgId),payload,{merge:true});
+    await platformAudit("Organisation platform profile updated",{
+      orgId,orgName:org.name,
+      details:`Plan ${payload.plan}; onboarding ${payload.onboardingStatus}; setup fee ₹${setupFeeAmount}; received ₹${setupFeePaid}`
+    });
+    cloudToast("Platform organisation profile saved");
+    window.closeModal?.();
+    await loadPlatformData();
+  }
+
+  async function markSetupFeePaid(orgId){
+    const org=platformOrgById(orgId);
+    if(!org) return;
+    const amount=Math.max(0,Number(document.getElementById("devOrgSetupFee")?.value)||0);
+    const paid=Math.max(0,Number(document.getElementById("devOrgSetupPaid")?.value)||0);
+    if(amount<=0){cloudToast("Set the Masul setup fee amount first");return}
+    if(!confirm(`Mark the full Masul setup fee of ₹${amount.toLocaleString("en-IN")} as received for ${org.name}?`)) return;
+    const input=document.getElementById("devOrgSetupPaid");
+    if(input) input.value=String(amount);
+    cloudToast(paid>=amount?"Setup fee was already fully received":"Setup fee marked fully received • Save to confirm");
+  }
+
+  function openPlatformOrg(orgId){
+    const org=platformOrgById(orgId);
+    if(!org){cloudToast("Organisation not found");return}
+    const m=org.meta||{};
+    const bal=Math.max(0,(+m.setupFeeAmount||0)-(+m.setupFeePaid||0));
+
+    window.modal?.(`
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">Platform Organisation</span>
+          <h3 style="margin:7px 0 0">${escapeHtml(org.name)}</h3>
+          <p style="font-size:10px;color:var(--muted);margin:5px 0 0">${escapeHtml(org.ownerEmail||"Owner email unavailable")} • ${escapeHtml(org.orgId)}</p>
+        </div>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+
+      <div class="dev-stat-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));margin-top:8px">
+        <div class="dev-stat"><span>Staff users</span><strong>${org.counts?.members||0}</strong><small>Aggregate count</small></div>
+        <div class="dev-stat"><span>People</span><strong>${org.counts?.people||0}</strong><small>No names opened</small></div>
+        <div class="dev-stat"><span>Payments</span><strong>${org.counts?.payments||0}</strong><small>Record count only</small></div>
+        <div class="dev-stat"><span>Version</span><strong>${org.sourceVersion?`V${escapeHtml(org.sourceVersion)}`:"—"}</strong><small>${org.sourceVersion==="1.61"?"Current":"Review before rollout"}</small></div>
+      </div>
+
+      <div class="dev-card" style="margin-top:10px">
+        <div class="dev-card-head">
+          <div><h3>Pilot / Commercial profile</h3><p>Metadata for your relationship with this organisation. It does not change their fees or member data.</p></div>
+          <span class="dev-badge ${bal>0?"attention":"active"}">${bal>0?`₹${bal.toLocaleString("en-IN")} due`:"Setup clear"}</span>
+        </div>
+        <div class="dev-form-grid">
+          <div><label>Plan</label><select id="devOrgPlan">
+            <option value="pilot" ${m.plan==="pilot"?"selected":""}>Pilot</option>
+            <option value="paid" ${m.plan==="paid"?"selected":""}>Paid</option>
+            <option value="free" ${m.plan==="free"?"selected":""}>Free</option>
+          </select></div>
+          <div><label>Lifecycle status</label><select id="devOrgLifecycle">
+            <option value="active" ${m.lifecycleStatus==="active"?"selected":""}>Active</option>
+            <option value="paused" ${m.lifecycleStatus==="paused"?"selected":""}>Paused / On hold</option>
+            <option value="closed" ${m.lifecycleStatus==="closed"?"selected":""}>Closed</option>
+          </select></div>
+          <div><label>Onboarding</label><select id="devOrgOnboarding">
+            <option value="not-started" ${m.onboardingStatus==="not-started"?"selected":""}>Not started</option>
+            <option value="setup" ${m.onboardingStatus==="setup"?"selected":""}>Setup</option>
+            <option value="testing" ${m.onboardingStatus==="testing"?"selected":""}>Testing</option>
+            <option value="live" ${m.onboardingStatus==="live"?"selected":""}>Live</option>
+            <option value="paused" ${m.onboardingStatus==="paused"?"selected":""}>Paused</option>
+          </select></div>
+          <div><label>Support priority</label><select id="devOrgPriority">
+            <option value="normal" ${m.priority==="normal"?"selected":""}>Normal</option>
+            <option value="attention" ${m.priority==="attention"?"selected":""}>Needs attention</option>
+            <option value="urgent" ${m.priority==="urgent"?"selected":""}>Urgent</option>
+          </select></div>
+
+          <div><label>Masul setup fee (₹)</label><input id="devOrgSetupFee" type="number" min="0" value="${Number(m.setupFeeAmount||0)}"></div>
+          <div><label>Setup fee received (₹)</label><input id="devOrgSetupPaid" type="number" min="0" value="${Number(m.setupFeePaid||0)}"></div>
+          <div><label>Monthly price / pilot value (₹)</label><input id="devOrgMonthlyPrice" type="number" min="0" value="${Number(m.monthlyPrice||0)}"></div>
+          <div><label>Renewal / review date</label><input id="devOrgRenewal" type="date" value="${escapeHtml(m.renewalDate||"")}"></div>
+          <div><label>Next follow-up</label><input id="devOrgFollowUp" type="date" value="${escapeHtml(m.nextFollowUp||"")}"></div>
+          <div><label>Tags</label><input id="devOrgTags" value="${escapeHtml((m.tags||[]).join(", "))}" placeholder="pilot, dance, assisted"></div>
+          <div class="full"><label>Internal support / onboarding notes</label><textarea id="devOrgNotes" placeholder="Private developer notes">${escapeHtml(m.notes||"")}</textarea></div>
+        </div>
+
+        <div class="request-action-row">
+          <button class="btn primary" onclick="window.MasulPlatform?.saveOrg?.('${escapeHtml(orgId)}')">Save Platform Profile</button>
+          <button class="btn ghost" onclick="window.MasulPlatform?.markPaid?.('${escapeHtml(orgId)}')">Mark Setup Fee Fully Paid</button>
+          <button class="btn ghost" onclick="navigator.clipboard.writeText('${escapeHtml(orgId)}').then(()=>toast('Organisation ID copied'))">Copy Org ID</button>
+          <button class="btn ghost" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="dev-secure-note">
+        <strong>Privacy:</strong> this screen intentionally uses aggregate counts only. To troubleshoot customer-specific records, use the organisation's authorised account with the organisation's knowledge rather than a hidden impersonation feature.
+      </div>
+    `);
+  }
+
+  async function savePlatformSettings(){
+    if(!platform.isAdmin) return;
+    const v=id=>document.getElementById(id)?.value||"";
+    const payload={
+      defaultPlan:v("devSettingDefaultPlan")||"pilot",
+      defaultSetupFee:Math.max(0,Number(v("devSettingSetupFee"))||0),
+      defaultMonthlyPrice:Math.max(0,Number(v("devSettingMonthlyPrice"))||0),
+      pilotLimit:Math.max(1,Number(v("devSettingPilotLimit"))||10),
+      supportEmail:String(v("devSettingSupportEmail")).trim(),
+      notes:String(v("devSettingNotes")).slice(0,5000),
+      updatedAt:serverTimestamp(),
+      updatedByUid:auth.currentUser.uid,
+      updatedByEmail:auth.currentUser.email||""
+    };
+    await setDoc(platformSettingsRef(),payload,{merge:true});
+    await platformAudit("Platform settings updated",{details:`Default plan ${payload.defaultPlan}; pilot limit ${payload.pilotLimit}`});
+    platform.settings={...platform.settings,...payload};
+    cloudToast("Platform settings saved");
+    await loadPlatformData();
+  }
+
+  function exportPlatformCsv(){
+    const rows=[[
+      "Organisation","Org ID","Owner Email","Plan","Lifecycle","Onboarding","Version",
+      "Staff","People","Fees","Payments","Payment Requests",
+      "Setup Fee Billed","Setup Fee Received","Setup Fee Outstanding","Monthly Price",
+      "Renewal Date","Next Follow-up","Priority"
+    ]];
+    platform.orgs.forEach(o=>{
+      const m=o.meta||{};
+      const due=Math.max(0,(+m.setupFeeAmount||0)-(+m.setupFeePaid||0));
+      rows.push([
+        o.name,o.orgId,o.ownerEmail||"",m.plan||"pilot",m.lifecycleStatus||"active",
+        m.onboardingStatus||"not-started",o.sourceVersion||"",
+        o.counts?.members||0,o.counts?.people||0,o.counts?.fees||0,o.counts?.payments||0,o.counts?.paymentRequests||0,
+        +m.setupFeeAmount||0,+m.setupFeePaid||0,due,+m.monthlyPrice||0,
+        m.renewalDate||"",m.nextFollowUp||"",m.priority||"normal"
+      ]);
+    });
+    const csv=rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+    const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=`masul-platform-organisations-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
+  async function openPlatformConsole(){
+    if(!auth.currentUser){
+      bridge()?.toast?.("Sign in first, then open Developer Console");
+      return;
+    }
+    if(!platform.isAdmin){
+      try{await checkPlatformAdmin(auth.currentUser)}catch(_){}
+    }
+    if(!platform.isAdmin){
+      window.modal?.(`
+        <div class="modal-head">
+          <div><span class="eyebrow">Developer Console</span><h3 style="margin:7px 0 0">Platform-admin authority required</h3></div>
+          <button class="close" onclick="closeModal()">×</button>
+        </div>
+        <div class="danger-alert">
+          <div class="danger-title">This account is not enabled as a Masul platform administrator.</div>
+          <p>Developer access is controlled by the protected Firebase document <strong>platformAdmins/&lt;your Firebase UID&gt;</strong>. It is never granted by editing an email address in index.html.</p>
+        </div>
+      `);
+      return;
+    }
+
+    window.showView?.("developerView");
+    const loading=document.getElementById("developerLoading");
+    const content=document.getElementById("developerContent");
+    if(content) content.classList.add("hidden");
+    if(loading){
+      loading.classList.remove("hidden");
+      loading.textContent="Loading secure platform data from Firebase…";
+    }
+    try{
+      await loadPlatformData();
+    }catch(err){
+      console.error("Developer Console load:",err);
+      window.renderDeveloperError?.(
+        `${err?.message||"Could not load platform data."} If V1.61 was just deployed, publish the V1.61 Firestore Rules and confirm your platformAdmins UID document.`
+      );
+    }
+  }
+
+  window.MasulPlatform={
+    open:openPlatformConsole,
+    refresh:loadPlatformData,
+    refreshAudit:async()=>{await loadPlatformAudit();window.renderDeveloperData?.({admin:platform.adminDoc,orgs:platform.orgs,settings:platform.settings,audit:platform.audit})},
+    openOrg:openPlatformOrg,
+    saveOrg:savePlatformOrgFromModal,
+    markPaid:markSetupFeePaid,
+    saveSettings:savePlatformSettings,
+    exportCsv:exportPlatformCsv,
+    get state(){
+      return {isAdmin:platform.isAdmin,admin:platform.adminDoc,orgCount:platform.orgs.length};
+    }
+  };
 
   const publicPaymentWatchers=new Map();
 
@@ -13510,7 +14605,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.60 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.61 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -13538,6 +14633,7 @@ handlePaymentRequestFromUrl();
     previouslyAuthenticated=!!user;
     cloud.user=user||null;
     cloud.ready=true;
+    setTimeout(()=>checkPlatformAdmin(user).catch(err=>console.warn("Platform admin check failed:",err)),0);
     cloud.lastError="";
     cloud.orgId="";
     cloud.orgName="";
@@ -13610,7 +14706,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.60 Firebase module ready");
+  console.info("Masul V1.61 Firebase module ready");
 
   window.MasulCloud={
     auth,
