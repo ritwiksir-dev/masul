@@ -1945,10 +1945,33 @@
     .audit-row,.invite-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:9px 2px}
     .audit-row:last-child,.invite-row:last-child{border-bottom:none}
     .audit-row strong,.invite-row strong{display:block;font-size:10px}.audit-row small,.invite-row small{display:block;font-size:8px;color:var(--muted);margin-top:3px;line-height:1.4}
-    .permissions-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}
-    .permission-item{border:1px solid var(--line);border-radius:10px;padding:8px;font-size:9px;background:#fbfcfe}
-    .permission-item.allowed{background:#f3faf6;border-color:#d7e9df;color:#326f54}
-    .permission-item.denied{background:#fff7f5;border-color:#efdeda;color:#92554e}
+    .permissions-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+    .permission-item{
+      border:1px solid var(--line);border-radius:12px;padding:10px 11px;font-size:9px;background:#fbfcfe;
+      display:flex;align-items:flex-start;justify-content:space-between;gap:10px
+    }
+    .permission-copy{min-width:0}
+    .permission-copy strong{display:block;font-size:10px;color:#35455d;margin-bottom:2px}
+    .permission-copy small{display:block;font-size:8px;line-height:1.45;color:#718095}
+    .permission-item.allowed{background:#f3faf6;border-color:#d7e9df}
+    .permission-item.view{background:#f5f8fc;border-color:#d9e3ee}
+    .permission-item.denied{background:#fff7f5;border-color:#efdeda}
+    .permission-state{
+      flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+      border-radius:999px;padding:4px 7px;font-size:8px;font-weight:950;white-space:nowrap
+    }
+    .permission-item.allowed .permission-state{background:#e4f4ea;color:#2c7651;border:1px solid #cde7d7}
+    .permission-item.view .permission-state{background:#eaf1f8;color:#47627f;border:1px solid #d4e0ec}
+    .permission-item.denied .permission-state{background:#fff0ed;color:#9a524a;border:1px solid #efd5d0}
+    .owner-only-action{
+      color:#76561f!important;border-color:#ead7ad!important;background:#fffaf0!important;
+      position:relative
+    }
+    .owner-only-action:hover{background:#fff4da!important}
+    .access-readonly-note{
+      display:inline-flex;align-items:center;border:1px solid #dde4ed;background:#f8fafc;color:#6a778a;
+      border-radius:999px;padding:5px 8px;font-size:8px;font-weight:850
+    }
     .bulk-access-preview{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:10px}
     .bulk-access-line{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);font-size:9px;align-items:center}
     .bulk-access-line:last-child{border-bottom:none}
@@ -2982,7 +3005,7 @@
               <div>
                 <span class="eyebrow">Access Control Centre</span>
                 <h2 style="margin:6px 0 4px">Organisation Users & Roles</h2>
-                <p>One organisation, separate logins and controlled permissions for every authorised user.</p>
+                <p>One organisation, separate logins and Firestore-aligned permissions for every authorised user.</p>
               </div>
               <button class="btn primary small" id="inviteStaffBtn">+ Invite User</button>
             </div>
@@ -3242,9 +3265,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.51</span>
+                <span class="chip">V1.52</span>
               </div>
-              <div class="request-meta">Masul V1.51 • Reliable Fee Target Selector</div>
+              <div class="request-meta">Masul V1.52 • Roles & Permissions Consistency</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3708,7 +3731,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.51: cloud/status refreshes must never render the full dashboard
+    // V1.52: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -5272,7 +5295,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.51: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.52: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 function renderPeople(){
@@ -6004,7 +6027,7 @@ async function createPaymentRequestFromCollect(){
         <p>${escapeHtml(err?.message||"Publish failed")}</p>
       </div>
       <div class="preview-box">
-        Publish the V1.51 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
+        Publish the V1.52 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
       </div>
     `);
   }
@@ -6052,7 +6075,7 @@ window.copyPaymentRequestLink=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.51 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.52 Firestore Rules.");
     return;
   }
 
@@ -6072,7 +6095,7 @@ window.sharePaymentRequest=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.51 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.52 Firestore Rules.");
     return;
   }
 
@@ -6274,7 +6297,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.51 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.52 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -6298,7 +6321,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.51 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.52 secure link.");
     },100);
     return true;
   }
@@ -8803,7 +8826,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.51: payment history no longer prevents removal of a student profile.
+  // V1.52: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -8937,7 +8960,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.51",
+    version:"1.52",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -10532,7 +10555,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.51"
+        sourceVersion:"1.52"
       };
 
       const ops=[];
@@ -10965,13 +10988,54 @@ handlePaymentRequestFromUrl();
   const ROLE_LABELS={
     owner:"Owner",admin:"Admin",accountant:"Accountant",collector:"Collector","read-only":"Read-only"
   };
-  const ROLE_PERMISSIONS={
-    owner:["Full organisation access","Manage users and roles","Transfer ownership","Organisation settings","Fees and payments","Reports and exports"],
-    admin:["Operational administration","Manage lower-level staff (future rule expansion)","People, batches and fees","Payments and reports","No ownership transfer"],
-    accountant:["View people and batches","Manage fees and collections","Payment records and receipts","Financial reports","No user management"],
-    collector:["View dues and required student details","Record/collect payments","Payment requests","No fee-rule or user management"],
-    "read-only":["View permitted organisation data","View reports","No editing","No payment recording","No user management"]
+  const CAPABILITY_DEFINITIONS=[
+    {id:"orgControl",label:"Full organisation control",description:"Owner-level control over the organisation and protected administrative operations."},
+    {id:"staffView",label:"View staff users & access activity",description:"See organisation users, roles and access/audit information."},
+    {id:"staffManage",label:"Manage staff users & roles",description:"Invite staff, change roles, disable/remove staff and send password-reset links."},
+    {id:"ownership",label:"Transfer ownership",description:"Initiate and finalise transfer of the organisation Owner role."},
+    {id:"orgSettings",label:"Organisation settings",description:"View or edit organisation/profile/configuration settings."},
+    {id:"peopleBatches",label:"People & batches",description:"View or edit student/customer and batch/group records."},
+    {id:"feeRules",label:"Fee rules",description:"View or edit fee/charge definitions and rules."},
+    {id:"collect",label:"Record / collect payments",description:"Create payment requests and record or verify collections."},
+    {id:"paymentRecords",label:"Payment records & receipts",description:"View or manage payment records and receipts."},
+    {id:"reports",label:"Reports & exports",description:"View reports and create permitted exports from organisation data."},
+    {id:"customerAccess",label:"Customer access management",description:"Manage customer/parent portal accounts and invitations."}
+  ];
+
+  // Explicitly aligned with the currently published consolidated V1.46
+  // Firestore rules. Do not infer capabilities from descriptive text.
+  const ROLE_CAPABILITIES={
+    owner:{
+      orgControl:"full",staffView:"view",staffManage:"manage",ownership:"full",
+      orgSettings:"edit",peopleBatches:"edit",feeRules:"edit",collect:"edit",
+      paymentRecords:"edit",reports:"view",customerAccess:"edit"
+    },
+    admin:{
+      orgControl:"denied",staffView:"view",staffManage:"denied",ownership:"denied",
+      orgSettings:"edit",peopleBatches:"edit",feeRules:"edit",collect:"edit",
+      paymentRecords:"edit",reports:"view",customerAccess:"edit"
+    },
+    accountant:{
+      orgControl:"denied",staffView:"denied",staffManage:"denied",ownership:"denied",
+      orgSettings:"view",peopleBatches:"view",feeRules:"edit",collect:"edit",
+      paymentRecords:"edit",reports:"view",customerAccess:"denied"
+    },
+    collector:{
+      orgControl:"denied",staffView:"denied",staffManage:"denied",ownership:"denied",
+      orgSettings:"view",peopleBatches:"view",feeRules:"view",collect:"edit",
+      paymentRecords:"edit",reports:"view",customerAccess:"denied"
+    },
+    "read-only":{
+      orgControl:"denied",staffView:"denied",staffManage:"denied",ownership:"denied",
+      orgSettings:"view",peopleBatches:"view",feeRules:"view",collect:"denied",
+      paymentRecords:"view",reports:"view",customerAccess:"denied"
+    }
   };
+
+  const CAPABILITY_STATE_LABELS={
+    full:"Full",manage:"Manage",edit:"Edit",view:"View",denied:"No access"
+  };
+
 
   function safeEmail(v){return String(v||"").trim().toLowerCase()}
   function randomToken(prefix="inv"){
@@ -10980,6 +11044,15 @@ handlePaymentRequestFromUrl();
     return `${prefix}_${Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("")}`;
   }
   function displayRole(role){return ROLE_LABELS[role]||role||"—"}
+  function roleCapability(role,id){
+    return ROLE_CAPABILITIES[String(role||"read-only").toLowerCase()]?.[id] || "denied";
+  }
+  function capabilityAllowed(role,id){
+    return roleCapability(role,id)!=="denied";
+  }
+  function capabilityCanEdit(role,id){
+    return ["full","manage","edit"].includes(roleCapability(role,id));
+  }
   function initials(name,email){
     const s=String(name||email||"?").trim();
     return s.split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"?";
@@ -11195,8 +11268,13 @@ handlePaymentRequestFromUrl();
                   : actionButton("Disable","disable",m.id);
                 actions+=actionButton("Password Reset","password",m.id);
                 actions+=actionButton("Remove","remove",m.id,"danger");
-                if(m.status==="active") actions+=actionButton("Transfer Ownership","transfer",m.id);
+                if(m.status==="active") actions+=actionButton("Owner: Transfer Ownership","transfer",m.id,"owner-only-action");
               }
+            }else if(accessCanViewAdmin()){
+              // Admin may view the staff directory and audit activity, but the
+              // published rules keep staff-role mutations Owner-only.
+              actions+=actionButton("Permissions","permissions",m.id);
+              actions+=actionButton("Activity","activity",m.id);
             }else{
               actions+=actionButton("Permissions","permissions",m.id);
             }
@@ -11218,10 +11296,12 @@ handlePaymentRequestFromUrl();
         <div class="invite-row">
           <div><strong>${escapeHtml(inv.email||"")}</strong><small>${escapeHtml(displayRole(inv.role))} • Invited ${escapeHtml(accessDate(inv.createdAt))}</small></div>
           <div class="access-actions">
-            ${actionButton("Share","share-staff",inv.id)}
-            ${actionButton("Copy Link","copy-staff",inv.id)}
-            ${actionButton("Email","resend-staff",inv.id)}
-            ${actionButton("Cancel","cancel-staff",inv.id,"danger")}
+            ${canManage ? `
+              ${actionButton("Share","share-staff",inv.id)}
+              ${actionButton("Copy Link","copy-staff",inv.id)}
+              ${actionButton("Email","resend-staff",inv.id)}
+              ${actionButton("Cancel","cancel-staff",inv.id,"danger")}
+            ` : '<span class="access-readonly-note">Owner manages staff invitations</span>'}
           </div>
         </div>`).join(""):'<div class="empty">No pending staff invitations.</div>';
     }
@@ -11259,8 +11339,9 @@ handlePaymentRequestFromUrl();
     const linked=new Set(customers.flatMap(x=>Array.isArray(x.personIds)?x.personIds:[]));
     setTextIfChanged(document.getElementById("customerLinkedCount"),String(linked.size));
 
+    const canManageCustomers=accessCanViewAdmin();
     ["inviteCustomerBtn","bulkCustomerInviteBtn","openBulkCustomerBtn"].forEach(id=>{
-      const el=document.getElementById(id); if(el) el.disabled=!cloud.user || !canManage;
+      const el=document.getElementById(id); if(el) el.disabled=!cloud.user || !canManageCustomers;
     });
 
     const ca=document.getElementById("customerAccountsWrap");
@@ -11274,10 +11355,12 @@ handlePaymentRequestFromUrl();
             <td>${escapeHtml(names.join(", ")||"No linked people")}</td>
             <td><span class="status-badge ${escapeHtml(c.status||"active")}">${escapeHtml(c.status||"active")}</span></td>
             <td><div class="access-actions">
-              ${c.status==="disabled"?actionButton("Enable","customer-enable",c.id,"good"):actionButton("Disable","customer-disable",c.id)}
-              ${actionButton("Link / Unlink","customer-link",c.id)}
-              ${actionButton("Reset Access","customer-reset",c.id)}
-              ${actionButton("Remove","customer-remove",c.id,"danger")}
+              ${canManageCustomers ? `
+                ${c.status==="disabled"?actionButton("Enable","customer-enable",c.id,"good"):actionButton("Disable","customer-disable",c.id)}
+                ${actionButton("Link / Unlink","customer-link",c.id)}
+                ${actionButton("Reset Access","customer-reset",c.id)}
+                ${actionButton("Remove","customer-remove",c.id,"danger")}
+              ` : '<span class="access-readonly-note">View only</span>'}
             </div></td>
           </tr>`;
         }).join("")}</tbody></table>`:'<div class="empty">No active customer accounts yet.</div>';
@@ -11290,9 +11373,11 @@ handlePaymentRequestFromUrl();
         return `<div class="invite-row">
           <div><strong>${escapeHtml(inv.email||"")}</strong><small>${escapeHtml(names||"Customer")} • ${escapeHtml(accessDate(inv.createdAt))}</small></div>
           <div class="access-actions">
-            ${actionButton("Resend","resend-customer",inv.id)}
-            ${actionButton("Copy Link","copy-customer",inv.id)}
-            ${actionButton("Cancel","cancel-customer",inv.id,"danger")}
+            ${canManageCustomers ? `
+              ${actionButton("Resend","resend-customer",inv.id)}
+              ${actionButton("Copy Link","copy-customer",inv.id)}
+              ${actionButton("Cancel","cancel-customer",inv.id,"danger")}
+            ` : '<span class="access-readonly-note">View only</span>'}
           </div>
         </div>`;
       }).join(""):'<div class="empty">No pending customer invitations.</div>';
@@ -11522,13 +11607,35 @@ handlePaymentRequestFromUrl();
   }
 
   function permissionModal(member){
-    const role=member?.role||"read-only";
-    const allowed=ROLE_PERMISSIONS[role]||[];
-    const all=["Full organisation access","Manage users and roles","Transfer ownership","Organisation settings","People, batches and fees","Fees and payments","Payment records and receipts","Record/collect payments","Reports and exports"];
+    const role=String(member?.role||"read-only").toLowerCase();
+    const capabilities=ROLE_CAPABILITIES[role]||ROLE_CAPABILITIES["read-only"];
+
+    const itemHtml=CAPABILITY_DEFINITIONS.map(cap=>{
+      const stateName=capabilities[cap.id]||"denied";
+      const cls=stateName==="denied"?"denied":(stateName==="view"?"view":"allowed");
+      const stateLabel=CAPABILITY_STATE_LABELS[stateName]||stateName;
+      return `<div class="permission-item ${cls}">
+        <div class="permission-copy">
+          <strong>${escapeHtml(cap.label)}</strong>
+          <small>${escapeHtml(cap.description)}</small>
+        </div>
+        <span class="permission-state">${escapeHtml(stateLabel)}</span>
+      </div>`;
+    }).join("");
+
     window.modal(`
-      <div class="modal-head"><div><span class="eyebrow">Permissions</span><h3 style="margin:7px 0 0">${escapeHtml(displayRole(role))}</h3></div><button class="close" onclick="closeModal()">×</button></div>
-      <div class="permissions-grid">${all.map(p=>`<div class="permission-item ${allowed.some(a=>a.toLowerCase().includes(p.toLowerCase().split(" ")[0]))?"allowed":"denied"}">${allowed.some(a=>a.toLowerCase().includes(p.toLowerCase().split(" ")[0]))?"✓":"—"} ${escapeHtml(p)}</div>`).join("")}</div>
-      <div class="request-meta" style="margin-top:10px">Firestore rules remain the final authority even if a button is visible in the interface.</div>
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">Permissions</span>
+          <h3 style="margin:7px 0 0">${escapeHtml(displayRole(role))}</h3>
+          <p style="font-size:11px;color:var(--muted);margin:5px 0 0">Effective organisation permissions for this role.</p>
+        </div>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div class="permissions-grid">${itemHtml}</div>
+      <div class="request-meta" style="margin-top:12px">
+        <strong>Firestore-aligned:</strong> this matrix is explicitly mapped to the currently published consolidated V1.46 rules; it is no longer inferred from descriptive text.
+      </div>
     `);
   }
 
@@ -11650,6 +11757,24 @@ handlePaymentRequestFromUrl();
   }
 
   async function handleAccessAction(action,id){
+    const ownerOnlyActions=new Set([
+      "role","transfer","password","disable","enable","remove",
+      "resend-staff","share-staff","copy-staff","cancel-staff"
+    ]);
+    const customerManageActions=new Set([
+      "customer-disable","customer-enable","customer-remove","customer-reset","customer-link",
+      "resend-customer","copy-customer","cancel-customer"
+    ]);
+
+    if(ownerOnlyActions.has(action) && !accessCanManage()){
+      cloudToast("This staff-management action is Owner-only.");
+      return;
+    }
+    if(customerManageActions.has(action) && !accessCanViewAdmin()){
+      cloudToast("Customer access can be managed only by Owner or Admin.");
+      return;
+    }
+
     const member=cloud.access.members.find(x=>x.id===id);
     const staffInv=cloud.access.staffInvites.find(x=>x.id===id);
     const customer=cloud.access.customers.find(x=>x.id===id);
@@ -11910,7 +12035,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.51 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.52 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -12210,7 +12335,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.51 will claim the still-pending invitation after authentication.
+      // V1.52 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -12438,7 +12563,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.51 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.52 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -12538,7 +12663,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.51 Firebase module ready");
+  console.info("Masul V1.52 Firebase module ready");
 
   window.MasulCloud={
     auth,
