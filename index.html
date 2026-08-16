@@ -3198,7 +3198,7 @@
                     </div>
                     <div class="form-note">
                       Masul checks the UPI ID format before creating a payment request. The receiving UPI app/bank still decides whether the VPA actually exists and can accept payment.<br>
-                      <strong>Cross-app mode:</strong> Masul keeps the <code>@</code> separator literal and uses <code>%20</code> for spaces to avoid PSP decoding differences.
+                      <strong>Universal mode:</strong> Masul uses a minimal encoding-free UPI payload. The app-launch payee token contains only URI-safe letters/numbers; the full payee name remains visible on the Masul payment page.
                     </div>
                   </div>
                   <div class="switch-row"><div class="switch-copy"><strong>Smart online</strong><span>Gateway integration</span></div><label class="switch"><input id="settingsSmart" type="checkbox"><span class="slider"></span></label></div>
@@ -3314,9 +3314,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.56</span>
+                <span class="chip">V1.57</span>
               </div>
-              <div class="request-meta">Masul V1.56 • Cross-App UPI Compatibility</div>
+              <div class="request-meta">Masul V1.57 • Minimal Universal UPI</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3832,7 +3832,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.56: cloud/status refreshes must never render the full dashboard
+    // V1.57: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -5406,7 +5406,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.56: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.57: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 
@@ -6138,49 +6138,36 @@ function masulUpiTransactionRef(req){
   return (`MASUL${raw}`).slice(0,35);
 }
 
-function encodeUpiText(value){
-  // Generic UPI apps do not all parse application/x-www-form-urlencoded
-  // identically. encodeURIComponent gives %20 for spaces instead of '+'.
-  return encodeURIComponent(String(value||'').trim());
+function safeUpiDisplayToken(value,fallback="MasulPayee"){
+  // Keep deep-link display fields URI-safe so a PSP does not need to decode
+  // spaces or percent sequences. Full human-readable names stay on Masul UI.
+  const ascii=String(value||"")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^A-Za-z0-9._-]+/g,"")
+    .slice(0,40);
+  return ascii||fallback;
 }
 
-function encodeUpiVpa(value){
-  // Keep the UPI separator '@' literal for broad PSP compatibility.
-  // The BHIM test showed %40 being treated as part of the VPA.
-  const v=cleanUpiId(value);
-  const at=v.lastIndexOf('@');
-  if(at<=0) return encodeURIComponent(v).replace(/%40/gi,'@');
-  return `${encodeURIComponent(v.slice(0,at))}@${encodeURIComponent(v.slice(at+1))}`;
+function safeUpiVpaLiteral(value){
+  // Preserve @ literally; the BHIM tests showed %40 being treated as text.
+  return cleanUpiId(value).replace(/[^A-Za-z0-9._@-]/g,"");
 }
 
-function buildUpiIntentUri({upiId,payee,amount,note,transactionRef,referenceUrl,includeReferenceUrl=false}){
-  const pa=cleanUpiId(upiId);
-  const pn=String(payee||'').trim();
+function buildUpiIntentUri({upiId,payee,amount,transactionRef}){
+  const pa=safeUpiVpaLiteral(upiId);
+  const pn=safeUpiDisplayToken(payee,"MasulPayee");
   const am=Number(amount);
+  const tr=String(transactionRef||`MASUL${Date.now()}`)
+    .replace(/[^A-Za-z0-9]/g,"")
+    .slice(0,35);
 
-  if(!isLikelyValidUpiId(pa)) throw new Error('The configured UPI ID / VPA format is invalid.');
-  if(!pn) throw new Error('Payee name is missing.');
-  if(!(am>0) || !Number.isFinite(am)) throw new Error('Payment amount must be greater than zero.');
+  if(!isLikelyValidUpiId(pa)) throw new Error("The configured UPI ID / VPA format is invalid.");
+  if(!(am>0) || !Number.isFinite(am)) throw new Error("Payment amount must be greater than zero.");
 
-  const tr=String(transactionRef||`MASUL${Date.now()}`).replace(/[^A-Za-z0-9]/g,'').slice(0,35);
-  const tn=String(note||'Masul fee payment').slice(0,80);
-
-  const parts=[
-    `pa=${encodeUpiVpa(pa)}`,
-    `pn=${encodeUpiText(pn)}`,
-    `tr=${encodeURIComponent(tr)}`,
-    `tn=${encodeUpiText(tn)}`,
-    `am=${am.toFixed(2)}`,
-    'cu=INR'
-  ];
-
-  // Reference URL is optional in Masul's generic cross-app intent.
-  // Keep it off by default to minimise parser differences between PSP apps.
-  if(includeReferenceUrl && referenceUrl && /^https:\/\//i.test(String(referenceUrl))){
-    parts.push(`url=${encodeURIComponent(String(referenceUrl))}`);
-  }
-
-  return `upi://pay?${parts.join('&')}`;
+  // Minimal generic UPI payload: every value is already URI-safe.
+  // No %20, no +, no tn, no url.
+  return `upi://pay?pa=${pa}&pn=${pn}&tr=${tr}&am=${am.toFixed(2)}&cu=INR`;
 }
 
 function paymentRequestUpiUri(req){
@@ -6188,10 +6175,7 @@ function paymentRequestUpiUri(req){
     upiId:req.upiId,
     payee:req.payee||req.orgName,
     amount:req.amount,
-    note:`Masul ${req.id} ${req.personName}`,
-    transactionRef:masulUpiTransactionRef(req),
-    referenceUrl:req.publicToken?requestPublicUrl(req):location.href.split("?")[0].split("#")[0],
-    includeReferenceUrl:false
+    transactionRef:masulUpiTransactionRef(req)
   });
 }
 
@@ -6298,7 +6282,7 @@ function showPaymentRequestCreated(req){
     </div>
     <div class="preview-box" style="margin-top:12px">
       <strong>UPI destination:</strong> ${escapeHtml(req.payee||req.orgName)} • ${escapeHtml(req.upiId)}
-      <br><span style="font-size:10px;color:var(--muted)">Please verify this UPI ID before sharing. A syntactically valid VPA can still be rejected by the receiving UPI app if the account/VPA is inactive or incorrect.</span>
+      <br><span style="font-size:10px;color:var(--muted)">The public page shows the full payee name. The UPI app-launch token removes spaces (for example AditiChakravarty) so BHIM does not receive %20 or + as literal characters.</span>
     </div>
     <div class="preview-box" style="margin-top:12px">
       <strong>Secure public link:</strong> this link contains a long random access token and opens only a sanitised payment-request copy. The private student record is not made public.
@@ -6416,9 +6400,9 @@ window.openPaymentRequest=(id)=>{
         <div id="requestQr"></div>
         <div>
           <h3>Pay ${money(req.amount)}</h3>
-          <p style="font-size:12px;color:var(--muted)">Recipient: ${escapeHtml(req.payee||req.orgName)}<br>UPI ID: ${escapeHtml(req.upiId)}</p>
+          <p style="font-size:12px;color:var(--muted)">Recipient: ${escapeHtml(req.payee||req.orgName)}<br>UPI ID: ${escapeHtml(req.upiId)}</p><p style="font-size:9px;color:var(--muted)">QR and app button use the same minimal cross-app UPI payload.</p>
           ${uri
-            ? `<a class="btn primary" href="${uri}" style="text-decoration:none">Pay with Any UPI App</a>`
+            ? `<a class="btn primary" href="${uri}" style="text-decoration:none">Open UPI App</a>`
             : `<button class="btn primary" disabled>UPI configuration needs correction</button>`}
         </div>
       </div>
@@ -6570,7 +6554,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.56 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.57 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -6594,7 +6578,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.56 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.57 secure link.");
     },100);
     return true;
   }
@@ -6777,10 +6761,7 @@ function renderPaymentMethodDetail(){
         upiId:upi,
         payee:state.paymentsConfig.payee||state.org.name||"Masul Payee",
         amount:total,
-        note:"Masul fee payment",
-        transactionRef:`MASUL${Date.now().toString(36).toUpperCase()}`.slice(0,35),
-        referenceUrl:location.href.split("?")[0].split("#")[0],
-        includeReferenceUrl:false
+        transactionRef:`MASUL${Date.now().toString(36).toUpperCase()}`.slice(0,35)
       });
     }catch(err){
       paymentMethodDetail.innerHTML=`<div class="danger-alert"><div class="danger-title">UPI configuration needs correction</div><p>${escapeHtml(err?.message||"Invalid UPI configuration")}</p></div>`;
@@ -9173,7 +9154,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.56: payment history no longer prevents removal of a student profile.
+  // V1.57: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -9311,7 +9292,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.56",
+    version:"1.57",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -10929,7 +10910,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.56"
+        sourceVersion:"1.57"
       };
 
       const ops=[];
@@ -12409,7 +12390,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.56 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.57 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -12709,7 +12690,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.56 will claim the still-pending invitation after authentication.
+      // V1.57 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -12937,7 +12918,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.56 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.57 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -13037,7 +13018,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.56 Firebase module ready");
+  console.info("Masul V1.57 Firebase module ready");
 
   window.MasulCloud={
     auth,
