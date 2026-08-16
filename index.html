@@ -2258,7 +2258,7 @@
     }
   
     /* ========================================================
-       V1.61 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
+       V1.61.1 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
        ======================================================== */
     .developer-entry{
       margin-top:10px;border-top:1px solid var(--line);padding-top:10px
@@ -3544,9 +3544,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.61</span>
+                <span class="chip">V1.61.1</span>
               </div>
-              <div class="request-meta">Masul V1.61 • Developer / Super Admin Console</div>
+              <div class="request-meta">Masul V1.61.1 • Developer / Super Admin Console Hotfix</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3607,7 +3607,7 @@
               <img src="masul-icon.png" alt="Masul">
               <div>
                 <strong>Masul Platform</strong>
-                <small>Developer / Super Admin<br>V1.61</small>
+                <small>Developer / Super Admin<br>V1.61.1</small>
               </div>
             </div>
           </div>
@@ -3629,7 +3629,7 @@
             <div class="developer-hero-row">
               <div>
                 <span class="eyebrow">Masul Platform Control</span>
-                <h1>Developer / Super Admin Console</h1>
+                <h1>Developer / Super Admin Console Hotfix</h1>
                 <p>Manage pilot organisations, onboarding, Masul setup fees, release health and platform metadata without casually opening customer/student records.</p>
               </div>
               <div class="dev-admin-chip"><span class="dot"></span><span id="developerAdminIdentity">Checking platform access…</span></div>
@@ -3651,7 +3651,7 @@
                 <div class="dev-stat"><span>Payment records</span><strong id="devStatPayments">0</strong><small>Aggregate count only</small></div>
                 <div class="dev-stat good"><span>Setup fees received</span><strong id="devStatSetupPaid">₹0</strong><small>Masul onboarding/setup revenue</small></div>
                 <div class="dev-stat attention"><span>Setup fees due</span><strong id="devStatSetupDue">₹0</strong><small>Outstanding pilot setup amounts</small></div>
-                <div class="dev-stat"><span>Current release</span><strong>V1.61</strong><small>Developer Console foundation</small></div>
+                <div class="dev-stat"><span>Current release</span><strong>V1.61.1</strong><small>Developer Console foundation</small></div>
                 <div class="dev-stat attention"><span>Needs attention</span><strong id="devStatAttention">0</strong><small>Follow-up / old version / incomplete onboarding</small></div>
               </div>
 
@@ -3667,7 +3667,7 @@
                 <div class="dev-card">
                   <div class="dev-card-head">
                     <div><h3>Version adoption</h3><p>Source version reported by each organisation's Firebase config.</p></div>
-                    <span class="dev-badge active">Current V1.61</span>
+                    <span class="dev-badge active">Current V1.61.1.1</span>
                   </div>
                   <div id="developerVersionChart"></div>
                 </div>
@@ -3732,7 +3732,7 @@
             <section class="developer-tab" id="devtab-health">
               <div class="dev-health-grid">
                 <div class="dev-health"><strong>Firebase Project</strong><span>masul-900d7<br>Production cloud data layer</span></div>
-                <div class="dev-health"><strong>Current Web Release</strong><span>Masul V1.61<br>Developer Console foundation</span></div>
+                <div class="dev-health"><strong>Current Web Release</strong><span>Masul V1.61.1<br>Developer Console foundation</span></div>
                 <div class="dev-health"><strong>Platform Admin Security</strong><span>Protected UID registry<br>No hard-coded super-admin email</span></div>
                 <div class="dev-health"><strong>Organisation Privacy</strong><span>Aggregate usage counts<br>No default student/payment-detail browsing</span></div>
                 <div class="dev-health"><strong>Public Payments</strong><span>Secure token mirror<br>Manual verification before receipt</span></div>
@@ -4202,7 +4202,7 @@ function developerAttentionReasons(org){
   if((meta.onboardingStatus||"not-started")!=="live") reasons.push(`Onboarding: ${meta.onboardingStatus||"not-started"}`);
   const balance=Math.max(0,(+meta.setupFeeAmount||0)-(+meta.setupFeePaid||0));
   if(balance>0) reasons.push(`Setup fee due ${developerMoney(balance)}`);
-  if(org.sourceVersion && org.sourceVersion!=="1.61") reasons.push(`Version V${org.sourceVersion}`);
+  if(org.sourceVersion && org.sourceVersion!=="1.61.1") reasons.push(`Version V${org.sourceVersion}`);
   if(!org.sourceVersion) reasons.push("Version not reported");
   if(meta.nextFollowUp){
     const d=new Date(meta.nextFollowUp+"T00:00:00");
@@ -4252,7 +4252,7 @@ window.renderDeveloperOrganisationTable=()=>{
         <td><span class="dev-badge ${escapeHtml(m.onboardingStatus||"not-started")}">${escapeHtml(m.onboardingStatus||"not-started")}</span>
           <span class="dev-sub">${escapeHtml(m.priority||"normal")} priority</span></td>
         <td><strong>${org.sourceVersion?`V${escapeHtml(org.sourceVersion)}`:"—"}</strong>
-          <span class="dev-sub">${org.sourceVersion==="1.61"?"Current":"Review before rollout"}</span></td>
+          <span class="dev-sub">${org.sourceVersion==="1.61.1"?"Current":"Review before rollout"}</span></td>
         <td><strong>${org.counts?.people||0}</strong> people
           <span class="dev-sub">${org.counts?.members||0} staff • ${org.counts?.payments||0} payments • ${org.counts?.fees||0} fees</span></td>
         <td><span class="dev-balance ${due>0?"due":"clear"}">${due>0?`${developerMoney(due)} due`:"Clear"}</span>
@@ -4303,7 +4303,7 @@ function renderDeveloperHealthTable(){
   wrap.innerHTML=rows.length?`<div class="dev-table-wrap"><table class="dev-table">
     <thead><tr><th>Organisation</th><th>Source Version</th><th>Cloud Schema</th><th>Last Org Update</th><th>Staff</th><th>People</th><th>Payment Requests</th><th>Health</th></tr></thead>
     <tbody>${rows.map(org=>{
-      const current=org.sourceVersion==="1.61";
+      const current=org.sourceVersion==="1.61.1";
       return `<tr>
         <td><strong>${escapeHtml(org.name)}</strong><span class="dev-sub">${escapeHtml(org.orgId)}</span></td>
         <td><strong>${org.sourceVersion?`V${escapeHtml(org.sourceVersion)}`:"—"}</strong></td>
@@ -4524,7 +4524,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.61: cloud/status refreshes must never render the full dashboard
+    // V1.61.1: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -6098,7 +6098,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.61: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.61.1: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 
@@ -7564,7 +7564,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.61 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.61.1 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -7588,7 +7588,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.61 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.61.1 secure link.");
     },100);
     return true;
   }
@@ -8453,7 +8453,7 @@ function dashJump(target,options={}){
 
   currentDashTarget=target;
   document.querySelectorAll(".dash-section").forEach(s=>s.classList.toggle("active",s.id===`dash-${target}`));
-  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.dash===target));
+  document.querySelectorAll(".nav-btn[data-dash]").forEach(b=>b.classList.toggle("active",b.dataset.dash===target));
 
   if(target==="people") renderPeople();
   if(target==="batches") renderBatches();
@@ -9127,7 +9127,16 @@ if(typeof reportFullSessionBtn!=="undefined" && reportFullSessionBtn){
   if(el) el.addEventListener("change",()=>{ if(currentReportSnapshot) generateReport(); });
 });
 
-document.querySelectorAll(".nav-btn").forEach(b=>b.onclick=()=>dashJump(b.dataset.dash));
+document.querySelectorAll(".nav-btn[data-dash]").forEach(b=>b.onclick=()=>dashJump(b.dataset.dash));
+const developerConsoleNavButton=document.getElementById("developerConsoleNavBtn");
+if(developerConsoleNavButton){
+  developerConsoleNavButton.onclick=(event)=>{
+    event.preventDefault();
+    event.stopPropagation();
+    openDeveloperConsole();
+  };
+}
+
 document.addEventListener("click",e=>{
   const jump=e.target.closest("[data-dash-jump]");
   if(jump){dashJump(jump.dataset.dashJump);return}
@@ -10341,7 +10350,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.61: payment history no longer prevents removal of a student profile.
+  // V1.61.1: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -10479,7 +10488,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.61",
+    version:"1.61.1",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -12098,7 +12107,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.61"
+        sourceVersion:"1.61.1"
       };
 
       const ops=[];
@@ -13578,7 +13587,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.61 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.61.1 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -13878,7 +13887,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.61 will claim the still-pending invitation after authentication.
+      // V1.61.1 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -13964,7 +13973,7 @@ handlePaymentRequestFromUrl();
 
 
   // ==========================================================
-  // V1.61 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
+  // V1.61.1 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
   // ==========================================================
   const platform={
     isAdmin:false,
@@ -14261,7 +14270,7 @@ handlePaymentRequestFromUrl();
         <div class="dev-stat"><span>Staff users</span><strong>${org.counts?.members||0}</strong><small>Aggregate count</small></div>
         <div class="dev-stat"><span>People</span><strong>${org.counts?.people||0}</strong><small>No names opened</small></div>
         <div class="dev-stat"><span>Payments</span><strong>${org.counts?.payments||0}</strong><small>Record count only</small></div>
-        <div class="dev-stat"><span>Version</span><strong>${org.sourceVersion?`V${escapeHtml(org.sourceVersion)}`:"—"}</strong><small>${org.sourceVersion==="1.61"?"Current":"Review before rollout"}</small></div>
+        <div class="dev-stat"><span>Version</span><strong>${org.sourceVersion?`V${escapeHtml(org.sourceVersion)}`:"—"}</strong><small>${org.sourceVersion==="1.61.1"?"Current":"Review before rollout"}</small></div>
       </div>
 
       <div class="dev-card" style="margin-top:10px">
@@ -14400,7 +14409,7 @@ handlePaymentRequestFromUrl();
     }catch(err){
       console.error("Developer Console load:",err);
       window.renderDeveloperError?.(
-        `${err?.message||"Could not load platform data."} If V1.61 was just deployed, publish the V1.61 Firestore Rules and confirm your platformAdmins UID document.`
+        `${err?.message||"Could not load platform data."} If V1.61.1 was just deployed, publish the V1.61.1 Firestore Rules and confirm your platformAdmins UID document.`
       );
     }
   }
@@ -14605,7 +14614,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.61 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.61.1 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -14706,7 +14715,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.61 Firebase module ready");
+  console.info("Masul V1.61.1 Firebase module ready");
 
   window.MasulCloud={
     auth,
