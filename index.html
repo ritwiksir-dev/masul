@@ -1225,6 +1225,26 @@
       display:flex;align-items:center;justify-content:space-between;gap:10px
     }
     .archived-people-inner{padding:0 12px 12px}
+    .people-trash-panel{
+      margin-top:14px;border:1px solid #ead9d4;border-radius:16px;background:#fffafa;overflow:hidden
+    }
+    .people-trash-panel summary{
+      cursor:pointer;padding:12px 14px;font-size:11px;font-weight:900;color:#7a514a;
+      display:flex;align-items:center;justify-content:space-between;gap:10px
+    }
+    .people-trash-inner{padding:0 12px 12px}
+    .trash-badge{
+      display:inline-flex;align-items:center;border:1px solid #efd5d0;background:#fff2ef;color:#994c43;
+      border-radius:999px;padding:3px 7px;font-size:8px;font-weight:900
+    }
+    .trash-days{
+      display:inline-flex;align-items:center;border:1px solid #e2e7ee;background:#f8fafc;color:#647287;
+      border-radius:999px;padding:3px 7px;font-size:8px;font-weight:850;margin-left:5px
+    }
+    .undo-delete-box{
+      border:1px solid #d8e7dd;background:#f3faf6;border-radius:14px;padding:11px 12px;
+      color:#346e54;font-size:10px;line-height:1.5;margin-top:10px
+    }
     .left-session-badge{
       display:inline-flex;align-items:center;border:1px solid #e3dac6;background:#fffaf0;color:#7e6330;
       border-radius:999px;padding:3px 7px;font-size:8px;font-weight:900
@@ -3265,9 +3285,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.52</span>
+                <span class="chip">V1.53</span>
               </div>
-              <div class="request-meta">Masul V1.52 • Roles & Permissions Consistency</div>
+              <div class="request-meta">Masul V1.53 • People Trash & Undo Delete</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3552,6 +3572,7 @@ function normalisePeopleData(){
     p.name=String(p.name).trim();
     p.batch=String(p.batch||"General").trim()||"General";
     p.archived=!!p.archived;
+    p.trashed=!!p.trashed;
     p.exemptions=Array.isArray(p.exemptions)?p.exemptions:[];
     if(!p.id) p.id=uuid("p");
     const key=(p.name+"|"+p.batch).toLowerCase();
@@ -3731,7 +3752,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.52: cloud/status refreshes must never render the full dashboard
+    // V1.53: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -3864,7 +3885,7 @@ window.showSetupChecklist=showSetupChecklist;
 
 function renderHomeOverview(){
   const ready=setupReadiness();
-  const activePeople=(state.people||[]).filter(p=>!p.archived);
+  const activePeople=(state.people||[]).filter(p=>!p.archived && !p.trashed);
   const openRequests=(state.paymentRequests||[]).filter(r=>["awaiting_payment","payment_reported"].includes(r.status));
 
   if(typeof homeOrgTitle!=="undefined" && homeOrgTitle){
@@ -4228,7 +4249,7 @@ function feeTargetOptionsHtml(mode,valuePrefix="",selectedBatches=[],selectedPeo
   }
 
   if(mode==="Selected people"){
-    const people=[...(state.people||[])].filter(p=>!p.archived)
+    const people=[...(state.people||[])].filter(p=>!p.archived && !p.trashed)
       .sort((a,b)=>String(a.name||a.personName||a.displayName||"").localeCompare(
         String(b.name||b.personName||b.displayName||""),undefined,{sensitivity:"base"}
       ));
@@ -4653,7 +4674,7 @@ function reportPersonBatch(person){
 
 function reportActivePeople(){
   return (state.people||[])
-    .filter(p=>!p.archived)
+    .filter(p=>!p.archived && !p.trashed)
     .sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"}));
 }
 
@@ -5295,12 +5316,12 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.52: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.53: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 function renderPeople(){
   normalisePeopleData();
-  const all=[...state.people].filter(p=>!p.archived).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
+  const all=[...state.people].filter(p=>!p.archived && !p.trashed).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
 
   // Drop stale selections if records no longer exist.
   const activeIds=new Set(all.map(p=>p.id));
@@ -5351,7 +5372,7 @@ function renderPeople(){
       <span><strong>${selectedPeopleForBulkDelete.size}</strong> selected for bulk action</span>
       <div class="button-row">
         <button class="btn ghost small" onclick="clearBulkPeopleSelection()">Clear selection</button>
-        <button class="btn danger small" onclick="openBulkDeletePeopleWarning()">⚠ Bulk Delete Selected</button>
+        <button class="btn danger small" onclick="openBulkDeletePeopleWarning()">Move Selected to Trash</button>
       </div>
     </div>
     <table class="table-lite">
@@ -5376,7 +5397,7 @@ function renderPeople(){
       }</tbody>
     </table>
     ${(()=>{
-      const archived=[...state.people].filter(p=>p.archived).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
+      const archived=[...state.people].filter(p=>p.archived && !p.trashed).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
       if(!archived.length) return "";
       return `<details class="archived-people-panel">
         <summary><span>Left Session / Archived</span><span class="left-session-badge">${archived.length} record${archived.length===1?"":"s"}</span></summary>
@@ -5395,20 +5416,50 @@ function renderPeople(){
           </table>
         </div>
       </details>`;
+    })()}
+    ${(()=>{
+      const trashed=[...state.people].filter(p=>p.trashed)
+        .sort((a,b)=>new Date(b.trashedAt||0)-new Date(a.trashedAt||0));
+      if(!trashed.length) return "";
+      return `<details class="people-trash-panel">
+        <summary><span>Recently Deleted / Trash</span><span class="trash-badge">${trashed.length} record${trashed.length===1?"":"s"}</span></summary>
+        <div class="people-trash-inner">
+          <div class="preview-box" style="margin-bottom:10px">
+            Deleted profiles can be restored for <strong>30 days</strong>. Permanent deletion is a separate irreversible action. Payment and receipt history remains protected.
+          </div>
+          <table class="table-lite">
+            <thead><tr><th>Name</th><th>Batch</th><th>Deleted</th><th>Actions</th></tr></thead>
+            <tbody>${trashed.map(p=>{
+              const days=trashDaysRemaining(p);
+              return `<tr>
+                <td>${escapeHtml(p.name)}</td>
+                <td>${escapeHtml(p.batch||"General")}</td>
+                <td>${escapeHtml(formatDateOnly(p.trashedAt||""))}
+                  <span class="trash-days">${days>0?`${days} day${days===1?"":"s"} to restore`:"Recovery period ended"}</span>
+                </td>
+                <td><div class="student-action-row">
+                  ${days>0?`<button class="btn ghost small" onclick="restoreTrashedPerson('${p.id}')">Restore</button>`:""}
+                  <button class="btn person-delete-action small" onclick="openPermanentDeletePersonWarning('${p.id}')">Delete Permanently</button>
+                </div></td>
+              </tr>`;
+            }).join("")}</tbody>
+          </table>
+        </div>
+      </details>`;
     })()}`;
 }
 
 
 function getBatchNames(){
   const fromSetup=(state.org.batches||[]).map(b=>b.name).filter(Boolean);
-  const fromPeople=(state.people||[]).filter(p=>!p.archived).map(p=>p.batch||"General").filter(Boolean);
+  const fromPeople=(state.people||[]).filter(p=>!p.archived && !p.trashed).map(p=>p.batch||"General").filter(Boolean);
   return [...new Set([...fromSetup,...fromPeople])].sort((a,b)=>a.localeCompare(b));
 }
 
 function renderBatches(){
   normalisePeopleData();
   const batches=getBatchNames();
-  if(typeof hubPeopleText!=="undefined" && hubPeopleText) hubPeopleText.textContent=`${state.people.filter(p=>!p.archived).length} people • view and collect`;
+  if(typeof hubPeopleText!=="undefined" && hubPeopleText) hubPeopleText.textContent=`${state.people.filter(p=>!p.archived && !p.trashed).length} people • view and collect`;
   if(typeof hubBatchText!=="undefined" && hubBatchText) hubBatchText.textContent=`${batches.length} batches/groups • open members`;
 
   if(!batches.length){
@@ -5435,7 +5486,7 @@ function renderBatches(){
 }
 
 window.openBatchDetail=(batchName)=>{
-  const people=[...state.people].filter(p=>!p.archived && (p.batch||"General")===batchName).sort((a,b)=>a.name.localeCompare(b.name));
+  const people=[...state.people].filter(p=>!p.archived && !p.trashed && (p.batch||"General")===batchName).sort((a,b)=>a.name.localeCompare(b.name));
   batchDetailTitle.textContent=batchName;
   batchDetailMeta.textContent=`${people.length} ${String(state.org.peopleLabel||"people").toLowerCase()}`;
   batchStudentList.innerHTML=people.length
@@ -5677,7 +5728,7 @@ window.openStudentQuickCard=(personId)=>{
       <div>
         <span class="eyebrow">Fee Card / Ledger</span>
         <h3 style="margin:7px 0 0">${escapeHtml(p.name)}</h3>
-        <p style="font-size:12px;color:var(--muted)">${escapeHtml(p.batch||"General")} • ${escapeHtml(state.org.sessionName||"")}${p.archived?' • <span class="left-session-badge">Left Session / Archived</span>':""}</p>
+        <p style="font-size:12px;color:var(--muted)">${escapeHtml(p.batch||"General")} • ${escapeHtml(state.org.sessionName||"")}${p.trashed?' • <span class="trash-badge">Recently Deleted</span>':(p.archived?' • <span class="left-session-badge">Left Session / Archived</span>':"")}</p>
       </div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
@@ -5734,19 +5785,22 @@ window.openStudentQuickCard=(personId)=>{
     </div>`:""}
 
     <div class="context-actions">
-      ${p.archived?"":`<button class="btn primary" onclick="closeModal();collectForPerson('${p.id}')">Collect Payment</button>`}
-      <button class="btn ghost" onclick="openFeeExemption('${p.id}')">Fee Exemption</button>
-      <button class="btn person-edit-action" onclick="openEditPerson('${p.id}')">Edit Record</button>
-      ${p.archived?"":`<button class="btn ghost" onclick="closeModal();openBatchDetail('${escapeHtml(p.batch||"General")}')">Open Batch</button>`}
-      <button class="btn ghost" onclick="archivePerson('${p.id}')">${p.archived?"Restore to Active":"Mark Left Session"}</button>
-      <button class="btn danger" onclick="openDeletePersonWarning('${p.id}')">Delete Record</button>
+      ${p.trashed
+        ? `${trashDaysRemaining(p)>0?`<button class="btn primary" onclick="restoreTrashedPerson('${p.id}')">Undo Delete / Restore</button>`:""}
+           <button class="btn danger" onclick="openPermanentDeletePersonWarning('${p.id}')">Delete Permanently</button>`
+        : `${p.archived?"":`<button class="btn primary" onclick="closeModal();collectForPerson('${p.id}')">Collect Payment</button>`}
+           <button class="btn ghost" onclick="openFeeExemption('${p.id}')">Fee Exemption</button>
+           <button class="btn person-edit-action" onclick="openEditPerson('${p.id}')">Edit Record</button>
+           ${p.archived?"":`<button class="btn ghost" onclick="closeModal();openBatchDetail('${escapeHtml(p.batch||"General")}')">Open Batch</button>`}
+           <button class="btn ghost" onclick="archivePerson('${p.id}')">${p.archived?"Restore to Active":"Mark Left Session"}</button>
+           <button class="btn danger" onclick="openDeletePersonWarning('${p.id}')">Delete Record</button>`}
     </div>
   `)
 };
 
 function renderPendingDues(){
   normalisePeopleData();
-  const activePeople=state.people.filter(p=>!p.archived);
+  const activePeople=state.people.filter(p=>!p.archived && !p.trashed);
   if(!activePeople.length){
     pendingDuesWrap.innerHTML=`<div class="empty">No people available.
       <div class="empty-actions">
@@ -5833,7 +5887,7 @@ window.saveFeeEdit=id=>{
 
 function getCollectionPeople(){
   normalisePeopleData();
-  return [...state.people].filter(p=>!p.archived).sort((a,b)=>
+  return [...state.people].filter(p=>!p.archived && !p.trashed).sort((a,b)=>
     String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"})
   );
 }
@@ -6027,7 +6081,7 @@ async function createPaymentRequestFromCollect(){
         <p>${escapeHtml(err?.message||"Publish failed")}</p>
       </div>
       <div class="preview-box">
-        Publish the V1.52 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
+        Publish the V1.53 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
       </div>
     `);
   }
@@ -6075,7 +6129,7 @@ window.copyPaymentRequestLink=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.52 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.53 Firestore Rules.");
     return;
   }
 
@@ -6095,7 +6149,7 @@ window.sharePaymentRequest=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.52 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.53 Firestore Rules.");
     return;
   }
 
@@ -6297,7 +6351,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.52 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.53 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -6321,7 +6375,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.52 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.53 secure link.");
     },100);
     return true;
   }
@@ -7055,7 +7109,7 @@ document.getElementById("sideBulkPeopleBtn").onclick=openBulkPeopleFromHome;
 document.querySelectorAll("[data-home-dash]").forEach(b=>b.onclick=()=>{
   const target=b.dataset.homeDash;
   if(target==="collect"){
-    const active=(state.people||[]).filter(p=>!p.archived);
+    const active=(state.people||[]).filter(p=>!p.archived && !p.trashed);
     if(!active.length){toast(`Add ${String(state.org.peopleLabel||"people").toLowerCase()} first — Bulk Entry is available from this page.`);return}
     if(!(state.fees||[]).length){toast("Add at least one fee / charge before collecting.");return}
   }
@@ -7893,7 +7947,7 @@ function parseHistoryNarration(text){
 
 function openPastHistorySetup(){
   const monthly=historyMonthlyFees();
-  if(!(state.people||[]).filter(p=>!p.archived).length){
+  if(!(state.people||[]).filter(p=>!p.archived && !p.trashed).length){
     toast("Add students/customers before setting up past fee history");
     return;
   }
@@ -8269,6 +8323,16 @@ window.archivePerson=(personId)=>{
   toast(p.archived?"Marked as Left Session • awaiting payment links cancelled":"Student restored to active session");
 };
 
+const PEOPLE_TRASH_DAYS=30;
+
+function trashDaysRemaining(person){
+  if(!person?.trashedAt) return PEOPLE_TRASH_DAYS;
+  const deleted=new Date(person.trashedAt);
+  if(Number.isNaN(deleted.getTime())) return PEOPLE_TRASH_DAYS;
+  const expires=deleted.getTime()+PEOPLE_TRASH_DAYS*24*60*60*1000;
+  return Math.max(0,Math.ceil((expires-Date.now())/(24*60*60*1000)));
+}
+
 window.openDeletePersonWarning=(personId)=>{
   const p=state.people.find(x=>x.id===personId); if(!p)return;
   const linked=personRecordLinks(personId);
@@ -8278,82 +8342,129 @@ window.openDeletePersonWarning=(personId)=>{
       <div><span class="eyebrow">Student Record</span><h3 style="margin:7px 0 0">Delete ${escapeHtml(p.name)}?</h3></div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
-    <span class="danger-stage">WARNING 1 OF 2</span>
     <div class="danger-alert">
-      <div class="danger-title">⚠ The student profile can be deleted even when payments exist</div>
-      <p>Deleting removes this student from the active/session records and future dues. <strong>Verified payments, receipts and opening-history payments will be retained</strong> for financial integrity.</p>
+      <div class="danger-title">Move this profile to Trash?</div>
+      <p>This is <strong>not permanent deletion</strong>. The profile will disappear from normal lists and can be restored for the next <strong>30 days</strong>.</p>
     </div>
     <div class="record-impact-grid">
       <div class="record-impact"><strong>${linked.payments.length}</strong><span>payment / history records retained</span></div>
-      <div class="record-impact"><strong>${linked.awaiting.length}</strong><span>awaiting payment requests will be cancelled</span></div>
-      <div class="record-impact"><strong>${linked.reported.length}</strong><span>reported payments retained for verification</span></div>
+      <div class="record-impact"><strong>${linked.awaiting.length}</strong><span>awaiting payment requests cancelled</span></div>
+      <div class="record-impact"><strong>30</strong><span>days to undo / restore</span></div>
     </div>
     <div class="legal-strip warning">
-      <strong>If the student has simply left during the session:</strong> use <em>Mark Left Session</em> instead. This stops future dues, cancels awaiting links, preserves the full profile, and allows restoration later.
-    </div>
-    <div class="danger-choice-grid">
-      <div class="danger-choice">
-        <strong>Recommended — Left Session</strong>
-        <small>Keep the profile and financial history, but remove the student from active collection lists.</small>
-        <button class="btn ghost small" onclick="archivePerson('${p.id}')">Mark Left Session</button>
-      </div>
-      <div class="danger-choice">
-        <strong>Permanent profile deletion</strong>
-        <small>Payment/receipt history remains, but the student profile itself will be removed.</small>
-        <button class="btn danger small" onclick="openDeletePersonFinal('${p.id}',false)">Continue to Delete</button>
-      </div>
+      <strong>If the student simply left the session:</strong> use <em>Mark Left Session</em> instead. That preserves the profile as a normal archived record.
     </div>
     <div class="request-action-row">
-      <button class="btn primary small" onclick="downloadSafetyBackup();setTimeout(()=>openDeletePersonFinal('${p.id}',true),180)">Backup & Continue to Delete</button>
+      ${p.archived?"":`<button class="btn ghost" onclick="archivePerson('${p.id}')">Mark Left Session</button>`}
+      <button class="btn danger" onclick="movePersonToTrash('${p.id}')">Move to Trash</button>
       <button class="btn ghost" onclick="closeModal()">Cancel</button>
     </div>
   `);
 };
 
-window.openDeletePersonFinal=(personId,backupTaken=false)=>{
-  const p=state.people.find(x=>x.id===personId); if(!p){closeModal();return}
+window.movePersonToTrash=(personId)=>{
+  const p=state.people.find(x=>x.id===personId); if(!p)return;
   const linked=personRecordLinks(personId);
+  const now=new Date().toISOString();
+
+  linked.awaiting.forEach(r=>{
+    r.status="cancelled";
+    r.cancelledAt=now;
+    r.cancelReason="Person moved to Trash";
+  });
+
+  p.trashed=true;
+  p.trashedAt=now;
+  p.trashedFromArchived=!!p.archived;
+  p.archived=false;
+  p.updatedAt=now;
+  selectedPeopleForBulkDelete.delete(personId);
+
+  saveState();
+  closeModal();
+  renderDashboard();
+  renderCustomer();
+
+  modal(`
+    <div class="modal-head">
+      <div><span class="eyebrow">Moved to Trash</span><h3 style="margin:7px 0 0">${escapeHtml(p.name)}</h3></div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div class="undo-delete-box">
+      The profile can be restored for the next <strong>30 days</strong>.
+    </div>
+    <div class="request-action-row">
+      <button class="btn primary" onclick="restoreTrashedPerson('${p.id}')">Undo Delete / Restore</button>
+      <button class="btn ghost" onclick="closeModal()">Done</button>
+    </div>
+  `);
+};
+
+window.restoreTrashedPerson=(personId)=>{
+  const p=state.people.find(x=>x.id===personId); if(!p)return;
+  if(!p.trashed) return;
+  if(trashDaysRemaining(p)<=0){
+    toast("The 30-day recovery period has ended");
+    return;
+  }
+  const wasArchived=!!p.trashedFromArchived;
+  p.trashed=false;
+  p.archived=wasArchived;
+  p.restoredFromTrashAt=new Date().toISOString();
+  delete p.trashedAt;
+  delete p.trashedFromArchived;
+  saveState();
+  closeModal();
+  renderDashboard();
+  renderCustomer();
+  toast("Deletion undone • profile restored");
+};
+
+window.openPermanentDeletePersonWarning=(personId)=>{
+  const p=state.people.find(x=>x.id===personId); if(!p)return;
+  const linked=personRecordLinks(personId);
+  const days=trashDaysRemaining(p);
   playDangerSound(2);
   modal(`
     <div class="modal-head">
-      <div><span class="eyebrow">Final Confirmation</span><h3 style="margin:7px 0 0">Delete Student Profile</h3></div>
+      <div><span class="eyebrow">Permanent Delete</span><h3 style="margin:7px 0 0">${escapeHtml(p.name)}</h3></div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
-    <span class="danger-stage">WARNING 2 OF 2</span>
+    <span class="danger-stage">IRREVERSIBLE PROFILE ACTION</span>
     <div class="danger-alert">
-      <div class="danger-title">🚨 ${escapeHtml(p.name)} will be removed from student records</div>
-      <ul>
-        <li>${backupTaken?"A JSON backup download was requested.":"No new backup was requested in the previous step."}</li>
-        <li>${linked.payments.length} payment/opening-history record(s) will remain in Payments and reports.</li>
-        <li>${linked.awaiting.length} awaiting payment request(s) will be cancelled.</li>
-        <li>${linked.reported.length} payment-reported request(s) will remain available for verification/rejection.</li>
-        <li>The student profile, batch membership and exemption settings will be removed.</li>
-      </ul>
+      <div class="danger-title">Permanently delete this person profile?</div>
+      <p>This removes the profile immediately and <strong>cannot be undone</strong>. ${days>0?`The normal recovery period still has ${days} day${days===1?"":"s"} remaining.`:"The recovery period has ended."}</p>
+    </div>
+    <div class="record-impact-grid">
+      <div class="record-impact"><strong>${linked.payments.length}</strong><span>financial/payment records remain protected</span></div>
+      <div class="record-impact"><strong>${linked.reported.length}</strong><span>reported payment requests retained</span></div>
+      <div class="record-impact"><strong>0</strong><span>profile recovery after permanent deletion</span></div>
     </div>
     <div class="field">
-      <label>Type <span class="danger-confirm-word">DELETE</span> to remove the profile</label>
-      <input id="deletePersonConfirmWord" autocomplete="off" placeholder="Type DELETE">
+      <label>Type <span class="danger-confirm-word">DELETE PERMANENTLY</span> to continue</label>
+      <input id="permanentDeletePersonConfirm" autocomplete="off" placeholder="Type DELETE PERMANENTLY">
     </div>
     <div class="request-action-row">
-      <button class="btn danger" id="deletePersonFinalBtn" disabled>Delete Student Profile</button>
+      <button class="btn danger" id="permanentDeletePersonBtn" disabled>Delete Permanently</button>
+      ${days>0?`<button class="btn primary" onclick="restoreTrashedPerson('${p.id}')">Restore Instead</button>`:""}
       <button class="btn ghost" onclick="closeModal()">Cancel</button>
     </div>
   `);
-  const input=document.getElementById("deletePersonConfirmWord");
-  const btn=document.getElementById("deletePersonFinalBtn");
-  input.addEventListener("input",()=>btn.disabled=input.value.trim().toUpperCase()!=="DELETE");
-  btn.onclick=()=>performDeletePerson(personId);
+  const input=document.getElementById("permanentDeletePersonConfirm");
+  const btn=document.getElementById("permanentDeletePersonBtn");
+  input.addEventListener("input",()=>btn.disabled=input.value.trim().toUpperCase()!=="DELETE PERMANENTLY");
+  btn.onclick=()=>performPermanentDeletePerson(personId);
   setTimeout(()=>input.focus(),50);
 };
 
-window.performDeletePerson=(personId)=>{
+window.performPermanentDeletePerson=(personId)=>{
   const p=state.people.find(x=>x.id===personId); if(!p)return;
   const linked=personRecordLinks(personId);
 
   linked.awaiting.forEach(r=>{
     r.status="cancelled";
     r.cancelledAt=new Date().toISOString();
-    r.cancelReason="Student profile deleted";
+    r.cancelReason="Person profile permanently deleted";
   });
 
   state.people=state.people.filter(x=>x.id!==personId);
@@ -8362,8 +8473,12 @@ window.performDeletePerson=(personId)=>{
   closeModal();
   renderDashboard();
   renderCustomer();
-  toast(`Student profile deleted • ${linked.payments.length} financial record(s) retained`);
+  toast(`Profile permanently deleted • ${linked.payments.length} financial record(s) retained`);
 };
+
+window.openDeletePersonFinal=(personId)=>openPermanentDeletePersonWarning(personId);
+window.performDeletePerson=(personId)=>performPermanentDeletePerson(personId);
+
 
 // Backward-compatible internal name used by older buttons/bookmarks.
 window.deletePerson=(personId)=>openDeletePersonWarning(personId);
@@ -8544,7 +8659,7 @@ const MASUL_SUPPORT_EMAIL="ritwik.sir@gmail.com";
 function currentMasulContext(){
   const org=state?.org?.name||"Not configured";
   const session=state?.org?.sessionName||"Not configured";
-  const people=(state?.people||[]).filter(p=>!p.archived).length;
+  const people=(state?.people||[]).filter(p=>!p.archived && !p.trashed).length;
   return {org,session,people};
 }
 
@@ -8793,7 +8908,7 @@ function togglePersonBulkSelection(personId,checked){
 window.togglePersonBulkSelection=togglePersonBulkSelection;
 
 function visiblePeopleIds(){
-  const all=[...state.people].filter(p=>!p.archived).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
+  const all=[...state.people].filter(p=>!p.archived && !p.trashed).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
   const q=(typeof peopleSearch!=="undefined" && peopleSearch ? peopleSearch.value : "").trim().toLowerCase();
   const bf=(typeof peopleBatchFilter!=="undefined" && peopleBatchFilter ? peopleBatchFilter.value : "");
   return all.filter(p=>
@@ -8826,7 +8941,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.52: payment history no longer prevents removal of a student profile.
+  // V1.53: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -8853,7 +8968,7 @@ function openBulkDeletePeopleWarning(){
   playDangerSound(1);
   modal(`
     <div class="modal-head">
-      <div><span class="eyebrow">Destructive Action</span><h3 style="margin:7px 0 0">Bulk Delete Student Profiles</h3></div>
+      <div><span class="eyebrow">Destructive Action</span><h3 style="margin:7px 0 0">Move Selected People to Trash</h3></div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
     <span class="danger-stage">WARNING 1 OF 2</span>
@@ -8900,12 +9015,12 @@ function openBulkDeleteFinalWarning(backupTaken=false){
   playDangerSound(2);
   modal(`
     <div class="modal-head">
-      <div><span class="eyebrow">Final Confirmation</span><h3 style="margin:7px 0 0">Confirm Bulk Delete</h3></div>
+      <div><span class="eyebrow">Final Confirmation</span><h3 style="margin:7px 0 0">Confirm Move to Trash</h3></div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
     <span class="danger-stage">WARNING 2 OF 2</span>
     <div class="danger-alert">
-      <div class="danger-title">🚨 ${plan.deletable.length} student profile(s) will be removed</div>
+      <div class="danger-title">🚨 ${plan.deletable.length} student profile(s) will be moved to Trash</div>
       <ul>
         <li>${backupTaken?"A backup download was requested.":"You chose to continue without creating a new backup."}</li>
         <li>${retainedPayments} payment/opening-history record(s) will remain.</li>
@@ -8918,7 +9033,7 @@ function openBulkDeleteFinalWarning(backupTaken=false){
       <input id="bulkDeleteConfirmWord" autocomplete="off" placeholder="Type DELETE">
     </div>
     <div class="request-action-row">
-      <button class="btn danger" id="bulkDeleteFinalBtn" disabled>Delete ${plan.deletable.length} Profile(s)</button>
+      <button class="btn danger" id="bulkDeleteFinalBtn" disabled>Move ${plan.deletable.length} to Trash</button>
       <button class="btn ghost" onclick="closeModal()">Cancel</button>
     </div>
   `);
@@ -8932,8 +9047,8 @@ window.openBulkDeleteFinalWarning=openBulkDeleteFinalWarning;
 
 function performBulkDeletePeople(){
   const plan=getBulkDeletePlan();
-  if(!plan.deletable.length){closeModal();toast("Nothing to delete");return}
-  const ids=new Set(plan.deletable.map(p=>p.id));
+  if(!plan.deletable.length){closeModal();toast("Nothing selected");return}
+  const now=new Date().toISOString();
   let retainedPayments=0;
   let cancelledRequests=0;
 
@@ -8942,25 +9057,29 @@ function performBulkDeletePeople(){
     retainedPayments+=linked.payments.length;
     linked.awaiting.forEach(r=>{
       r.status="cancelled";
-      r.cancelledAt=new Date().toISOString();
-      r.cancelReason="Student profile deleted in bulk";
+      r.cancelledAt=now;
+      r.cancelReason="Person moved to Trash in bulk";
       cancelledRequests++;
     });
+    p.trashed=true;
+    p.trashedAt=now;
+    p.trashedFromArchived=!!p.archived;
+    p.archived=false;
+    p.updatedAt=now;
   });
 
-  state.people=state.people.filter(p=>!ids.has(p.id));
   selectedPeopleForBulkDelete.clear();
   saveState();
   closeModal();
   renderDashboard();
   renderCustomer();
-  toast(`${ids.size} profile(s) deleted • ${retainedPayments} financial record(s) retained${cancelledRequests?` • ${cancelledRequests} request(s) cancelled`:""}`);
+  toast(`${plan.deletable.length} profile(s) moved to Trash • recoverable for 30 days${cancelledRequests?` • ${cancelledRequests} request(s) cancelled`:""}`);
 }
 
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.52",
+    version:"1.53",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -10555,7 +10674,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.52"
+        sourceVersion:"1.53"
       };
 
       const ops=[];
@@ -12035,7 +12154,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.52 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.53 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -12335,7 +12454,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.52 will claim the still-pending invitation after authentication.
+      // V1.53 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -12563,7 +12682,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.52 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.53 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -12663,7 +12782,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.52 Firebase module ready");
+  console.info("Masul V1.53 Firebase module ready");
 
   window.MasulCloud={
     auth,
