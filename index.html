@@ -244,6 +244,24 @@
     .logo-preview img{width:100%;height:100%;object-fit:contain}
     .section-title{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:16px}
     .section-title p{margin-bottom:0;color:var(--muted);font-size:13px}
+    .page-back-bar{
+      display:flex;align-items:center;justify-content:flex-start;gap:8px;
+      margin:0 0 12px
+    }
+    .page-back-btn{
+      display:inline-flex;align-items:center;gap:7px;
+      border:1px solid #d9e2ed;background:#fff;color:#41546d;
+      border-radius:999px;padding:8px 12px;font-size:10px;font-weight:900;
+      cursor:pointer;box-shadow:0 2px 8px rgba(24,39,75,.04)
+    }
+    .page-back-btn:hover{background:#f5f8fc;border-color:#cbd7e5;color:#213d61}
+    .page-back-btn .back-arrow{font-size:15px;line-height:1}
+    .page-back-context{font-size:9px;color:#78869a;font-weight:750}
+    @media(max-width:620px){
+      .page-back-bar{margin-bottom:10px}
+      .page-back-btn{padding:8px 11px;font-size:9px}
+      .page-back-context{display:none}
+    }
     .fee-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px}
     .fee-target-box{
       border:1px solid #dde5ee;background:#fbfdff;border-radius:14px;padding:11px 12px;margin:2px 0 12px
@@ -257,7 +275,28 @@
     }
     .fee-target-choice:has(input:checked){background:#eef5fb;border-color:#bed2e7;color:#315579}
     .fee-target-choice input{margin:0;flex:0 0 auto}
-    .fee-target-choice span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .fee-target-choice .fee-target-name{
+      display:block!important;min-width:0;opacity:1!important;color:#2f3d52!important;
+      overflow:hidden
+    }
+    .fee-target-choice .fee-target-name strong{
+      display:block!important;color:#2f3d52!important;font-size:10px!important;
+      line-height:1.25!important;white-space:normal!important;overflow:visible!important;
+      text-overflow:clip!important
+    }
+    .fee-target-choice .fee-target-name small{
+      display:block!important;color:#7a8798!important;font-size:8px!important;
+      font-weight:750!important;line-height:1.25!important;margin-top:2px!important;
+      white-space:normal!important
+    }
+    .fee-target-toolbar{
+      display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;
+      align-items:center;margin-bottom:9px
+    }
+    .fee-target-toolbar input{
+      min-height:36px;padding:8px 10px;font-size:10px;border-radius:10px
+    }
+    .fee-target-choice.fee-target-hidden{display:none!important}
     .fee-scope-badge{
       display:inline-flex;align-items:center;border:1px solid #d8e1ec;background:#f8fbfe;color:#586a80;
       border-radius:999px;padding:3px 7px;font-size:8px;font-weight:900;margin-left:4px
@@ -429,6 +468,15 @@
     }
     .modal-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}
     .close{border:none;background:var(--surface-2);width:36px;height:36px;border-radius:10px}
+    .modal-global-cancel{
+      position:sticky;bottom:-22px;z-index:6;
+      margin:18px -22px -22px;padding:12px 22px;
+      border-top:1px solid #e3e8ef;
+      background:rgba(255,255,255,.97);
+      backdrop-filter:blur(8px);
+      display:flex;justify-content:flex-end
+    }
+    .modal-global-cancel .btn{min-width:100px}
     .empty{
       border:1px dashed #cbd2df;border-radius:17px;padding:22px;text-align:center;color:var(--muted);font-size:13px
     }
@@ -2223,6 +2271,10 @@
     <!-- SETUP -->
     <section id="setupView" class="container hidden">
       <div class="panel">
+        <div class="page-back-bar">
+          <button type="button" class="page-back-btn" onclick="goBackFromView('setupView')"><span class="back-arrow">←</span><span>Back</span></button>
+          <span class="page-back-context">Return to previous menu</span>
+        </div>
         <div class="panel-head">
           <div>
             <span class="eyebrow">Admin setup</span>
@@ -2589,6 +2641,12 @@
         </aside>
 
         <div>
+          <div class="page-back-bar" id="dashboardBackBar">
+            <button type="button" class="page-back-btn" id="dashboardBackBtn" onclick="goBackDashboard()">
+              <span class="back-arrow">←</span><span id="dashboardBackLabel">Back to Home</span>
+            </button>
+            <span class="page-back-context" id="dashboardBackContext">Previous menu</span>
+          </div>
           <section class="dash-section active" id="dash-overview">
             <div class="org-identity">
               <div class="org-identity-logo" id="adminOrgLogo">M</div>
@@ -3127,9 +3185,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.48</span>
+                <span class="chip">V1.50</span>
               </div>
-              <div class="request-meta">Masul V1.48 • Unified Fee Editor</div>
+              <div class="request-meta">Masul V1.50 • Consistent Back Navigation</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3182,6 +3240,10 @@
 
     <!-- CUSTOMER -->
     <section id="customerView" class="container hidden">
+      <div class="page-back-bar">
+        <button type="button" class="page-back-btn" onclick="goBackFromView('customerView')"><span class="back-arrow">←</span><span>Back</span></button>
+        <span class="page-back-context">Return to previous menu</span>
+      </div>
       <div class="customer-shell">
         <div class="customer-head">
           <div class="org-logo" id="customerLogo">M</div>
@@ -3424,11 +3486,62 @@ function toast(msg){
   t.textContent=msg;t.classList.add("show");
   setTimeout(()=>t.classList.remove("show"),2200);
 }
-function showView(id){
+let currentDashTarget="overview";
+let dashNavHistory=[];
+let dashboardOriginState={view:"homeView",dash:null};
+const auxiliaryViewOrigins={
+  setupView:{view:"homeView",dash:null},
+  customerView:{view:"homeView",dash:null}
+};
+
+function visibleMainView(){
+  return ["homeView","setupView","dashboardView","customerView"]
+    .find(id=>!document.getElementById(id)?.classList.contains("hidden")) || "homeView";
+}
+
+function currentNavigationState(){
+  const view=visibleMainView();
+  return {view,dash:view==="dashboardView"?currentDashTarget:null};
+}
+
+function navigationLabel(stateObj){
+  if(!stateObj) return "Home";
+  if(stateObj.view==="homeView") return "Home";
+  if(stateObj.view==="setupView") return "Setup";
+  if(stateObj.view==="customerView") return "Customer Preview";
+  if(stateObj.view==="dashboardView") return dashPageLabel(stateObj.dash||"overview");
+  return "Previous";
+}
+
+function showView(id,options={}){
+  const current=visibleMainView();
+  if(options.record!==false && current && current!==id){
+    const origin={view:current,dash:current==="dashboardView"?currentDashTarget:null};
+    if(id==="setupView" || id==="customerView"){
+      auxiliaryViewOrigins[id]=origin;
+    }
+    if(id==="dashboardView"){
+      dashboardOriginState=origin;
+      if(options.resetDashHistory!==false) dashNavHistory=[];
+    }
+  }
+
   ["homeView","setupView","dashboardView","customerView"].forEach(v=>document.getElementById(v).classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
+
+  if(id==="dashboardView") updateDashboardBackButton();
   window.scrollTo({top:0,behavior:"smooth"});
 }
+
+window.goBackFromView=(viewId)=>{
+  const origin=auxiliaryViewOrigins[viewId]||{view:"homeView",dash:null};
+  if(origin.view==="dashboardView"){
+    showView("dashboardView",{record:false,resetDashHistory:false});
+    dashJump(origin.dash||"overview",{record:false});
+  }else{
+    showView(origin.view||"homeView",{record:false});
+  }
+};
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
 function uuid(prefix="id"){return prefix+"_"+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4)}
 function money(n){
@@ -3538,7 +3651,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.48: cloud/status refreshes must never render the full dashboard
+    // V1.50: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -3754,13 +3867,23 @@ function renderSetupGuidance(){
 }
 
 function openAdminDashboard(target="overview"){
+  const prior=visibleMainView();
+  const wasDashboard=prior==="dashboardView";
+
   persistSetupInputs();
   normalisePeopleData();
   saveState();
   renderDashboard();
   renderHomeOverview();
-  showView("dashboardView");
-  dashJump(target);
+
+  if(!wasDashboard){
+    currentDashTarget=target;
+    dashNavHistory=[];
+    showView("dashboardView",{record:true,resetDashHistory:false});
+    dashJump(target,{record:false});
+  }else{
+    dashJump(target);
+  }
 }
 
 function openBulkPeopleFromHome(){
@@ -3954,6 +4077,25 @@ function feeScopeSummary(fee){
   return "Everyone";
 }
 
+
+window.filterFeeTargetChoices=(input)=>{
+  const box=input?.closest(".fee-target-box");
+  if(!box) return;
+  const q=String(input.value||"").trim().toLowerCase();
+  box.querySelectorAll(".fee-target-choice").forEach(label=>{
+    const hay=String(label.dataset.search||label.textContent||"").toLowerCase();
+    label.classList.toggle("fee-target-hidden",!!q && !hay.includes(q));
+  });
+};
+
+window.selectVisibleFeeTargets=(button,checked)=>{
+  const box=button?.closest(".fee-target-box");
+  if(!box) return;
+  box.querySelectorAll(".fee-target-choice:not(.fee-target-hidden) input[type='checkbox']")
+    .forEach(cb=>cb.checked=!!checked);
+  box.dispatchEvent(new Event("change",{bubbles:true}));
+};
+
 function feeTargetOptionsHtml(mode,valuePrefix="",selectedBatches=[],selectedPeople=[]){
   if(mode==="Selected batch"){
     const batches=[...new Set([
@@ -3963,11 +4105,16 @@ function feeTargetOptionsHtml(mode,valuePrefix="",selectedBatches=[],selectedPeo
     if(!batches.length) return `<div class="empty">Add a batch/group first, then choose it here.</div>`;
     return `
       <div class="fee-target-head"><strong>Choose one or more batches / groups</strong><span class="fee-scope-badge">${batches.length} available</span></div>
+      <div class="fee-target-toolbar">
+        <input type="search" placeholder="Search batch / group" oninput="filterFeeTargetChoices(this)">
+        <button type="button" class="btn ghost small" onclick="selectVisibleFeeTargets(this,true)">Select visible</button>
+        <button type="button" class="btn ghost small" onclick="selectVisibleFeeTargets(this,false)">Clear visible</button>
+      </div>
       <div class="fee-target-grid">
-        ${batches.map((b,i)=>`
-          <label class="fee-target-choice">
+        ${batches.map(b=>`
+          <label class="fee-target-choice" data-search="${escapeHtml(b.toLowerCase())}">
             <input type="checkbox" class="${valuePrefix}fee-batch-target" value="${escapeHtml(b)}" ${selectedBatches.includes(b)?"checked":""}>
-            <span>${escapeHtml(b)}</span>
+            <span class="fee-target-name"><strong>${escapeHtml(b)}</strong></span>
           </label>`).join("")}
       </div>`;
   }
@@ -3978,12 +4125,25 @@ function feeTargetOptionsHtml(mode,valuePrefix="",selectedBatches=[],selectedPeo
     if(!people.length) return `<div class="empty">Add students/customers first, then choose them here.</div>`;
     return `
       <div class="fee-target-head"><strong>Choose one or more students / customers</strong><span class="fee-scope-badge">${people.length} available</span></div>
+      <div class="fee-target-toolbar">
+        <input type="search" placeholder="Search student or batch" oninput="filterFeeTargetChoices(this)">
+        <button type="button" class="btn ghost small" onclick="selectVisibleFeeTargets(this,true)">Select visible</button>
+        <button type="button" class="btn ghost small" onclick="selectVisibleFeeTargets(this,false)">Clear visible</button>
+      </div>
       <div class="fee-target-grid">
-        ${people.map(p=>`
-          <label class="fee-target-choice">
-            <input type="checkbox" class="${valuePrefix}fee-person-target" value="${escapeHtml(p.id)}" ${selectedPeople.includes(p.id)?"checked":""}>
-            <span>${escapeHtml(p.name)}${p.batch?` — ${escapeHtml(p.batch)}`:""}</span>
-          </label>`).join("")}
+        ${people.map(p=>{
+          const name=String(p.name||p.personName||p.displayName||"Unnamed");
+          const batch=String(p.batch||"General");
+          const search=`${name} ${batch}`.toLowerCase();
+          return `
+            <label class="fee-target-choice" data-search="${escapeHtml(search)}">
+              <input type="checkbox" class="${valuePrefix}fee-person-target" value="${escapeHtml(p.id)}" ${selectedPeople.includes(p.id)?"checked":""}>
+              <span class="fee-target-name">
+                <strong>${escapeHtml(name)}</strong>
+                <small>${escapeHtml(batch)}</small>
+              </span>
+            </label>`;
+        }).join("")}
       </div>`;
   }
 
@@ -5010,7 +5170,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.48: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.50: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 function renderPeople(){
@@ -5502,7 +5662,7 @@ window.editFee=id=>{
     <div class="modal-head">
       <div>
         <h3>Edit ${escapeHtml(f.name)}</h3>
-        <p style="color:var(--muted);font-size:12px">The same fields used in Fee Setup are available here. Changes are effective from the month you choose; recorded payments remain unchanged.</p>
+        <p style="color:var(--muted);font-size:12px">The same fields used in Fee Setup are available here. For Selected People/Batch, use the searchable selector below. Recorded payments remain unchanged.</p>
       </div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
@@ -5742,7 +5902,7 @@ async function createPaymentRequestFromCollect(){
         <p>${escapeHtml(err?.message||"Publish failed")}</p>
       </div>
       <div class="preview-box">
-        Publish the V1.48 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
+        Publish the V1.50 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
       </div>
     `);
   }
@@ -5790,7 +5950,7 @@ window.copyPaymentRequestLink=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.48 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.50 Firestore Rules.");
     return;
   }
 
@@ -5810,7 +5970,7 @@ window.sharePaymentRequest=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.48 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.50 Firestore Rules.");
     return;
   }
 
@@ -6012,7 +6172,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.48 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.50 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -6036,7 +6196,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.48 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.50 secure link.");
     },100);
     return true;
   }
@@ -6485,12 +6645,26 @@ function openBulkBatchModal(){
 }
 
 function modal(content){
-  modalRoot.innerHTML=`<div class="modal-backdrop"><div class="modal">${content}</div></div>`;
+  modalRoot.innerHTML=`<div class="modal-backdrop" data-modal-backdrop>
+    <div class="modal" role="dialog" aria-modal="true">
+      ${content}
+      <div class="modal-global-cancel">
+        <button type="button" class="btn ghost" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+  const backdrop=modalRoot.querySelector("[data-modal-backdrop]");
+  backdrop?.addEventListener("click",e=>{
+    if(e.target===backdrop) closeModal();
+  });
 }
 window.closeModal=()=>{
   modalRoot.innerHTML="";
   if(window.MasulCloudHooks?.modalClosed) window.MasulCloudHooks.modalClosed();
 };
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && modalRoot?.innerHTML) closeModal();
+});
 
 
 function formatDateOnly(value){
@@ -6654,17 +6828,80 @@ function receiptModal(payment){
   `);
 }
 
-function dashJump(target){
+function dashPageLabel(target){
+  return ({
+    overview:"Overview",
+    people:"People",
+    batches:"Batches",
+    fees:"Fees & Rules",
+    pending:"Pending Dues",
+    collect:"Collect Payment",
+    payments:"Payments",
+    reports:"Reports & Analytics",
+    access:"Users & Roles",
+    "customer-access":"Customer Access",
+    settings:"Settings"
+  })[target] || "Dashboard";
+}
+
+function updateDashboardBackButton(){
+  const label=document.getElementById("dashboardBackLabel");
+  const context=document.getElementById("dashboardBackContext");
+  if(!label) return;
+
+  if(dashNavHistory.length){
+    const previous=dashNavHistory[dashNavHistory.length-1];
+    label.textContent=`Back to ${dashPageLabel(previous)}`;
+    if(context) context.textContent=`Previous page • ${dashPageLabel(previous)}`;
+  }else{
+    const origin=dashboardOriginState||{view:"homeView"};
+    label.textContent=`Back to ${navigationLabel(origin)}`;
+    if(context) context.textContent="Previous menu";
+  }
+}
+
+function dashJump(target,options={}){
+  const record=options.record!==false;
+  const previous=currentDashTarget;
+
+  if(record && previous && previous!==target){
+    // Avoid duplicate consecutive entries while preserving the real path used.
+    if(dashNavHistory[dashNavHistory.length-1]!==previous){
+      dashNavHistory.push(previous);
+    }
+    if(dashNavHistory.length>30) dashNavHistory=dashNavHistory.slice(-30);
+  }
+
+  currentDashTarget=target;
   document.querySelectorAll(".dash-section").forEach(s=>s.classList.toggle("active",s.id===`dash-${target}`));
   document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.dash===target));
+
   if(target==="people") renderPeople();
   if(target==="batches") renderBatches();
   if(target==="pending") renderPendingDues();
   if(target==="collect") renderCollect();
   if(target==="payments") renderPayments();
   if(target==="reports") renderReports();
+
+  updateDashboardBackButton();
   window.scrollTo({top:0,behavior:"smooth"});
 }
+
+window.goBackDashboard=()=>{
+  if(dashNavHistory.length){
+    const previous=dashNavHistory.pop();
+    dashJump(previous,{record:false});
+    return;
+  }
+
+  const origin=dashboardOriginState||{view:"homeView",dash:null};
+  if(origin.view==="dashboardView"){
+    dashJump(origin.dash||"overview",{record:false});
+    return;
+  }
+  showView(origin.view||"homeView",{record:false});
+};
+
 
 document.getElementById("homeSetupState").onclick=showSetupChecklist;
 document.getElementById("continueSetupBtn").onclick=()=>{
@@ -6722,7 +6959,12 @@ if(typeof peopleBatchFilter!=="undefined" && peopleBatchFilter && !peopleBatchFi
   peopleBatchFilter.dataset.bulkSafeBound="1";
 }
 document.getElementById("customerStartBtn").onclick=()=>{renderCustomer();showView("customerView")};
-document.getElementById("homeBtn").onclick=()=>{renderHomeOverview();showView("homeView")};
+document.getElementById("homeBtn").onclick=()=>{
+  renderHomeOverview();
+  dashNavHistory=[];
+  dashboardOriginState={view:"homeView",dash:null};
+  showView("homeView",{record:false});
+};
 document.getElementById("useDemoSetup").onclick=()=>seedDemo();
 document.getElementById("prevStepBtn").onclick=()=>setSetupStep(setupStep-1);
 document.getElementById("nextStepBtn").onclick=()=>{
@@ -7269,7 +7511,10 @@ finishSetupBtn.onclick=()=>{
   state.setupComplete=ready.missing.length===0;
   state.demoMode=false;
   normalisePeopleData();
-  saveState();renderDashboard();renderHomeOverview();showView("dashboardView");
+  currentDashTarget="overview";
+  dashNavHistory=[];
+  saveState();renderDashboard();renderHomeOverview();showView("dashboardView",{record:true,resetDashHistory:false});
+  dashJump("overview",{record:false});
   if(ready.missing.length) toast(`Dashboard opened • ${ready.missing.length} essential setup item(s) still pending`);
 };
 previewCustomerBtn.onclick=()=>{persistSetupInputs();renderCustomer();showView("customerView")};
@@ -8456,7 +8701,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.48: payment history no longer prevents removal of a student profile.
+  // V1.50: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -8590,7 +8835,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.48",
+    version:"1.50",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -8620,7 +8865,10 @@ function doRestoreBackup(file){
       state=restored;
       normalisePeopleData();
       saveState();
-      hydrateSetup();renderDashboard();renderCustomer();showView("dashboardView");
+      currentDashTarget="overview";
+      dashNavHistory=[];
+      hydrateSetup();renderDashboard();renderCustomer();showView("dashboardView",{record:true,resetDashHistory:false});
+      dashJump("overview",{record:false});
       toast(cloudActive?"Backup restored locally • cloud copy unchanged":"Backup restored");
     }catch(err){
       console.error(err);
@@ -10182,7 +10430,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.48"
+        sourceVersion:"1.50"
       };
 
       const ops=[];
@@ -11560,7 +11808,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.48 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.50 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -11860,7 +12108,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.48 will claim the still-pending invitation after authentication.
+      // V1.50 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -12088,7 +12336,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.48 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.50 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -12188,7 +12436,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.48 Firebase module ready");
+  console.info("Masul V1.50 Firebase module ready");
 
   window.MasulCloud={
     auth,
