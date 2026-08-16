@@ -245,6 +245,25 @@
     .section-title{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:16px}
     .section-title p{margin-bottom:0;color:var(--muted);font-size:13px}
     .fee-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px}
+    .fee-target-box{
+      border:1px solid #dde5ee;background:#fbfdff;border-radius:14px;padding:11px 12px;margin:2px 0 12px
+    }
+    .fee-target-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+    .fee-target-head strong{font-size:10px;color:#40516a}
+    .fee-target-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+    .fee-target-choice{
+      display:flex;align-items:center;gap:7px;border:1px solid #dfe5ec;background:#fff;border-radius:10px;
+      padding:8px 9px;font-size:9px;font-weight:800;color:#536176;cursor:pointer;min-width:0
+    }
+    .fee-target-choice:has(input:checked){background:#eef5fb;border-color:#bed2e7;color:#315579}
+    .fee-target-choice input{margin:0;flex:0 0 auto}
+    .fee-target-choice span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .fee-scope-badge{
+      display:inline-flex;align-items:center;border:1px solid #d8e1ec;background:#f8fbfe;color:#586a80;
+      border-radius:999px;padding:3px 7px;font-size:8px;font-weight:900;margin-left:4px
+    }
+    @media(max-width:720px){.fee-target-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:480px){.fee-target-grid{grid-template-columns:1fr}}
     .preset{
       border:1px solid var(--line);background:#fff;border-radius:999px;
       padding:9px 12px;font-size:12px;font-weight:750;color:#4d566b
@@ -2458,6 +2477,7 @@
                 </div>
                 <div class="field"><label>Effective from</label><input id="feeEffective" type="month"></div>
               </div>
+              <div id="feeTargetBox" class="fee-target-box hidden"></div>
               <button class="btn primary" id="addFeeBtn">+ Add fee type</button>
               <div id="feeDraftWarning" class="fee-draft-warning hidden" role="alert">
                 <span class="fee-warning-icon">⚑</span>
@@ -3107,9 +3127,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.47</span>
+                <span class="chip">V1.48</span>
               </div>
-              <div class="request-meta">Masul V1.47 • Student Record Controls</div>
+              <div class="request-meta">Masul V1.48 • Unified Fee Editor</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3518,7 +3538,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.47: cloud/status refreshes must never render the full dashboard
+    // V1.48: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -3883,12 +3903,227 @@ function renderCustomRegs(){
 }
 window.removeReg=id=>{state.org.regs.custom=state.org.regs.custom.filter(x=>x.id!==id);renderCustomRegs();saveState()};
 
+
+function normaliseFeeScope(fee){
+  if(!fee) return fee;
+  fee.applies=fee.applies||"Everyone";
+  fee.appliesBatchNames=Array.isArray(fee.appliesBatchNames)?fee.appliesBatchNames:[];
+  fee.appliesPersonIds=Array.isArray(fee.appliesPersonIds)?fee.appliesPersonIds:[];
+  fee.versions=Array.isArray(fee.versions)?fee.versions:[];
+  return fee;
+}
+
+function normaliseAllFees(){
+  (state.fees||[]).forEach(normaliseFeeScope);
+}
+
+function feeAppliesToPerson(fee,person){
+  normaliseFeeScope(fee);
+  if(!person) return true;
+  if(fee.applies==="Everyone" || !fee.applies) return true;
+
+  if(fee.applies==="Selected batch"){
+    // Legacy fees that had the label but no stored targets remain active for
+    // everyone until the owner edits and explicitly selects batches.
+    if(!fee.appliesBatchNames.length) return true;
+    return fee.appliesBatchNames.includes(person.batch||"General");
+  }
+
+  if(fee.applies==="Selected people"){
+    if(!fee.appliesPersonIds.length) return true;
+    return fee.appliesPersonIds.includes(person.id);
+  }
+  return true;
+}
+
+function feeScopeSummary(fee){
+  normaliseFeeScope(fee);
+  if(fee.applies==="Selected batch"){
+    return fee.appliesBatchNames.length
+      ? `Selected batch: ${fee.appliesBatchNames.join(", ")}`
+      : "Selected batch (targets not yet set)";
+  }
+  if(fee.applies==="Selected people"){
+    const names=fee.appliesPersonIds
+      .map(id=>state.people.find(p=>p.id===id)?.name)
+      .filter(Boolean);
+    return names.length
+      ? `Selected people: ${names.slice(0,3).join(", ")}${names.length>3?` +${names.length-3} more`:""}`
+      : "Selected people (targets not yet set)";
+  }
+  return "Everyone";
+}
+
+function feeTargetOptionsHtml(mode,valuePrefix="",selectedBatches=[],selectedPeople=[]){
+  if(mode==="Selected batch"){
+    const batches=[...new Set([
+      ...(state.org?.batches||[]).map(b=>b.name),
+      ...(state.people||[]).map(p=>p.batch||"General")
+    ].filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    if(!batches.length) return `<div class="empty">Add a batch/group first, then choose it here.</div>`;
+    return `
+      <div class="fee-target-head"><strong>Choose one or more batches / groups</strong><span class="fee-scope-badge">${batches.length} available</span></div>
+      <div class="fee-target-grid">
+        ${batches.map((b,i)=>`
+          <label class="fee-target-choice">
+            <input type="checkbox" class="${valuePrefix}fee-batch-target" value="${escapeHtml(b)}" ${selectedBatches.includes(b)?"checked":""}>
+            <span>${escapeHtml(b)}</span>
+          </label>`).join("")}
+      </div>`;
+  }
+
+  if(mode==="Selected people"){
+    const people=[...(state.people||[])].filter(p=>!p.archived)
+      .sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"}));
+    if(!people.length) return `<div class="empty">Add students/customers first, then choose them here.</div>`;
+    return `
+      <div class="fee-target-head"><strong>Choose one or more students / customers</strong><span class="fee-scope-badge">${people.length} available</span></div>
+      <div class="fee-target-grid">
+        ${people.map(p=>`
+          <label class="fee-target-choice">
+            <input type="checkbox" class="${valuePrefix}fee-person-target" value="${escapeHtml(p.id)}" ${selectedPeople.includes(p.id)?"checked":""}>
+            <span>${escapeHtml(p.name)}${p.batch?` — ${escapeHtml(p.batch)}`:""}</span>
+          </label>`).join("")}
+      </div>`;
+  }
+
+  return "";
+}
+
+function collectFeeTargets(prefix,applies){
+  if(applies==="Selected batch"){
+    return {
+      appliesBatchNames:[...document.querySelectorAll(`.${prefix}fee-batch-target:checked`)].map(x=>x.value),
+      appliesPersonIds:[]
+    };
+  }
+  if(applies==="Selected people"){
+    return {
+      appliesBatchNames:[],
+      appliesPersonIds:[...document.querySelectorAll(`.${prefix}fee-person-target:checked`)].map(x=>x.value)
+    };
+  }
+  return {appliesBatchNames:[],appliesPersonIds:[]};
+}
+
+function validateFeeTargets(applies,targets){
+  if(applies==="Selected batch" && !targets.appliesBatchNames.length){
+    toast("Select at least one batch / group");
+    return false;
+  }
+  if(applies==="Selected people" && !targets.appliesPersonIds.length){
+    toast("Select at least one student / customer");
+    return false;
+  }
+  return true;
+}
+
+function renderSetupFeeTargets(){
+  const box=document.getElementById("feeTargetBox");
+  const applies=document.getElementById("feeApplies")?.value||"Everyone";
+  if(!box) return;
+  if(applies==="Everyone"){
+    box.classList.add("hidden");
+    box.innerHTML="";
+    return;
+  }
+  box.classList.remove("hidden");
+  box.innerHTML=feeTargetOptionsHtml(applies,"setup-");
+}
+
+function feeEditorFieldsHtml(fee=null,prefix="mFee"){
+  const f=normaliseFeeScope(fee ? {...fee} : {
+    name:"",amount:"",type:"recurring",frequency:"Monthly",
+    dueRule:"monthly-day",dueValue:"",applies:"Everyone",
+    effective:currentMonthKey(),appliesBatchNames:[],appliesPersonIds:[]
+  });
+  const esc=v=>escapeHtml(String(v??""));
+  return `
+    <div class="grid-3">
+      <div class="field"><label>Fee / Charge Name</label><input id="${prefix}Name" value="${esc(f.name)}"></div>
+      <div class="field"><label>Amount</label><input id="${prefix}Amount" type="number" min="0" value="${esc(f.amount)}"></div>
+      <div class="field"><label>Type</label><select id="${prefix}Type">
+        <option value="recurring" ${f.type==="recurring"?"selected":""}>Recurring</option>
+        <option value="one-time" ${f.type==="one-time"?"selected":""}>One-time</option>
+        <option value="optional" ${f.type==="optional"?"selected":""}>Optional</option>
+        <option value="custom" ${f.type==="custom"?"selected":""}>Custom amount</option>
+      </select></div>
+    </div>
+    <div class="grid-3">
+      <div class="field"><label>Frequency</label><select id="${prefix}Frequency">
+        ${["Monthly","Quarterly","Half-yearly","Yearly","Once","Custom"].map(x=>`<option ${f.frequency===x?"selected":""}>${x}</option>`).join("")}
+      </select></div>
+      <div class="field"><label>Due date rule</label><select id="${prefix}DueRule">
+        <option value="monthly-day" ${f.dueRule==="monthly-day"?"selected":""}>Day of every month</option>
+        <option value="specific" ${f.dueRule==="specific"?"selected":""}>Specific date</option>
+        <option value="none" ${f.dueRule==="none"?"selected":""}>No fixed due date</option>
+      </select></div>
+      <div class="field"><label>Due day / date</label><input id="${prefix}DueValue" value="${esc(f.dueValue)}" placeholder="e.g. 10"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Applies to</label><select id="${prefix}Applies">
+        ${["Everyone","Selected batch","Selected people"].map(x=>`<option ${f.applies===x?"selected":""}>${x}</option>`).join("")}
+      </select></div>
+      <div class="field"><label>Effective from</label><input id="${prefix}Effective" type="month" value="${esc(f.effective||currentMonthKey())}"></div>
+    </div>
+    <div id="${prefix}TargetBox" class="fee-target-box ${f.applies==="Everyone"?"hidden":""}">
+      ${feeTargetOptionsHtml(f.applies,`${prefix}-`,f.appliesBatchNames,f.appliesPersonIds)}
+    </div>`;
+}
+
+function bindFeeEditorTarget(prefix,fee=null){
+  const select=document.getElementById(`${prefix}Applies`);
+  const box=document.getElementById(`${prefix}TargetBox`);
+  if(!select||!box) return;
+
+  let batches=[...(fee?.appliesBatchNames||[])];
+  let people=[...(fee?.appliesPersonIds||[])];
+
+  const redraw=()=>{
+    const mode=select.value;
+    if(mode==="Everyone"){
+      box.classList.add("hidden");
+      box.innerHTML="";
+      return;
+    }
+    box.classList.remove("hidden");
+    box.innerHTML=feeTargetOptionsHtml(mode,`${prefix}-`,batches,people);
+  };
+
+  box.addEventListener("change",()=>{
+    batches=[...box.querySelectorAll(`.${prefix}-fee-batch-target:checked`)].map(x=>x.value);
+    people=[...box.querySelectorAll(`.${prefix}-fee-person-target:checked`)].map(x=>x.value);
+  });
+  select.addEventListener("change",redraw);
+}
+
+function feeFormData(prefix){
+  const get=id=>document.getElementById(`${prefix}${id}`);
+  const applies=get("Applies")?.value||"Everyone";
+  const targets=collectFeeTargets(`${prefix}-`,applies);
+  return {
+    name:String(get("Name")?.value||"").trim(),
+    amount:Number(get("Amount")?.value||0),
+    type:get("Type")?.value||"recurring",
+    frequency:get("Frequency")?.value||"Monthly",
+    dueRule:get("DueRule")?.value||"none",
+    dueValue:String(get("DueValue")?.value||"").trim(),
+    applies,
+    effective:get("Effective")?.value||currentMonthKey(),
+    ...targets
+  };
+}
+
 function renderFeeList(){
+  normaliseAllFees();
   feeList.innerHTML=state.fees.length?state.fees.map(f=>`
     <div class="item-card">
       <div><strong>${escapeHtml(f.name)} — ${money(f.amount)}</strong>
-      <small>${escapeHtml(f.type)} • ${escapeHtml(f.frequency)} • Due: ${escapeHtml(formatDue(f))}</small></div>
-      <button class="btn danger small" onclick="removeFee('${f.id}')">Remove</button>
+      <small>${escapeHtml(f.type)} • ${escapeHtml(f.frequency)} • Due: ${escapeHtml(formatDue(f))} • ${escapeHtml(feeScopeSummary(f))} • Effective ${escapeHtml(f.effective||"now")}</small></div>
+      <div class="student-action-row">
+        <button class="btn ghost small" onclick="editFee('${f.id}')">Edit</button>
+        <button class="btn danger small" onclick="removeFee('${f.id}')">Remove</button>
+      </div>
     </div>`).join(""):`<div class="empty">No fee types yet. Choose a suggestion above or create your own.</div>`;
 }
 window.removeFee=id=>{state.fees=state.fees.filter(x=>x.id!==id);renderFeeList();saveState()};
@@ -4030,6 +4265,7 @@ function generateFeeInstances(person){
   // while one-time/optional fees generate one selectable component.
   const out=[];
   state.fees.forEach(f=>{
+    if(f.active===false || !feeAppliesToPerson(f,person)) return;
     if(f.type==="recurring" && f.frequency==="Monthly"){
       let startIndex=months.indexOf(state.org.sessionStart||"January");
       if(startIndex<0) startIndex=3;
@@ -4152,7 +4388,7 @@ function reportFeeItemsForPerson(person,fromMonth,toMonth,includeUndated=false){
   const out=[];
 
   (state.fees||[]).forEach(fee=>{
-    if(fee.active===false) return;
+    if(fee.active===false || !feeAppliesToPerson(fee,person)) return;
 
     if(fee.type==="recurring" && fee.frequency==="Monthly"){
       monthKeys.forEach(mk=>{
@@ -4774,7 +5010,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.47: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.48: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 function renderPeople(){
@@ -5129,7 +5365,7 @@ window.openStudentQuickCard=(personId)=>{
   const dues=generateFeeInstances(p);
   const total=dues.reduce((a,d)=>a+d.base+d.late,0);
 
-  const recurringFees=state.fees.filter(f=>f.type==="recurring" && f.frequency==="Monthly");
+  const recurringFees=state.fees.filter(f=>feeAppliesToPerson(f,p) && f.type==="recurring" && f.frequency==="Monthly");
   const primaryMonthly=recurringFees[0]||null;
   const year=today.getFullYear();
 
@@ -5149,7 +5385,7 @@ window.openStudentQuickCard=(personId)=>{
     return {month:m,key,fee:ex.base,originalFee:ex.originalBase,discount:ex.discount,exemption:ex.exemption,late:paid?0:ex.late,payment,status};
   }).filter(Boolean);
 
-  const otherFees=state.fees.filter(f=>!(f.type==="recurring" && f.frequency==="Monthly"));
+  const otherFees=state.fees.filter(f=>feeAppliesToPerson(f,p) && !(f.type==="recurring" && f.frequency==="Monthly"));
 
   modal(`
     <div class="modal-head">
@@ -5251,40 +5487,64 @@ function renderPendingDues(){
 }
 
 function renderDashFees(){
+  normaliseAllFees();
   dashFeeList.innerHTML=state.fees.length?state.fees.map(f=>`
     <div class="item-card">
       <div><strong>${escapeHtml(f.name)} — ${money(f.amount)}</strong>
-      <small>${escapeHtml(f.frequency)} • ${escapeHtml(formatDue(f))} • Effective ${escapeHtml(f.effective||"now")}</small></div>
+      <small>${escapeHtml(f.type)} • ${escapeHtml(f.frequency)} • ${escapeHtml(formatDue(f))} • ${escapeHtml(feeScopeSummary(f))} • Effective ${escapeHtml(f.effective||"now")}</small></div>
       <button class="btn ghost small" onclick="editFee('${f.id}')">Edit</button>
     </div>`).join(""):`<div class="empty">No fees configured.</div>`;
 }
 window.editFee=id=>{
   const f=state.fees.find(x=>x.id===id); if(!f)return;
+  normaliseFeeScope(f);
   modal(`
-    <div class="modal-head"><div><h3>Edit ${escapeHtml(f.name)}</h3><p style="color:var(--muted);font-size:12px">Changes create a new effective version; historical payments remain unchanged.</p></div><button class="close" onclick="closeModal()">×</button></div>
-    <div class="field"><label>Fee name</label><input id="mFeeName" value="${escapeHtml(f.name)}"></div>
-    <div class="grid-2">
-      <div class="field"><label>New amount</label><input id="mFeeAmount" type="number" value="${f.amount}"></div>
-      <div class="field"><label>Effective from</label><input id="mFeeEffective" type="month" value="${f.effective||currentMonthKey()}"></div>
+    <div class="modal-head">
+      <div>
+        <h3>Edit ${escapeHtml(f.name)}</h3>
+        <p style="color:var(--muted);font-size:12px">The same fields used in Fee Setup are available here. Changes are effective from the month you choose; recorded payments remain unchanged.</p>
+      </div>
+      <button class="close" onclick="closeModal()">×</button>
     </div>
-    <div class="grid-2">
-      <div class="field"><label>Due rule</label><select id="mFeeDueRule"><option value="monthly-day" ${f.dueRule==="monthly-day"?"selected":""}>Day of every month</option><option value="specific" ${f.dueRule==="specific"?"selected":""}>Specific date</option><option value="none" ${f.dueRule==="none"?"selected":""}>No fixed due date</option></select></div>
-      <div class="field"><label>Due day / date</label><input id="mFeeDueValue" value="${escapeHtml(f.dueValue||"")}"></div>
+    ${feeEditorFieldsHtml(f,"mFee")}
+    <div class="preview-box">
+      <strong>Fee version safety:</strong> Masul records this configuration as a new effective version. Existing payment and receipt records are not rewritten.
     </div>
     <button class="btn primary" onclick="saveFeeEdit('${f.id}')">Save new fee version</button>
-  `)
-}
+  `);
+  bindFeeEditorTarget("mFee",f);
+};
+
 window.saveFeeEdit=id=>{
   const f=state.fees.find(x=>x.id===id); if(!f)return;
+  const data=feeFormData("mFee");
+  if(!data.name){toast("Enter a fee / charge name");return}
+  if(data.type!=="custom" && !(data.amount>=0)){toast("Enter an amount");return}
+  if(!validateFeeTargets(data.applies,data)) return;
+
   f.versions=f.versions||[];
-  f.versions.push({amount:+mFeeAmount.value||0,effective:mFeeEffective.value||currentMonthKey(),savedAt:new Date().toISOString()});
-  f.name=mFeeName.value.trim()||f.name;
-  f.amount=+mFeeAmount.value||0;
-  f.effective=mFeeEffective.value||currentMonthKey();
-  f.dueRule=mFeeDueRule.value;
-  f.dueValue=mFeeDueValue.value.trim();
-  saveState();closeModal();renderDashboard();renderCustomer();toast("Fee updated without changing old records");
-}
+  f.versions.push({
+    amount:data.amount,
+    effective:data.effective,
+    type:data.type,
+    frequency:data.frequency,
+    dueRule:data.dueRule,
+    dueValue:data.dueValue,
+    applies:data.applies,
+    appliesBatchNames:[...data.appliesBatchNames],
+    appliesPersonIds:[...data.appliesPersonIds],
+    savedAt:new Date().toISOString()
+  });
+
+  Object.assign(f,data);
+  saveState();
+  closeModal();
+  renderFeeList();
+  renderDashboard();
+  renderCustomer();
+  toast("Fee updated without changing recorded payments");
+};
+
 
 function getCollectionPeople(){
   normalisePeopleData();
@@ -5482,7 +5742,7 @@ async function createPaymentRequestFromCollect(){
         <p>${escapeHtml(err?.message||"Publish failed")}</p>
       </div>
       <div class="preview-box">
-        Publish the V1.47 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
+        Publish the V1.48 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
       </div>
     `);
   }
@@ -5530,7 +5790,7 @@ window.copyPaymentRequestLink=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.47 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.48 Firestore Rules.");
     return;
   }
 
@@ -5550,7 +5810,7 @@ window.sharePaymentRequest=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.47 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.48 Firestore Rules.");
     return;
   }
 
@@ -5752,7 +6012,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.47 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.48 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -5776,7 +6036,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.47 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.48 secure link.");
     },100);
     return true;
   }
@@ -6967,14 +7227,37 @@ function updateFeeDraftWarning(force=false){
 [feeType,feeFrequency,feeDueRule,feeApplies].forEach(el=>{
   el.addEventListener("change",()=>updateFeeDraftWarning(false));
 });
+feeApplies.addEventListener("change",renderSetupFeeTargets);
+renderSetupFeeTargets();
 
 addFeeBtn.onclick=()=>{
   const name=feeName.value.trim(),amount=+feeAmount.value;
   if(!name){toast("Enter a fee / charge name");return}
   if(feeType.value!=="custom" && !(amount>=0)){toast("Enter an amount");return}
-  const f={id:uuid("fee"),name,amount:amount||0,type:feeType.value,frequency:feeFrequency.value,dueRule:feeDueRule.value,dueValue:feeDueValue.value.trim(),applies:feeApplies.value,effective:feeEffective.value||currentMonthKey(),versions:[{amount:amount||0,effective:feeEffective.value||currentMonthKey()}]};
+  const applies=feeApplies.value;
+  const targets=collectFeeTargets("setup-",applies);
+  if(!validateFeeTargets(applies,targets)) return;
+
+  const effective=feeEffective.value||currentMonthKey();
+  const f={
+    id:uuid("fee"),name,amount:amount||0,
+    type:feeType.value,frequency:feeFrequency.value,
+    dueRule:feeDueRule.value,dueValue:feeDueValue.value.trim(),
+    applies,effective,...targets,
+    versions:[{
+      amount:amount||0,effective,
+      type:feeType.value,frequency:feeFrequency.value,
+      dueRule:feeDueRule.value,dueValue:feeDueValue.value.trim(),
+      applies,
+      appliesBatchNames:[...targets.appliesBatchNames],
+      appliesPersonIds:[...targets.appliesPersonIds],
+      savedAt:new Date().toISOString()
+    }]
+  };
   state.fees.push(f);
   feeName.value="";feeAmount.value="";feeDueValue.value="";feeEffective.value="";
+  feeApplies.value="Everyone";
+  renderSetupFeeTargets();
   renderFeeList();saveState();updateFeeDraftWarning(false);toast("Fee type added");
 };
 orgCurrency.onchange=()=>{state.org.currency=orgCurrency.value||"INR";saveState();renderFeeList();renderLatePreview()};
@@ -7725,17 +8008,44 @@ window.saveNewPerson=()=>{
 
 dashAddFeeBtn.onclick=()=>{
   modal(`
-    <div class="modal-head"><div><h3>Add fee</h3><p style="font-size:12px;color:var(--muted)">Create a new charge without affecting existing definitions.</p></div><button class="close" onclick="closeModal()">×</button></div>
-    <div class="grid-2"><div class="field"><label>Name</label><input id="mNewFeeName"></div><div class="field"><label>Amount</label><input id="mNewFeeAmount" type="number"></div></div>
-    <div class="grid-2"><div class="field"><label>Frequency</label><select id="mNewFeeFreq"><option>Monthly</option><option>Quarterly</option><option>Yearly</option><option>Once</option></select></div><div class="field"><label>Due day</label><input id="mNewFeeDue" placeholder="10"></div></div>
-    <button class="btn primary" onclick="saveNewFee()">Add fee</button>
-  `)
+    <div class="modal-head">
+      <div><h3>Add fee</h3><p style="font-size:12px;color:var(--muted)">Uses the same fields as Fee Setup for a consistent fee definition.</p></div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    ${feeEditorFieldsHtml(null,"mNewFee")}
+    <button class="btn primary" onclick="saveNewFee()">+ Add fee type</button>
+  `);
+  bindFeeEditorTarget("mNewFee",null);
 };
+
 window.saveNewFee=()=>{
-  const name=mNewFeeName.value.trim(),amount=+mNewFeeAmount.value;if(!name||isNaN(amount)){toast("Enter fee name and amount");return}
-  const freq=mNewFeeFreq.value;
-  state.fees.push({id:uuid("fee"),name,amount,type:freq==="Monthly"?"recurring":"one-time",frequency:freq,dueRule:mNewFeeDue.value?"monthly-day":"none",dueValue:mNewFeeDue.value.trim(),applies:"Everyone",effective:currentMonthKey(),versions:[{amount,effective:currentMonthKey()}]});
-  saveState();closeModal();renderDashboard();renderCustomer();toast("Fee added");
+  const data=feeFormData("mNewFee");
+  if(!data.name){toast("Enter a fee / charge name");return}
+  if(data.type!=="custom" && !(data.amount>=0)){toast("Enter an amount");return}
+  if(!validateFeeTargets(data.applies,data)) return;
+
+  state.fees.push({
+    id:uuid("fee"),
+    ...data,
+    versions:[{
+      amount:data.amount,
+      effective:data.effective,
+      type:data.type,
+      frequency:data.frequency,
+      dueRule:data.dueRule,
+      dueValue:data.dueValue,
+      applies:data.applies,
+      appliesBatchNames:[...data.appliesBatchNames],
+      appliesPersonIds:[...data.appliesPersonIds],
+      savedAt:new Date().toISOString()
+    }]
+  });
+  saveState();
+  closeModal();
+  renderFeeList();
+  renderDashboard();
+  renderCustomer();
+  toast("Fee type added");
 };
 
 
@@ -8146,7 +8456,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.47: payment history no longer prevents removal of a student profile.
+  // V1.48: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -8280,7 +8590,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.47",
+    version:"1.48",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -9872,7 +10182,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.47"
+        sourceVersion:"1.48"
       };
 
       const ops=[];
@@ -11250,7 +11560,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.47 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.48 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -11550,7 +11860,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.47 will claim the still-pending invitation after authentication.
+      // V1.48 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -11778,7 +12088,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.47 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.48 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -11878,7 +12188,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.47 Firebase module ready");
+  console.info("Masul V1.48 Firebase module ready");
 
   window.MasulCloud={
     auth,
