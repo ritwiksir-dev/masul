@@ -2981,9 +2981,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.40.1</span>
+                <span class="chip">V1.41</span>
               </div>
-              <div class="request-meta">Masul V1.40.1 • Secure Staff Roles Hotfix</div>
+              <div class="request-meta">Masul V1.41 • Sync & Invitation Stability</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3392,9 +3392,9 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
+    // V1.41: cloud/status refreshes must never render the full dashboard
+    // or cause persistence. They update indicators only.
     updateSaveIndicators();
-    renderHomeOverview();
-    if(typeof renderDashboard==="function") renderDashboard();
   }
 };
 
@@ -4569,7 +4569,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  saveState();
+  // V1.41: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 function renderPeople(){
@@ -7446,7 +7446,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.25",
+    version:"1.41",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -8241,6 +8241,7 @@ handlePaymentRequestFromUrl();
   }
 
   let previouslyAuthenticated=false;
+  let emailLinkLandingInProgress=isSignInWithEmailLink(auth,window.location.href);
 
   const cloud={
     user:null,
@@ -9033,7 +9034,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.40.1"
+        sourceVersion:"1.41"
       };
 
       const ops=[];
@@ -9137,10 +9138,23 @@ handlePaymentRequestFromUrl();
     refreshCloudUI();
 
     if(cloud.syncTimer) clearTimeout(cloud.syncTimer);
-    cloud.syncTimer=setTimeout(()=>{
+
+    const trySync=()=>{
+      if(!cloud.user || !cloud.orgId){
+        cloud.syncTimer=null;
+        return;
+      }
+      if(cloud.syncing){
+        // Never nest Firebase writes. A real local change remains marked pending
+        // and is retried after the active write has finished.
+        cloud.syncTimer=setTimeout(trySync,500);
+        return;
+      }
       cloud.syncTimer=null;
       syncLocalNow();
-    },900);
+    };
+
+    cloud.syncTimer=setTimeout(trySync,900);
   }
 
   function authModal(mode="signin"){
@@ -10208,6 +10222,24 @@ handlePaymentRequestFromUrl();
     return "";
   }
 
+  function hasInvitationInUrl(){
+    return !!(inviteParamFromUrl("staffInvite") || inviteParamFromUrl("customerInvite"));
+  }
+
+  function preservePlainInvitationUrl(){
+    const orgId=inviteParamFromUrl("org");
+    const staffToken=inviteParamFromUrl("staffInvite");
+    const customerToken=inviteParamFromUrl("customerInvite");
+    if(!orgId || (!staffToken && !customerToken)) return false;
+
+    const clean=new URL(window.location.origin+window.location.pathname);
+    clean.searchParams.set("org",orgId);
+    if(staffToken) clean.searchParams.set("staffInvite",staffToken);
+    if(customerToken) clean.searchParams.set("customerInvite",customerToken);
+    history.replaceState({},document.title,clean.toString());
+    return true;
+  }
+
   function cleanInvitationUrl(){
     const clean=window.location.origin+window.location.pathname;
     history.replaceState({},document.title,clean);
@@ -10308,14 +10340,22 @@ handlePaymentRequestFromUrl();
   }
 
   async function processEmailLinkLanding(){
-    if(!isSignInWithEmailLink(auth,window.location.href)) return false;
+    if(!isSignInWithEmailLink(auth,window.location.href)){
+      emailLinkLandingInProgress=false;
+      return false;
+    }
+
+    emailLinkLandingInProgress=true;
 
     let email=localStorage.getItem("masul_email_for_signin")||"";
     if(!email){
       email=prompt("Enter the email address to which this Masul sign-in link was sent:")||"";
     }
     email=safeEmail(email);
-    if(!email) return false;
+    if(!email){
+      emailLinkLandingInProgress=false;
+      return false;
+    }
 
     try{
       await signInWithEmailLink(auth,email,window.location.href);
@@ -10327,9 +10367,49 @@ handlePaymentRequestFromUrl();
         if(auth.currentUser) await loadProfileForUser(auth.currentUser);
         cloudToast("Signed in with email link");
       }
+      emailLinkLandingInProgress=false;
       return true;
     }catch(err){
       console.error("Email-link sign-in / invitation claim failed:",err);
+
+      const code=String(err?.code||"");
+      const invitePreserved=preservePlainInvitationUrl();
+      emailLinkLandingInProgress=false;
+
+      // A Firebase email-link action code is single-use/time-limited. If it is
+      // already used/expired, preserve the Masul invitation token separately.
+      // An existing recipient account can then sign in with its password and
+      // V1.41 will claim the still-pending invitation after authentication.
+      if(code==="auth/invalid-action-code" && invitePreserved){
+        cloud.lastError="";
+        refreshCloudUI();
+        window.modal(`
+          <div class="modal-head">
+            <div>
+              <span class="eyebrow">Masul Invitation</span>
+              <h3 style="margin:7px 0 0">Email sign-in link is no longer valid</h3>
+            </div>
+            <button class="close" onclick="closeModal()">×</button>
+          </div>
+          <div class="legal-strip warning">
+            <strong>The Masul invitation has been preserved.</strong>
+            The Firebase email sign-in code was expired, already used, or otherwise invalid.
+          </div>
+          <div class="preview-box" style="margin-top:10px">
+            If this email already has a Masul/Firebase password account, sign in with that same invited email now. Masul will then claim the pending organisation invitation automatically. If the recipient has no account/password yet, ask the organisation owner to resend the invitation email.
+          </div>
+          <div class="request-action-row">
+            <button class="btn primary" id="expiredInvitePasswordBtn">Sign In with Password</button>
+            <button class="btn ghost" onclick="closeModal()">Close</button>
+          </div>
+        `);
+        document.getElementById("expiredInvitePasswordBtn")?.addEventListener("click",()=>{
+          closeModal();
+          authModal("signin");
+        });
+        return false;
+      }
+
       cloud.lastError=err?.message||"Could not complete the invitation.";
       refreshCloudUI();
       window.modal(`
@@ -10337,7 +10417,10 @@ handlePaymentRequestFromUrl();
           <div><span class="eyebrow">Masul Invitation</span><h3 style="margin:7px 0 0">Could not complete access</h3></div>
           <button class="close" onclick="closeModal()">×</button>
         </div>
-        <div class="danger-alert"><div class="danger-title">Invitation could not be accepted</div><p>${escapeHtml(err?.message||"Please ask the organisation owner to resend the invitation.")}</p></div>
+        <div class="danger-alert">
+          <div class="danger-title">Invitation could not be accepted</div>
+          <p>${escapeHtml(err?.message||"Please ask the organisation owner to resend the invitation.")}</p>
+        </div>
         <div class="request-action-row"><button class="btn ghost" onclick="closeModal()">Close</button></div>
       `);
       return false;
@@ -10379,6 +10462,17 @@ handlePaymentRequestFromUrl();
     });
   }
 
+  window.addEventListener("error",event=>{
+    const msg=String(event?.message||"");
+    if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
+      console.error("Masul V1.41 call-stack guard:",event.error||event.message);
+      cloud.syncing=false;
+      cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
+      cloudStatus("error","Cloud issue");
+      bridge()?.refreshSaveIndicators?.();
+    }
+  });
+
   window.addEventListener("online",()=>{
     cloud.online=true;
     cloud.lastError="";
@@ -10409,7 +10503,16 @@ handlePaymentRequestFromUrl();
 
     if(user){
       try{
-        await loadProfileForUser(user);
+        if(emailLinkLandingInProgress){
+          // processEmailLinkLanding() owns this authentication transition.
+          // Do not race it by loading/claiming the organisation twice.
+          refreshCloudUI();
+        }else if(hasInvitationInUrl()){
+          const claimed=await claimPendingInvite();
+          if(!claimed) await loadProfileForUser(user);
+        }else{
+          await loadProfileForUser(user);
+        }
       }catch(err){
         console.error(err);
         cloud.lastError=err?.message||"Could not load Masul cloud profile.";
@@ -10449,7 +10552,7 @@ handlePaymentRequestFromUrl();
   renderAccessCentre();
   processEmailLinkLanding().catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.40.1 Firebase module ready");
+  console.info("Masul V1.41 Firebase module ready");
 
   window.MasulCloud={
     auth,
