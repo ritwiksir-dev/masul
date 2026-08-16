@@ -348,8 +348,51 @@
     .receipt{
       border:1px solid var(--line);border-radius:18px;padding:18px;background:#fff;
     }
+    .receipt-brand{
+      display:flex;align-items:center;gap:13px;padding-bottom:14px;margin-bottom:10px;
+      border-bottom:1px solid var(--line)
+    }
+    .receipt-logo{
+      width:64px;height:64px;border:1px solid #dfe5ed;border-radius:14px;
+      display:grid;place-items:center;background:#fff;overflow:hidden;flex:0 0 auto
+    }
+    .receipt-logo img{width:100%;height:100%;object-fit:contain;padding:5px;box-sizing:border-box}
+    .receipt-logo-fallback{font-size:27px;font-weight:950;color:#20304d}
+    .receipt-org strong{display:block;font-size:17px;color:#202b3d;margin-bottom:3px}
+    .receipt-org small{display:block;font-size:10px;line-height:1.45;color:var(--muted)}
     .receipt-line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px}
     .receipt-line:last-child{border-bottom:none}
+    .receipt-items{
+      margin-top:13px;border:1px solid #e2e6ed;border-radius:14px;overflow:hidden
+    }
+    .receipt-items-head{
+      padding:9px 11px;background:#fafbfd;font-size:9px;font-weight:900;
+      text-transform:uppercase;letter-spacing:.35px;color:#667085
+    }
+    .receipt-item{
+      display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;
+      padding:10px 11px;border-top:1px solid #edf0f4;align-items:start
+    }
+    .receipt-item strong{display:block;font-size:11px;color:#34435b}
+    .receipt-item small{display:block;font-size:9px;line-height:1.45;color:#667085;margin-top:2px}
+    .receipt-item-amount{text-align:right;font-size:11px;font-weight:900;color:#26364f;white-space:nowrap}
+    .receipt-discount{color:#654c85;font-weight:850}
+    .receipt-statutory{
+      margin-top:14px;border:1px solid #e2e6ed;border-radius:14px;padding:11px 12px;
+      background:#fbfcfe;font-size:9px;line-height:1.55;color:#5f6d80
+    }
+    .receipt-statutory strong{color:#394a61}
+    .receipt-statutory .stat-lines{margin-bottom:5px;color:#46566c;font-weight:750}
+    .history-date-pill{
+      display:inline-flex;align-items:center;border:1px solid #d9e2ed;background:#f8fbfe;
+      border-radius:999px;padding:3px 7px;font-size:8px;font-weight:850;color:#52637a
+    }
+    @media(max-width:620px){
+      .receipt-brand{align-items:flex-start}
+      .receipt-logo{width:56px;height:56px}
+      .receipt-item{grid-template-columns:1fr}
+      .receipt-item-amount{text-align:left}
+    }
     .toast{
       position:fixed;right:18px;bottom:18px;z-index:80;
       background:#17223b;color:white;border-radius:14px;padding:12px 15px;
@@ -1047,6 +1090,64 @@
     }
     .waived-amount{text-decoration:line-through;color:#98a2b3;font-weight:500;margin-right:6px}
     .exemption-amount{color:#67518d;font-weight:800}
+    .student-action-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .btn.person-edit-action{background:#f5f8fc;border-color:#d9e2ed;color:#405a79}
+    .btn.person-delete-action{background:#fff4f1;border-color:#efd5d0;color:#a3473d}
+    .archived-people-panel{
+      margin-top:14px;border:1px solid #e0e5ec;border-radius:16px;background:#fafbfd;overflow:hidden
+    }
+    .archived-people-panel summary{
+      cursor:pointer;padding:12px 14px;font-size:11px;font-weight:900;color:#526177;
+      display:flex;align-items:center;justify-content:space-between;gap:10px
+    }
+    .archived-people-inner{padding:0 12px 12px}
+    .left-session-badge{
+      display:inline-flex;align-items:center;border:1px solid #e3dac6;background:#fffaf0;color:#7e6330;
+      border-radius:999px;padding:3px 7px;font-size:8px;font-weight:900
+    }
+    .record-impact-grid{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0
+    }
+    .record-impact{
+      border:1px solid #e1e6ed;border-radius:12px;padding:9px 10px;background:#fbfcfe
+    }
+    .record-impact strong{display:block;font-size:14px;color:#28384f;margin-bottom:2px}
+    .record-impact span{display:block;font-size:8px;color:#6b7788;line-height:1.35}
+    @media(max-width:620px){
+      .record-impact-grid{grid-template-columns:1fr 1fr}
+    }
+    .btn.exemption-action{background:#f7f2ff;border-color:#ded2f0;color:#654c85}
+    .btn.exemption-action:hover{background:#f1e9fb}
+    .btn.exemption-action.active{background:#efe7fb;border-color:#cdbde5;color:#563b79}
+    .exemption-period-box{
+      border:1px solid #e1e6ed;background:#fbfcfe;border-radius:14px;padding:11px;margin:2px 0 12px
+    }
+    .exemption-period-head{
+      display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px
+    }
+    .exemption-period-head strong{font-size:10px;color:#3c4d63}
+    .month-choice-grid{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px
+    }
+    .month-choice{
+      display:flex;align-items:center;gap:6px;border:1px solid #e1e5eb;background:#fff;
+      border-radius:10px;padding:7px 8px;font-size:9px;font-weight:800;color:#536176;cursor:pointer
+    }
+    .month-choice:has(input:checked){
+      background:#f3edfb;border-color:#d0c1e5;color:#5d467e
+    }
+    .month-choice input{margin:0}
+    .exemption-period-tag{
+      display:inline-flex;align-items:center;border:1px solid #ded2f0;background:#f7f2ff;color:#654c85;
+      border-radius:999px;padding:3px 7px;font-size:8px;font-weight:900;margin-left:5px
+    }
+    @media(max-width:620px){
+      .month-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+    @media(max-width:620px){
+      .student-action-row{gap:5px}
+      .student-action-row .btn{padding:8px 9px;font-size:10px}
+    }
 
 
     .backup-range-box{
@@ -1691,6 +1792,31 @@
     .access-actions{display:flex;gap:5px;flex-wrap:wrap}
     .access-action{border:1px solid #d9e2ec;background:#fff;border-radius:8px;padding:5px 7px;font-size:8px;font-weight:850;color:#465a73;cursor:pointer}
     .access-action:hover{background:#f5f8fb}.access-action.danger{color:#a3473d;border-color:#eed8d4}.access-action.good{color:#267452;border-color:#d4e9dd}
+    .direct-invite-shell{
+      border:1px solid #d9e3ee;border-radius:18px;background:linear-gradient(145deg,#fff,#f8fbfe);
+      padding:14px;margin:10px 0
+    }
+    .direct-invite-title{display:flex;align-items:flex-start;gap:11px;margin-bottom:12px}
+    .direct-invite-icon{
+      width:39px;height:39px;border-radius:12px;background:#eef5fb;color:#315a8c;
+      display:grid;place-items:center;font-weight:950;font-size:18px;flex:0 0 auto
+    }
+    .direct-invite-title strong{display:block;font-size:13px;color:#26364f;margin-bottom:3px}
+    .direct-invite-title small{display:block;font-size:10px;line-height:1.5;color:#667085}
+    .invite-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0 12px}
+    .invite-mode-tab{
+      border:1px solid #dce3eb;background:#fff;color:#52637a;border-radius:11px;
+      padding:9px 10px;font-size:10px;font-weight:900;cursor:pointer
+    }
+    .invite-mode-tab.active{background:#edf4fb;border-color:#bfd2e7;color:#294f7c}
+    .invite-link-box{
+      border:1px dashed #cbd7e4;background:#f8fbfe;border-radius:12px;padding:9px 10px;
+      font-size:9px;line-height:1.45;color:#55657a;word-break:break-all;margin:9px 0
+    }
+    .invite-security-note{
+      border:1px solid #e7ddca;background:#fffaf0;border-radius:12px;padding:9px 10px;
+      color:#765d2b;font-size:9px;line-height:1.5
+    }
     .access-transfer-box{border:1px dashed #d4dce6;border-radius:13px;padding:12px;font-size:10px;color:#5e6b7c;background:#fbfcfd}
     .audit-row,.invite-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:9px 2px}
     .audit-row:last-child,.invite-row:last-child{border-bottom:none}
@@ -2750,7 +2876,7 @@
 
             <div class="clean-card" style="margin-top:14px">
               <div class="section-title" style="margin-bottom:10px">
-                <div><h3>Pending Invitations</h3><p>Invitations remain separate until the recipient accepts using the same email address.</p></div>
+                <div><h3>Pending Invitations</h3><p>Share the secure Masul link directly by WhatsApp, Telegram or another trusted channel. Firebase email delivery is optional.</p></div>
               </div>
               <div id="staffInvitesWrap"><div class="empty">No pending invitations.</div></div>
             </div>
@@ -2981,9 +3107,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.41</span>
+                <span class="chip">V1.47</span>
               </div>
-              <div class="request-meta">Masul V1.41 • Sync & Invitation Stability</div>
+              <div class="request-meta">Masul V1.47 • Student Record Controls</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3392,9 +3518,27 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.41: cloud/status refreshes must never render the full dashboard
+    // V1.47: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
+  },
+  mergePublicPaymentReport(token,publicData){
+    const req=(state.paymentRequests||[]).find(r=>r.publicToken===token);
+    if(!req || !publicData) return false;
+    if(req.status!=="awaiting_payment" || publicData.status!=="payment_reported") return false;
+    const transactionRef=String(publicData.transactionRef||"").trim();
+    if(!transactionRef) return false;
+
+    req.payerName=String(publicData.payerName||"");
+    req.payerMobile=String(publicData.payerMobile||"");
+    req.transactionRef=transactionRef;
+    req.reportedAt=publicData.reportedAt?.toDate?.()?.toISOString?.()
+      || String(publicData.reportedAt||new Date().toISOString());
+    req.status="payment_reported";
+    saveState();
+    renderDashboard();
+    toast(`Payment reported for ${req.id}`);
+    return true;
   }
 };
 
@@ -3782,19 +3926,60 @@ function renderReview(){
 }
 
 
-function activeExemptionFor(person,feeId){
-  if(!person || !Array.isArray(person.exemptions)) return null;
-  const active=person.exemptions.filter(e=>e && e.active!==false);
-  const feeSpecific=active.filter(e=>e.scope==="fee" && e.feeId===feeId);
-  if(feeSpecific.length) return feeSpecific[feeSpecific.length-1];
-  const all=active.filter(e=>e.scope==="all");
-  return all.length ? all[all.length-1] : null;
+function exemptionMonthKey(year,monthIndex){
+  return `${year}-${String(monthIndex+1).padStart(2,"0")}`;
 }
 
-function applyFeeExemption(person,feeId,base,late){
+function exemptionSessionMonths(){
+  const startIndex=Math.max(0,months.indexOf(state.org?.sessionStart||"January"));
+  const match=String(state.org?.sessionName||"").match(/\b(20\d{2})\b/);
+  let startYear=match?Number(match[1]):today.getFullYear();
+  if(!match && startIndex>today.getMonth()) startYear=today.getFullYear()-1;
+
+  return Array.from({length:12},(_,offset)=>{
+    const absolute=startIndex+offset;
+    const year=startYear+Math.floor(absolute/12);
+    const monthIndex=absolute%12;
+    return {
+      key:exemptionMonthKey(year,monthIndex),
+      year,monthIndex,
+      label:`${months[monthIndex].slice(0,3)} ${year}`
+    };
+  });
+}
+
+function exemptionAppliesToMonth(ex,year=null,monthIndex=null){
+  if(!ex || ex.active===false) return false;
+  const mode=ex.periodMode||"all"; // backward-compatible V1.42 and earlier
+  if(mode!=="months") return true;
+  if(year==null || monthIndex==null) return false;
+  return Array.isArray(ex.monthKeys) && ex.monthKeys.includes(exemptionMonthKey(year,monthIndex));
+}
+
+function activeExemptionFor(person,feeId,year=null,monthIndex=null){
+  if(!person || !Array.isArray(person.exemptions)) return null;
+
+  const candidates=person.exemptions
+    .filter(e=>e && e.active!==false)
+    .filter(e=>(e.scope==="fee" ? e.feeId===feeId : e.scope==="all"))
+    .filter(e=>exemptionAppliesToMonth(e,year,monthIndex));
+
+  if(!candidates.length) return null;
+
+  // Specific month(s) outrank all-month rules. Within the same period
+  // specificity, one-fee rules outrank all-fee rules. Newest wins ties.
+  return [...candidates].sort((a,b)=>{
+    const score=e=>((e.periodMode==="months")?2:0)+(e.scope==="fee"?1:0);
+    const diff=score(b)-score(a);
+    if(diff) return diff;
+    return String(b.createdAt||"").localeCompare(String(a.createdAt||""));
+  })[0];
+}
+
+function applyFeeExemption(person,feeId,base,late,year=null,monthIndex=null){
   const originalBase=+base||0;
   const originalLate=+late||0;
-  const ex=activeExemptionFor(person,feeId);
+  const ex=activeExemptionFor(person,feeId,year,monthIndex);
   if(!ex) return {originalBase,originalLate,discount:0,base:originalBase,late:originalLate,total:originalBase+originalLate,exemption:null};
 
   let discount=0, adjustedLate=originalLate;
@@ -3825,6 +4010,21 @@ function exemptionDescription(ex){
   return `${money(ex.value||0)} exemption`;
 }
 
+function exemptionPeriodDescription(ex){
+  if(!ex || (ex.periodMode||"all")!=="months") return "All months";
+  const selected=Array.isArray(ex.monthKeys)?ex.monthKeys:[];
+  if(!selected.length) return "Selected months";
+  const labels=selected
+    .slice()
+    .sort()
+    .map(key=>{
+      const [y,m]=String(key).split("-").map(Number);
+      return Number.isFinite(y)&&Number.isFinite(m) ? `${months[m-1]?.slice(0,3)||key} ${y}` : key;
+    });
+  if(labels.length<=4) return labels.join(", ");
+  return `${labels.slice(0,3).join(", ")} +${labels.length-3} more`;
+}
+
 function generateFeeInstances(person){
   // Demo-friendly dynamic dues. Recurring monthly fees generate Apr–current month for current year,
   // while one-time/optional fees generate one selectable component.
@@ -3838,13 +4038,15 @@ function generateFeeInstances(person){
         const year=today.getFullYear();
         const dueDate = f.dueRule==="monthly-day" ? new Date(year,i,Math.min(28,+f.dueValue||10)) : null;
         const late=calculateLate(f,dueDate);
-        const ex=applyFeeExemption(person,f.id,+f.amount||0,late);
+        const ex=applyFeeExemption(person,f.id,+f.amount||0,late,year,i);
         out.push({key:`${f.id}_${year}_${i}`,feeId:f.id,name:`${months[i]} ${f.name}`,base:ex.base,late:ex.late,originalBase:ex.originalBase,exemptionDiscount:ex.discount,exemption:ex.exemption,meta:`Due ${f.dueRule==="monthly-day"?(f.dueValue||"—")+" "+months[i]:"as configured"}`});
       }
     }else{
       const dueDate=f.dueRule==="specific"&&f.dueValue?new Date(f.dueValue):null;
       const rawLate=calculateLate(f,dueDate);
-      const ex=applyFeeExemption(person,f.id,+f.amount||0,rawLate);
+      const oneTimeYear=dueDate&&!Number.isNaN(dueDate.getTime())?dueDate.getFullYear():null;
+      const oneTimeMonth=dueDate&&!Number.isNaN(dueDate.getTime())?dueDate.getMonth():null;
+      const ex=applyFeeExemption(person,f.id,+f.amount||0,rawLate,oneTimeYear,oneTimeMonth);
       out.push({key:`${f.id}_once`,feeId:f.id,name:f.name,base:ex.base,late:ex.late,originalBase:ex.originalBase,exemptionDiscount:ex.discount,exemption:ex.exemption,meta:formatDue(f)});
     }
   });
@@ -3965,7 +4167,7 @@ function reportFeeItemsForPerson(person,fromMonth,toMonth,includeUndated=false){
           if(!Number.isNaN(specific.getTime()) && specific.getFullYear()===year && specific.getMonth()===mi) dueDate=specific;
         }
         const late=calculateLate(fee,dueDate);
-        const ex=applyFeeExemption(person,fee.id,baseConfigured,late);
+        const ex=applyFeeExemption(person,fee.id,baseConfigured,late,year,mi);
         const key=`${fee.id}_${year}_${mi}`;
         const payment=paidMap.get(key)||null;
         const status=payment?"Paid":(ex.total===0 && ex.exemption?"Exempt":"Pending");
@@ -3992,8 +4194,11 @@ function reportFeeItemsForPerson(person,fromMonth,toMonth,includeUndated=false){
     }
     if(!relevant) return;
 
-    const rawLate=fee.dueRule==="specific"&&fee.dueValue?calculateLate(fee,new Date(fee.dueValue)):0;
-    const ex=applyFeeExemption(person,fee.id,+fee.amount||0,rawLate);
+    const oneTimeDate=fee.dueRule==="specific"&&fee.dueValue?new Date(fee.dueValue):null;
+    const rawLate=oneTimeDate?calculateLate(fee,oneTimeDate):0;
+    const oneTimeYear=oneTimeDate&&!Number.isNaN(oneTimeDate.getTime())?oneTimeDate.getFullYear():null;
+    const oneTimeMonth=oneTimeDate&&!Number.isNaN(oneTimeDate.getTime())?oneTimeDate.getMonth():null;
+    const ex=applyFeeExemption(person,fee.id,+fee.amount||0,rawLate,oneTimeYear,oneTimeMonth);
     const key=`${fee.id}_once`;
     const payment=paidMap.get(key)||null;
     const status=payment?"Paid":(ex.total===0 && ex.exemption?"Exempt":"Pending");
@@ -4197,7 +4402,7 @@ function buildPaymentsReport(f){
       Payer:pm.payerName||"—",
       Mode:pm.method||"",
       Amount:+pm.amount||0,
-      Date:pm.historical?(pm.paidDateLabel||"Before Masul"):(pm.date?new Date(pm.date).toLocaleDateString("en-IN"):""),
+      Date:pm.historical?historicalPaidDateLabel(pm):(pm.date?new Date(pm.date).toLocaleDateString("en-IN"):""),
       Reference:pm.reference||pm.ref||"—",
       Type:pm.historical?"Opening History":"Payment"
     };
@@ -4334,7 +4539,7 @@ function buildStudentStatementReport(f){
         Original:x.originalBase,Exemption:x.discount,FeePayable:x.base,Late:x.late,
         Total:x.due,Status:x.status,
         Receipt:x.payment?.receipt||"—",
-        PaidOn:x.payment?(x.payment.historical?(x.payment.paidDateLabel||"Before Masul"):new Date(x.payment.date).toLocaleDateString("en-IN")):"—"
+        PaidOn:x.payment?(x.payment.historical?historicalPaidDateLabel(x.payment):new Date(x.payment.date).toLocaleDateString("en-IN")):"—"
       });
     });
   });
@@ -4569,7 +4774,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.41: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.47: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 function renderPeople(){
@@ -4638,10 +4843,38 @@ function renderPeople(){
           <td><input class="bulk-check" type="checkbox" ${selectedPeopleForBulkDelete.has(p.id)?"checked":""} aria-label="Select ${escapeHtml(p.name)}" onchange="togglePersonBulkSelection('${p.id}',this.checked)"></td>
           <td><button class="student-link" onclick="openStudentQuickCard('${p.id}')">${escapeHtml(p.name)}</button></td>
           <td><button class="student-link" onclick="openBatchDetail('${escapeHtml(p.batch||"General")}')">${escapeHtml(p.batch||"General")}</button></td>
-          <td><button class="btn primary small" onclick="collectForPerson('${p.id}')">Collect</button></td>
+          <td>
+            <div class="student-action-row">
+              <button class="btn primary small" onclick="collectForPerson('${p.id}')">Collect</button>
+              <button class="btn exemption-action small ${(Array.isArray(p.exemptions)&&p.exemptions.some(e=>e&&e.active!==false))?"active":""}" onclick="openFeeExemption('${p.id}')">${(Array.isArray(p.exemptions)&&p.exemptions.some(e=>e&&e.active!==false))?"Exemption ✓":"Exemption"}</button>
+              <button class="btn person-edit-action small" onclick="openEditPerson('${p.id}')">Edit</button>
+              <button class="btn person-delete-action small" onclick="openDeletePersonWarning('${p.id}')">Delete</button>
+            </div>
+          </td>
         </tr>`).join("")
       }</tbody>
-    </table>`;
+    </table>
+    ${(()=>{
+      const archived=[...state.people].filter(p=>p.archived).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
+      if(!archived.length) return "";
+      return `<details class="archived-people-panel">
+        <summary><span>Left Session / Archived</span><span class="left-session-badge">${archived.length} record${archived.length===1?"":"s"}</span></summary>
+        <div class="archived-people-inner">
+          <table class="table-lite">
+            <thead><tr><th>Name</th><th>Batch</th><th>Actions</th></tr></thead>
+            <tbody>${archived.map(p=>`<tr>
+              <td><button class="student-link" onclick="openStudentQuickCard('${p.id}')">${escapeHtml(p.name)}</button></td>
+              <td>${escapeHtml(p.batch||"General")}</td>
+              <td><div class="student-action-row">
+                <button class="btn ghost small" onclick="archivePerson('${p.id}')">Restore</button>
+                <button class="btn person-edit-action small" onclick="openEditPerson('${p.id}')">Edit</button>
+                <button class="btn person-delete-action small" onclick="openDeletePersonWarning('${p.id}')">Delete</button>
+              </div></td>
+            </tr>`).join("")}</tbody>
+          </table>
+        </div>
+      </details>`;
+    })()}`;
 }
 
 
@@ -4685,7 +4918,7 @@ window.openBatchDetail=(batchName)=>{
   batchDetailTitle.textContent=batchName;
   batchDetailMeta.textContent=`${people.length} ${String(state.org.peopleLabel||"people").toLowerCase()}`;
   batchStudentList.innerHTML=people.length
-    ? `<table class="table-lite"><thead><tr><th>Name</th><th>Action</th></tr></thead><tbody>${people.map(p=>`<tr><td><button class="student-link" onclick="openStudentQuickCard('${p.id}')">${escapeHtml(p.name)}</button></td><td><button class="btn primary small" onclick="collectForPerson('${p.id}')">Collect</button></td></tr>`).join("")}</tbody></table>`
+    ? `<table class="table-lite"><thead><tr><th>Name</th><th>Actions</th></tr></thead><tbody>${people.map(p=>`<tr><td><button class="student-link" onclick="openStudentQuickCard('${p.id}')">${escapeHtml(p.name)}</button></td><td><div class="student-action-row"><button class="btn primary small" onclick="collectForPerson('${p.id}')">Collect</button><button class="btn exemption-action small ${(Array.isArray(p.exemptions)&&p.exemptions.some(e=>e&&e.active!==false))?"active":""}" onclick="openFeeExemption('${p.id}')">${(Array.isArray(p.exemptions)&&p.exemptions.some(e=>e&&e.active!==false))?"Exemption ✓":"Exemption"}</button><button class="btn person-edit-action small" onclick="openEditPerson('${p.id}')">Edit</button><button class="btn person-delete-action small" onclick="openDeletePersonWarning('${p.id}')">Delete</button></div></td></tr>`).join("")}</tbody></table>`
     : `<div class="empty">No people are assigned to this batch yet.<div class="empty-actions"><button class="btn primary small" onclick="dashJump('people')">Add / Import People</button></div></div>`;
   batchDetailCard.classList.remove("hidden");
   batchDetailCard.dataset.batch=batchName;
@@ -4723,12 +4956,14 @@ window.openFeeExemption=(personId)=>{
   const p=state.people.find(x=>x.id===personId);if(!p)return;
   p.exemptions=Array.isArray(p.exemptions)?p.exemptions:[];
   const active=p.exemptions.filter(e=>e.active!==false);
+  const sessionMonths=exemptionSessionMonths();
+  const currentKey=exemptionMonthKey(today.getFullYear(),today.getMonth());
   modal(`
     <div class="modal-head">
       <div>
-        <span class="eyebrow">Student Fee Adjustment</span>
+        <span class="eyebrow">Student Fee Exemption</span>
         <h3 style="margin:7px 0 0">Fee Exemption — ${escapeHtml(p.name)}</h3>
-        <p style="font-size:12px;color:var(--muted)">Exemptions reduce future/current dues without changing the original fee rate or past payment history.</p>
+        <p style="font-size:12px;color:var(--muted)">Give a concession for all months or only selected month(s), without changing the original fee rate or past payments.</p>
       </div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
@@ -4738,7 +4973,11 @@ window.openFeeExemption=(personId)=>{
         ${active.map(e=>`<div class="item-card">
           <div>
             <strong>${escapeHtml(exemptionDescription(e))}</strong>
-            <small>${e.scope==="all"?"All fee types":escapeHtml(state.fees.find(f=>f.id===e.feeId)?.name||"Selected fee")}${e.note?` • ${escapeHtml(e.note)}`:""}</small>
+            <small>
+              ${e.scope==="all"?"All fee types":escapeHtml(state.fees.find(f=>f.id===e.feeId)?.name||"Selected fee")}
+              <span class="exemption-period-tag">${escapeHtml(exemptionPeriodDescription(e))}</span>
+              ${e.note?` • ${escapeHtml(e.note)}`:""}
+            </small>
           </div>
           <button class="btn ghost small" onclick="deactivateFeeExemption('${p.id}','${e.id}')">Remove</button>
         </div>`).join("")}
@@ -4761,7 +5000,7 @@ window.openFeeExemption=(personId)=>{
 
     <div class="grid-2">
       <div class="field">
-        <label>Applies to</label>
+        <label>Applies to fee</label>
         <select id="exemptionScope">
           <option value="all">All fee types</option>
           <option value="fee">One selected fee type</option>
@@ -4776,12 +5015,39 @@ window.openFeeExemption=(personId)=>{
     </div>
 
     <div class="field">
+      <label>Applies to month(s)</label>
+      <select id="exemptionPeriodMode">
+        <option value="all">All months</option>
+        <option value="months">Selected month(s) only</option>
+      </select>
+    </div>
+
+    <div class="exemption-period-box" id="exemptionMonthsBox" style="display:none">
+      <div class="exemption-period-head">
+        <strong>Select one or more months in ${escapeHtml(state.org.sessionName||"the current session")}</strong>
+        <div class="request-action-row" style="margin:0">
+          <button type="button" class="btn ghost small" id="exemptionSelectAllMonths">Select All</button>
+          <button type="button" class="btn ghost small" id="exemptionClearMonths">Clear</button>
+        </div>
+      </div>
+      <div class="month-choice-grid">
+        ${sessionMonths.map(m=>`
+          <label class="month-choice">
+            <input type="checkbox" class="exemption-month-check" value="${m.key}" ${m.key===currentKey?"checked":""}>
+            <span>${escapeHtml(m.label)}</span>
+          </label>`).join("")}
+      </div>
+    </div>
+
+    <div class="field">
       <label>Reason / Note <span class="optional">Optional</span></label>
       <input id="exemptionNote" placeholder="e.g. Scholarship, staff ward, special concession">
     </div>
 
     <div class="preview-box">
-      <strong>How it works:</strong> Full exemption makes the selected pending fee payable ₹0 and also waives its late fee. Partial exemption reduces the base fee; any applicable late fee remains separate.
+      <strong>Exemption possibilities:</strong> Full exemption, percentage concession, or fixed-amount concession; all fee types or one selected fee; all months or selected month(s). More-specific rules take priority when exemptions overlap.
+      <br><br>
+      <strong>Month-wise safety:</strong> A selected-month exemption applies only to those month(s). Other months keep the normal fee. Already-paid fee items remain unchanged. Full exemption also waives the late fee for the affected item; partial exemption reduces the base fee only.
     </div>
 
     <div class="context-actions">
@@ -4793,13 +5059,24 @@ window.openFeeExemption=(personId)=>{
   const updateFields=()=>{
     const mode=document.getElementById("exemptionMode")?.value;
     const scope=document.getElementById("exemptionScope")?.value;
+    const period=document.getElementById("exemptionPeriodMode")?.value;
     const valueField=document.getElementById("exemptionValueField");
     const feeField=document.getElementById("exemptionFeeField");
+    const monthsBox=document.getElementById("exemptionMonthsBox");
     if(valueField) valueField.style.display=mode==="full"?"none":"block";
     if(feeField) feeField.style.display=scope==="fee"?"block":"none";
+    if(monthsBox) monthsBox.style.display=period==="months"?"block":"none";
   };
   exemptionMode.onchange=updateFields;
   exemptionScope.onchange=updateFields;
+  exemptionPeriodMode.onchange=updateFields;
+
+  document.getElementById("exemptionSelectAllMonths")?.addEventListener("click",()=>{
+    document.querySelectorAll(".exemption-month-check").forEach(cb=>cb.checked=true);
+  });
+  document.getElementById("exemptionClearMonths")?.addEventListener("click",()=>{
+    document.querySelectorAll(".exemption-month-check").forEach(cb=>cb.checked=false);
+  });
   updateFields();
 };
 
@@ -4807,15 +5084,27 @@ window.saveFeeExemption=(personId)=>{
   const p=state.people.find(x=>x.id===personId);if(!p)return;
   const mode=exemptionMode.value;
   const scope=exemptionScope.value;
+  const periodMode=exemptionPeriodMode.value;
   const value=mode==="full"?100:+exemptionValue.value;
   if(mode!=="full" && !(value>0)){toast("Enter the exemption value");return}
   if(mode==="percent" && value>100){toast("Percentage exemption cannot exceed 100%");return}
   const feeId=scope==="fee"?exemptionFeeId.value:"";
   if(scope==="fee" && !feeId){toast("Choose the fee type");return}
+
+  const monthKeys=periodMode==="months"
+    ? [...document.querySelectorAll(".exemption-month-check:checked")].map(cb=>cb.value)
+    : [];
+  if(periodMode==="months" && !monthKeys.length){
+    toast("Select at least one month for the exemption");
+    return;
+  }
+
   p.exemptions=Array.isArray(p.exemptions)?p.exemptions:[];
   p.exemptions.push({
     id:uuid("ex"),
     mode, value, scope, feeId,
+    periodMode,
+    monthKeys,
     note:exemptionNote.value.trim(),
     active:true,
     createdAt:new Date().toISOString()
@@ -4823,7 +5112,7 @@ window.saveFeeExemption=(personId)=>{
   saveState();
   renderDashboard();
   openStudentQuickCard(personId);
-  toast("Fee exemption saved");
+  toast(periodMode==="months" ? `Exemption saved for ${monthKeys.length} month${monthKeys.length===1?"":"s"}` : "Fee exemption saved");
 };
 
 window.deactivateFeeExemption=(personId,exId)=>{
@@ -4852,7 +5141,7 @@ window.openStudentQuickCard=(personId)=>{
     const key=`${primaryMonthly.id}_${year}_${i}`;
     const dueDate=primaryMonthly.dueRule==="monthly-day" ? new Date(year,i,Math.min(28,+primaryMonthly.dueValue||10)) : null;
     const rawLate=calculateLate(primaryMonthly,dueDate);
-    const ex=applyFeeExemption(p,primaryMonthly.id,+primaryMonthly.amount||0,rawLate);
+    const ex=applyFeeExemption(p,primaryMonthly.id,+primaryMonthly.amount||0,rawLate,year,i);
     const paid=paidKeys.has(key);
     const payment=paymentItems.find(pm=>(pm.items||[]).includes(key));
     const fullyWaived=!paid && ex.total===0 && ex.exemption;
@@ -4867,7 +5156,7 @@ window.openStudentQuickCard=(personId)=>{
       <div>
         <span class="eyebrow">Fee Card / Ledger</span>
         <h3 style="margin:7px 0 0">${escapeHtml(p.name)}</h3>
-        <p style="font-size:12px;color:var(--muted)">${escapeHtml(p.batch||"General")} • ${escapeHtml(state.org.sessionName||"")}</p>
+        <p style="font-size:12px;color:var(--muted)">${escapeHtml(p.batch||"General")} • ${escapeHtml(state.org.sessionName||"")}${p.archived?' • <span class="left-session-badge">Left Session / Archived</span>':""}</p>
       </div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
@@ -4879,7 +5168,7 @@ window.openStudentQuickCard=(personId)=>{
     ${Array.isArray(p.exemptions)&&p.exemptions.some(e=>e.active!==false)?`
       <div class="exemption-note">
         <strong>Fee exemption active:</strong>
-        ${p.exemptions.filter(e=>e.active!==false).map(e=>`${escapeHtml(exemptionDescription(e))}${e.scope==="fee"?` for ${escapeHtml(state.fees.find(f=>f.id===e.feeId)?.name||"selected fee")}`:" for all fees"}`).join(" • ")}
+        ${p.exemptions.filter(e=>e.active!==false).map(e=>`${escapeHtml(exemptionDescription(e))}${e.scope==="fee"?` for ${escapeHtml(state.fees.find(f=>f.id===e.feeId)?.name||"selected fee")}`:" for all fees"} — ${escapeHtml(exemptionPeriodDescription(e))}`).join(" • ")}
       </div>`:""}
 
     ${primaryMonthly ? `
@@ -4894,7 +5183,7 @@ window.openStudentQuickCard=(personId)=>{
             <td>${r.discount?`<span class="waived-amount">${money(r.originalFee)}</span>${money(r.fee)}`:money(r.fee)}</td>
             <td>${r.discount?`<span class="exemption-amount">− ${money(r.discount)}</span>`:(r.exemption&&r.status==="Exempt"?"Full":"—")}</td>
             <td>${r.late?money(r.late):"—"}</td>
-            <td>${r.payment?(r.payment.historical?(r.payment.paidDateLabel||"Before Masul"):new Date(r.payment.date).toLocaleDateString("en-IN")):"—"}</td>
+            <td>${r.payment?(r.payment.historical?historicalPaidDateLabel(r.payment):new Date(r.payment.date).toLocaleDateString("en-IN")):"—"}</td>
             <td>${r.payment?escapeHtml(r.payment.method):"—"}</td>
             <td class="${r.status==="Paid"||r.status==="Exempt"?"status-paid":r.status==="Overdue"?"status-overdue":"status-due"}">${r.status}</td>
           </tr>`).join("")}
@@ -4910,7 +5199,10 @@ window.openStudentQuickCard=(personId)=>{
         ${otherFees.map(f=>{
           const key=`${f.id}_once`;
           const paid=paidKeys.has(key);
-          const ex=applyFeeExemption(p,f.id,+f.amount||0,0);
+          const oneTimeDate=f.dueRule==="specific"&&f.dueValue?new Date(f.dueValue):null;
+          const oneTimeYear=oneTimeDate&&!Number.isNaN(oneTimeDate.getTime())?oneTimeDate.getFullYear():null;
+          const oneTimeMonth=oneTimeDate&&!Number.isNaN(oneTimeDate.getTime())?oneTimeDate.getMonth():null;
+          const ex=applyFeeExemption(p,f.id,+f.amount||0,0,oneTimeYear,oneTimeMonth);
           const exempt=!paid && ex.total===0 && ex.exemption;
           return `<div class="item-card">
             <div><strong>${escapeHtml(f.name)}</strong><small>${escapeHtml(formatDue(f))}${ex.exemption?` • ${escapeHtml(exemptionDescription(ex.exemption))}`:""}</small></div>
@@ -4921,11 +5213,12 @@ window.openStudentQuickCard=(personId)=>{
     </div>`:""}
 
     <div class="context-actions">
-      <button class="btn primary" onclick="closeModal();collectForPerson('${p.id}')">Collect Payment</button>
+      ${p.archived?"":`<button class="btn primary" onclick="closeModal();collectForPerson('${p.id}')">Collect Payment</button>`}
       <button class="btn ghost" onclick="openFeeExemption('${p.id}')">Fee Exemption</button>
-      <button class="btn ghost" onclick="closeModal();openBatchDetail('${escapeHtml(p.batch||"General")}')">Open Batch</button>
-      <button class="btn ghost" onclick="archivePerson('${p.id}')">${p.archived?"Restore":"Archive"}</button>
-      ${paymentItems.length===0?`<button class="btn danger" onclick="deletePerson('${p.id}')">Delete</button>`:""}
+      <button class="btn person-edit-action" onclick="openEditPerson('${p.id}')">Edit Record</button>
+      ${p.archived?"":`<button class="btn ghost" onclick="closeModal();openBatchDetail('${escapeHtml(p.batch||"General")}')">Open Batch</button>`}
+      <button class="btn ghost" onclick="archivePerson('${p.id}')">${p.archived?"Restore to Active":"Mark Left Session"}</button>
+      <button class="btn danger" onclick="openDeletePersonWarning('${p.id}')">Delete Record</button>
     </div>
   `)
 };
@@ -5063,6 +5356,26 @@ function paymentRequestCode(){
   return `MSL-${part}`;
 }
 
+function paymentPublicToken(){
+  const bytes=new Uint8Array(24);
+  if(window.crypto?.getRandomValues){
+    window.crypto.getRandomValues(bytes);
+    return "mpr_"+[...bytes].map(b=>b.toString(16).padStart(2,"0")).join("");
+  }
+  return "mpr_"+Array.from({length:48},()=>Math.floor(Math.random()*16).toString(16)).join("");
+}
+
+function ensurePaymentPublicToken(req){
+  if(!req) return "";
+  if(!req.publicToken) req.publicToken=paymentPublicToken();
+  return req.publicToken;
+}
+
+function localOrPublicPaymentRequest(id){
+  return (state.paymentRequests||[]).find(r=>r.id===id)
+    || (window.__MASUL_PUBLIC_REQUEST__?.id===id ? window.__MASUL_PUBLIC_REQUEST__ : null);
+}
+
 function requestStatusLabel(status){
   return {
     awaiting_payment:"Awaiting Payment",
@@ -5082,7 +5395,8 @@ function requestStatusClass(status){
 
 function requestPublicUrl(req){
   const base=location.href.split("?")[0].split("#")[0];
-  return `${base}?pay=${encodeURIComponent(req.id)}`;
+  const token=ensurePaymentPublicToken(req);
+  return `${base}?pay=${encodeURIComponent(token)}`;
 }
 
 function selectedCollectionSnapshot(person){
@@ -5091,18 +5405,28 @@ function selectedCollectionSnapshot(person){
   const keys=selected.map(c=>c.dataset.key);
   const items=keys.map(key=>{
     const d=dues.find(x=>x.key===key);
-    return d ? {key:d.key,name:d.name,meta:d.meta,base:d.base,late:d.late,total:(+d.base||0)+(+d.late||0)} :
-      {key,name:key,meta:"",base:0,late:0,total:0};
+    return d ? {
+      key:d.key,name:d.name,meta:d.meta,
+      base:d.base,late:d.late,total:(+d.base||0)+(+d.late||0),
+      originalBase:d.originalBase==null?d.base:d.originalBase,
+      discount:+d.exemptionDiscount||0,
+      exemptionLabel:d.exemption?`${exemptionDescription(d.exemption)} — ${exemptionPeriodDescription(d.exemption)}`:""
+    } :
+      {key,name:key,meta:"",base:0,late:0,total:0,originalBase:0,discount:0,exemptionLabel:""};
   });
   return {keys,items,total:items.reduce((a,x)=>a+x.total,0)};
 }
 
-function createPaymentRequestFromCollect(){
+async function createPaymentRequestFromCollect(){
   const person=state.people.find(p=>p.id===collectPerson.value);
   if(!person){toast("Select a student/customer first");return}
   if(!state.paymentsConfig.upi){toast("Enable UPI / QR in Settings first");return}
   if((state.org.currency||"INR")!=="INR"){toast("Direct UPI links currently require INR");return}
   if(!state.paymentsConfig.upiId){toast("Add the business UPI ID in Settings first");return}
+  if(!window.MasulCloud?.state?.user || !window.MasulCloud?.state?.orgId){
+    toast("Sign in to Masul Cloud before creating a shareable payment link");
+    return;
+  }
 
   const snap=selectedCollectionSnapshot(person);
   if(!snap.items.length){toast("Select at least one month / fee component");return}
@@ -5135,12 +5459,33 @@ function createPaymentRequestFromCollect(){
     reportedAt:null,
     verifiedAt:null,
     rejectedAt:null,
-    receipt:null
+    receipt:null,
+    publicToken:paymentPublicToken()
   };
   state.paymentRequests.push(req);
   saveState();
   renderDashboard();
-  showPaymentRequestCreated(req);
+
+  try{
+    if(!window.MasulPublicPayments?.publish) throw new Error("Public payment service is still loading.");
+    await window.MasulPublicPayments.publish(req);
+    showPaymentRequestCreated(req);
+  }catch(err){
+    console.error("Public payment request publish failed:",err);
+    modal(`
+      <div class="modal-head">
+        <div><span class="eyebrow">Payment Request Saved</span><h3 style="margin:7px 0 0">Public link is not active yet</h3></div>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div class="danger-alert">
+        <div class="danger-title">The internal request was saved, but Firestore blocked the public mirror.</div>
+        <p>${escapeHtml(err?.message||"Publish failed")}</p>
+      </div>
+      <div class="preview-box">
+        Publish the V1.47 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
+      </div>
+    `);
+  }
 }
 
 function showPaymentRequestCreated(req){
@@ -5165,7 +5510,7 @@ function showPaymentRequestCreated(req){
       <button class="btn ghost" onclick="openPaymentRequest('${req.id}')">Open Preview</button>
     </div>
     <div class="preview-box" style="margin-top:12px">
-      <strong>Pre-cloud note:</strong> the complete cross-device link and in-app confirmation become live as soon as this Payment Request collection is moved to Firebase. In this local build, the full workflow can be tested in the same browser.
+      <strong>Secure public link:</strong> this link contains a long random access token and opens only a sanitised payment-request copy. The private student record is not made public.
     </div>
     <div class="legal-strip warning" style="margin-top:10px">
       <strong>Before sharing:</strong> check the business name, payee name, UPI ID, selected student and amount. Direct UPI payments must still be verified against the business bank/UPI record before being marked paid.
@@ -5176,15 +5521,39 @@ function showPaymentRequestCreated(req){
 
 window.copyPaymentRequestLink=async(id)=>{
   const req=(state.paymentRequests||[]).find(r=>r.id===id);if(!req)return;
-  const url=requestPublicUrl(req);
-  try{await navigator.clipboard.writeText(url);toast("Payment link copied")}
-  catch(e){
-    modal(`<div class="modal-head"><h3>Copy Payment Link</h3><button class="close" onclick="closeModal()">×</button></div><div class="payment-link-box">${escapeHtml(url)}</div>`);
+  const wasMissing=!req.publicToken;
+  ensurePaymentPublicToken(req);
+  if(wasMissing) saveState();
+
+  try{
+    if(!window.MasulPublicPayments?.publish) throw new Error("Public payment service is still loading.");
+    await window.MasulPublicPayments.publish(req);
+  }catch(err){
+    console.error(err);
+    toast("Public link could not be activated. Publish the V1.47 Firestore Rules.");
+    return;
   }
+
+  const url=requestPublicUrl(req);
+  try{await navigator.clipboard.writeText(url);toast(wasMissing?"New secure payment link created and copied":"Payment link copied")}
+  catch(e){modal(`<div class="modal-head"><h3>Copy Payment Link</h3><button class="close" onclick="closeModal()">×</button></div><div class="payment-link-box">${escapeHtml(url)}</div>`)}
 };
 
 window.sharePaymentRequest=async(id)=>{
   const req=(state.paymentRequests||[]).find(r=>r.id===id);if(!req)return;
+  const wasMissing=!req.publicToken;
+  ensurePaymentPublicToken(req);
+  if(wasMissing) saveState();
+
+  try{
+    if(!window.MasulPublicPayments?.publish) throw new Error("Public payment service is still loading.");
+    await window.MasulPublicPayments.publish(req);
+  }catch(err){
+    console.error(err);
+    toast("Public link could not be activated. Publish the V1.47 Firestore Rules.");
+    return;
+  }
+
   const url=requestPublicUrl(req);
   const text=`${req.orgName}\nPayment request for ${req.personName}\n${req.items.map(i=>i.name).join(", ")}\nTotal: ${money(req.amount)}\n${req.id}`;
   if(navigator.share){
@@ -5200,7 +5569,7 @@ function upiUriForRequest(req){
 }
 
 window.openPaymentRequest=(id)=>{
-  const req=(state.paymentRequests||[]).find(r=>r.id===id);
+  const req=localOrPublicPaymentRequest(id);
   if(!req){showMissingCloudRequest(id);return}
   const uri=upiUriForRequest(req);
   const paid=req.status==="verified_paid";
@@ -5253,7 +5622,7 @@ window.openPaymentRequest=(id)=>{
 };
 
 window.openReportPaymentForm=(id)=>{
-  const req=(state.paymentRequests||[]).find(r=>r.id===id);if(!req)return;
+  const req=localOrPublicPaymentRequest(id);if(!req)return;
   modal(`
     <div class="modal-head">
       <div><span class="eyebrow">${escapeHtml(req.id)}</span><h3 style="margin:7px 0 0">Report completed UPI payment</h3></div>
@@ -5270,13 +5639,34 @@ window.openReportPaymentForm=(id)=>{
   `);
 };
 
-window.reportRequestPayment=(id)=>{
-  const req=(state.paymentRequests||[]).find(r=>r.id===id);if(!req)return;
+window.reportRequestPayment=async(id)=>{
+  const privateReq=(state.paymentRequests||[]).find(r=>r.id===id);
+  const req=privateReq || (window.__MASUL_PUBLIC_REQUEST__?.id===id?window.__MASUL_PUBLIC_REQUEST__:null);
+  if(!req)return;
   const payer=document.getElementById("requestPayerName")?.value.trim()||"";
   const ref=document.getElementById("requestTxnRef")?.value.trim()||"";
   const mobile=document.getElementById("requestPayerMobile")?.value.trim()||"";
   if(!payer){toast("Enter the payer name");return}
   if(!ref){toast("Enter the UPI transaction reference");return}
+
+  if(!privateReq && req.publicToken){
+    try{
+      if(!window.MasulPublicPayments?.report) throw new Error("Public payment service is still loading.");
+      await window.MasulPublicPayments.report(req.publicToken,{payerName:payer,payerMobile:mobile,transactionRef:ref});
+      req.payerName=payer;
+      req.payerMobile=mobile;
+      req.transactionRef=ref;
+      req.reportedAt=new Date().toISOString();
+      req.status="payment_reported";
+      openPaymentRequest(id);
+      toast("Payment reported to the organisation for verification");
+    }catch(err){
+      console.error(err);
+      toast("Could not submit the payment report. Please try again.");
+    }
+    return;
+  }
+
   req.payerName=payer;
   req.payerMobile=mobile;
   req.transactionRef=ref;
@@ -5302,13 +5692,15 @@ window.confirmPaymentRequest=(id)=>{
     items:req.items.map(i=>i.key),
     reference:req.transactionRef,
     payerName:req.payerName,
-    requestId:req.id
+    requestId:req.id,
+    batch:req.batch||"General",
+    itemDetails:(req.items||[]).map(i=>({...i}))
   };
   state.payments.push(pmt);
   req.status="verified_paid";
   req.verifiedAt=pmt.date;
   req.receipt=pmt.receipt;
-  saveState();renderDashboard();toast("Payment verified and dues updated");
+  saveState();renderDashboard();receiptModal(pmt);
 };
 
 window.rejectPaymentRequest=(id)=>{
@@ -5329,6 +5721,7 @@ window.cancelPaymentRequest=(id)=>{
 function renderPaymentRequests(){
   if(typeof paymentRequestsWrap==="undefined" || !paymentRequestsWrap) return;
   const requests=[...(state.paymentRequests||[])].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  window.MasulPublicPayments?.watchRequests?.(requests);
   if(!requests.length){
     paymentRequestsWrap.innerHTML=`<div class="empty">No payment requests yet.<div class="empty-actions"><button class="btn primary small" onclick="dashJump('collect')">Create Payment Request</button></div></div>`;
     return;
@@ -5354,30 +5747,125 @@ function renderPaymentRequests(){
     </div>`).join("");
 }
 
-function showMissingCloudRequest(id){
+window.showMissingCloudRequest=function(id,message=""){
   modal(`
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
+    <div class="danger-alert">
+      <div class="danger-title">Payment request could not be opened</div>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.47 link.")}</p>
+    </div>
     <div class="preview-box">
-      This request is not stored in this browser. In V1.11 the workflow and link structure are ready, but cross-device request lookup requires Firebase. Once Firestore is connected, the same link will fetch the request securely on any device.
+      If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
     </div>
   `);
-}
+};
+
+window.showPublicPaymentLoading=function(){
+  modal(`
+    <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">Opening secure request…</h3></div></div>
+    <div class="preview-box">Fetching the payment request from Firebase. No Masul login is required for the payer.</div>
+  `);
+};
 
 function handlePaymentRequestFromUrl(){
   const params=new URLSearchParams(location.search);
-  const id=params.get("pay");
-  if(!id) return false;
-  const req=(state.paymentRequests||[]).find(r=>r.id===id);
-  setTimeout(()=>{if(req) openPaymentRequest(id); else showMissingCloudRequest(id)},100);
+  const token=params.get("pay");
+  if(!token) return false;
+
+  if(/^MSL-/i.test(token)){
+    const local=(state.paymentRequests||[]).find(r=>r.id===token);
+    setTimeout(()=>{
+      if(local) openPaymentRequest(local.id);
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.47 secure link.");
+    },100);
+    return true;
+  }
+
+  window.__MASUL_PENDING_PUBLIC_PAY_TOKEN__=token;
+  setTimeout(()=>{
+    if(window.MasulPublicPayments?.openToken) window.MasulPublicPayments.openToken(token);
+    else showPublicPaymentLoading();
+  },120);
   return true;
 }
+
+
+window.editHistoricalPaymentDate=(paymentId)=>{
+  const p=(state.payments||[]).find(x=>x.id===paymentId);
+  if(!p || !p.historical){toast("This date editor is only for opening-history records");return}
+  modal(`
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">Opening History</span>
+        <h3 style="margin:7px 0 0">Edit Payment Date</h3>
+        <p style="font-size:12px;color:var(--muted)">${escapeHtml(p.personName||"")} • ${escapeHtml(p.receipt||"")}</p>
+      </div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field">
+      <label>Actual historical payment date</label>
+      <input id="editHistoricalPaidDate" type="date" max="${new Date().toISOString().slice(0,10)}" value="${escapeHtml(p.paidDate||"")}">
+    </div>
+    <div class="preview-box">
+      Change this only from a reliable old register, receipt or other source record. Clearing the date changes the display back to <strong>Before Masul</strong>; it does not undo the paid months.
+    </div>
+    <div class="request-action-row">
+      <button class="btn primary" onclick="saveHistoricalPaymentDate('${p.id}')">Save Date</button>
+      <button class="btn ghost" onclick="clearHistoricalPaymentDate('${p.id}')">Clear / Unknown Date</button>
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+};
+
+window.saveHistoricalPaymentDate=(paymentId)=>{
+  const p=(state.payments||[]).find(x=>x.id===paymentId);
+  if(!p || !p.historical)return;
+  const value=String(document.getElementById("editHistoricalPaidDate")?.value||"").trim();
+  if(!value){toast("Choose a date, or use Clear / Unknown Date");return}
+  if(value>new Date().toISOString().slice(0,10)){toast("Historical payment date cannot be in the future");return}
+  p.paidDate=value;
+  p.paidDateLabel=formatDateOnly(value);
+  p.historyDateEditedAt=new Date().toISOString();
+  saveState();closeModal();renderPayments();renderReports();renderHomeOverview();
+  toast("Historical payment date updated");
+};
+
+window.clearHistoricalPaymentDate=(paymentId)=>{
+  const p=(state.payments||[]).find(x=>x.id===paymentId);
+  if(!p || !p.historical)return;
+  p.paidDate=null;
+  p.paidDateLabel="Before Masul";
+  p.historyDateEditedAt=new Date().toISOString();
+  saveState();closeModal();renderPayments();renderReports();renderHomeOverview();
+  toast("Historical payment date set to unknown");
+};
+
+window.openStoredReceipt=(paymentId)=>{
+  const p=(state.payments||[]).find(x=>x.id===paymentId);
+  if(!p){toast("Payment record not found");return}
+  receiptModal(p);
+};
 
 function renderPayments(){
   renderPaymentRequests();
   if(!state.payments.length){paymentsTableWrap.innerHTML='<div class="empty">No verified payments recorded yet.</div>';return}
-  paymentsTableWrap.innerHTML=`<table class="table-lite"><thead><tr><th>Receipt</th><th>Person</th><th>Payer</th><th>Mode</th><th>Amount</th><th>Date</th></tr></thead><tbody>${
-    [...state.payments].reverse().map(p=>`<tr><td>${escapeHtml(p.receipt)}</td><td>${escapeHtml(p.personName)}</td><td>${escapeHtml(p.payerName||"—")}</td><td>${escapeHtml(p.method)}</td><td>${money(p.amount)}</td><td>${p.historical?(p.paidDateLabel||"Before Masul"):new Date(p.date).toLocaleDateString("en-IN")}</td></tr>`).join("")
-  }</tbody></table>`;
+  paymentsTableWrap.innerHTML=`<table class="table-lite">
+    <thead><tr><th>Receipt</th><th>Person</th><th>Payer</th><th>Mode</th><th>Amount</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody>${
+      [...state.payments].reverse().map(p=>`<tr>
+        <td>${escapeHtml(p.receipt)}</td>
+        <td>${escapeHtml(p.personName)}</td>
+        <td>${escapeHtml(p.payerName||"—")}</td>
+        <td>${escapeHtml(p.method)}</td>
+        <td>${money(p.amount)}</td>
+        <td>${p.historical?`<span class="history-date-pill">${escapeHtml(historicalPaidDateLabel(p))}</span>`:new Date(p.date).toLocaleDateString("en-IN")}</td>
+        <td><div class="student-action-row">
+          <button class="btn ghost small" onclick="openStoredReceipt('${p.id}')">Receipt</button>
+          ${p.historical?`<button class="btn ghost small" onclick="editHistoricalPaymentDate('${p.id}')">Edit Date</button>`:""}
+        </div></td>
+      </tr>`).join("")
+    }</tbody>
+  </table>`;
 }
 
 function renderCustomer(){
@@ -5744,18 +6232,166 @@ window.closeModal=()=>{
   if(window.MasulCloudHooks?.modalClosed) window.MasulCloudHooks.modalClosed();
 };
 
+
+function formatDateOnly(value){
+  const s=String(value||"").trim();
+  if(!s) return "";
+  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m) return `${m[3]}/${m[2]}/${m[1]}`;
+  const d=new Date(s);
+  return Number.isNaN(d.getTime()) ? s : d.toLocaleDateString("en-IN");
+}
+
+function historicalPaidDateLabel(payment){
+  if(!payment?.historical) return "";
+  if(payment.paidDate) return formatDateOnly(payment.paidDate);
+  return payment.paidDateLabel||"Before Masul";
+}
+
+function paymentDisplayDate(payment){
+  if(payment?.historical) return historicalPaidDateLabel(payment);
+  return payment?.date ? new Date(payment.date).toLocaleString("en-IN") : "—";
+}
+
+function receiptStatutoryDetails(){
+  const regs=state.org?.regs||{};
+  const pairs=[];
+  if(regs.gstin) pairs.push(["GSTIN",regs.gstin]);
+  if(regs.pan) pairs.push(["PAN",regs.pan]);
+  if(regs.udyam) pairs.push(["UDYAM / MSME",regs.udyam]);
+  if(regs.registration) pairs.push(["Registration / Licence",regs.registration]);
+  (Array.isArray(regs.custom)?regs.custom:[]).forEach(r=>{
+    if(r?.name && r?.value) pairs.push([r.name,r.value]);
+  });
+  return pairs;
+}
+
+function resolvePaymentItemName(key){
+  const k=String(key||"");
+  const monthly=k.match(/^(.*)_(20\d{2})_(\d{1,2})$/);
+  if(monthly){
+    const fee=state.fees.find(f=>f.id===monthly[1]);
+    const mi=Number(monthly[3]);
+    return `${months[mi]||"Month"} ${monthly[2]}${fee?.name?` — ${fee.name}`:""}`;
+  }
+  const once=k.match(/^(.*)_once$/);
+  if(once){
+    const fee=state.fees.find(f=>f.id===once[1]);
+    return fee?.name||"One-time fee";
+  }
+  return k||"Fee item";
+}
+
+function paymentReceiptItems(payment){
+  if(Array.isArray(payment?.itemDetails) && payment.itemDetails.length){
+    return payment.itemDetails.map(i=>({
+      name:i.name||resolvePaymentItemName(i.key),
+      meta:i.meta||"",
+      base:+i.base||0,
+      late:+i.late||0,
+      originalBase:i.originalBase==null?(+i.base||0):(+i.originalBase||0),
+      discount:+i.discount||+i.exemptionDiscount||0,
+      exemption:i.exemptionLabel||i.exemption||""
+    }));
+  }
+
+  if(payment?.requestId){
+    const req=(state.paymentRequests||[]).find(r=>r.id===payment.requestId);
+    if(req?.items?.length){
+      return req.items.map(i=>({
+        name:i.name||resolvePaymentItemName(i.key),
+        meta:i.meta||"",
+        base:+i.base||0,
+        late:+i.late||0,
+        originalBase:i.originalBase==null?(+i.base||0):(+i.originalBase||0),
+        discount:+i.discount||+i.exemptionDiscount||0,
+        exemption:i.exemptionLabel||i.exemption||""
+      }));
+    }
+  }
+
+  return (payment?.items||[]).map(key=>({
+    name:resolvePaymentItemName(key),meta:"",base:0,late:0,originalBase:0,discount:0,exemption:""
+  }));
+}
+
+function receiptOrgMeta(){
+  const bits=[];
+  if(state.org?.address) bits.push(state.org.address);
+  if(state.org?.city) bits.push(state.org.city);
+  if(state.org?.phone) bits.push(`Phone: ${state.org.phone}`);
+  if(state.org?.email) bits.push(state.org.email);
+  return bits;
+}
+
 function receiptModal(payment){
+  const person=state.people.find(p=>p.id===payment.personId);
+  const batch=payment.batch||person?.batch||"General";
+  const items=paymentReceiptItems(payment);
+  const statutory=receiptStatutoryDetails();
+  const orgMeta=receiptOrgMeta();
+  const discountTotal=items.reduce((s,i)=>s+(+i.discount||0),0);
+  const lateTotal=items.reduce((s,i)=>s+(+i.late||0),0);
+  const logo=state.org.logo
+    ? `<img src="${escapeHtml(state.org.logo)}" alt="${escapeHtml(state.org.name||"Organisation")} logo">`
+    : `<div class="receipt-logo-fallback">${escapeHtml((state.org.short||state.org.name||"M").charAt(0).toUpperCase())}</div>`;
+
   modal(`
-    <div class="modal-head"><div><span class="eyebrow">Payment recorded</span><h3 style="margin:7px 0 0">Receipt ${escapeHtml(payment.receipt)}</h3></div><button class="close" onclick="closeModal()">×</button></div>
-    <div class="receipt">
-      <div class="receipt-line"><span>Organisation</span><strong>${escapeHtml(state.org.name)}</strong></div>
-      <div class="receipt-line"><span>Person</span><strong>${escapeHtml(payment.personName)}</strong></div>
-      <div class="receipt-line"><span>Payment mode</span><strong>${escapeHtml(payment.method)}</strong></div>
-      <div class="receipt-line"><span>Amount</span><strong>${money(payment.amount)}</strong></div>
-      <div class="receipt-line"><span>Date</span><strong>${new Date(payment.date).toLocaleString("en-IN")}</strong></div>
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">${payment.historical?"Opening history record":"Payment recorded"}</span>
+        <h3 style="margin:7px 0 0">Receipt ${escapeHtml(payment.receipt||"")}</h3>
+      </div>
+      <button class="close" onclick="closeModal()">×</button>
     </div>
-    <div class="preview-box" style="margin-top:14px">V1 prototype receipt. A production version can generate downloadable PDF receipts and include statutory fields selected by the organisation.</div>
-  `)
+
+    <div class="receipt">
+      <div class="receipt-brand">
+        <div class="receipt-logo">${logo}</div>
+        <div class="receipt-org">
+          <strong>${escapeHtml(state.org.name||"Masul Organisation")}</strong>
+          ${orgMeta.length?`<small>${orgMeta.map(escapeHtml).join(" • ")}</small>`:""}
+        </div>
+      </div>
+
+      <div class="receipt-line"><span>Receipt No.</span><strong>${escapeHtml(payment.receipt||"—")}</strong></div>
+      <div class="receipt-line"><span>${escapeHtml((state.org.peopleLabel||"Student").replace(/s$/,""))}</span><strong>${escapeHtml(payment.personName||person?.name||"—")}</strong></div>
+      <div class="receipt-line"><span>Batch / Group</span><strong>${escapeHtml(batch)}</strong></div>
+      ${payment.payerName?`<div class="receipt-line"><span>Payer</span><strong>${escapeHtml(payment.payerName)}</strong></div>`:""}
+      <div class="receipt-line"><span>Payment mode</span><strong>${escapeHtml(payment.method||"—")}</strong></div>
+      ${payment.reference?`<div class="receipt-line"><span>Transaction / Reference</span><strong>${escapeHtml(payment.reference)}</strong></div>`:""}
+      <div class="receipt-line"><span>Date</span><strong>${escapeHtml(paymentDisplayDate(payment))}</strong></div>
+      ${discountTotal?`<div class="receipt-line"><span>Fee exemption / concession</span><strong class="receipt-discount">− ${money(discountTotal)}</strong></div>`:""}
+      ${lateTotal?`<div class="receipt-line"><span>Late fee included</span><strong>${money(lateTotal)}</strong></div>`:""}
+      <div class="receipt-line"><span>Amount received / recorded</span><strong>${money(payment.amount)}</strong></div>
+
+      ${items.length?`
+        <div class="receipt-items">
+          <div class="receipt-items-head">Fee details</div>
+          ${items.map(i=>`
+            <div class="receipt-item">
+              <div>
+                <strong>${escapeHtml(i.name)}</strong>
+                ${i.meta?`<small>${escapeHtml(i.meta)}</small>`:""}
+                ${i.discount?`<small class="receipt-discount">Original ${money(i.originalBase)} • Exemption − ${money(i.discount)}${i.exemption?` • ${escapeHtml(String(i.exemption))}`:""}</small>`:""}
+                ${i.late?`<small>Late fee: ${money(i.late)}</small>`:""}
+              </div>
+              <div class="receipt-item-amount">${(i.base||i.late)?money((+i.base||0)+(+i.late||0)):"Recorded"}</div>
+            </div>`).join("")}
+        </div>`:""}
+
+      <div class="receipt-statutory">
+        ${statutory.length
+          ? `<div class="stat-lines">${statutory.map(([k,v])=>`${escapeHtml(k)}: ${escapeHtml(v)}`).join(" • ")}</div>`
+          : `<div class="stat-lines">No statutory registration identifiers have been entered in Masul for this organisation.</div>`
+        }
+        <strong>Payment acknowledgement:</strong>
+        This computer-generated receipt records payment acknowledged by the organisation.
+        It is not, by itself, a tax invoice unless the organisation separately issues it as one in accordance with applicable law.
+        Statutory identifiers displayed above are those entered by the organisation in Masul.
+      </div>
+    </div>
+  `);
 }
 
 function dashJump(target){
@@ -6410,11 +7046,21 @@ createPaymentRequestBtn.onclick=createPaymentRequestFromCollect;
 recordPaymentBtn.onclick=()=>{
   const person=state.people.find(p=>p.id===collectPerson.value);
   if(!person){toast("Select a real student/customer first");return}
-  let total=0;
-  const selected=[...document.querySelectorAll(".collect-check:checked")];
-  selected.forEach(c=>total+=+c.dataset.base + +c.dataset.late);
-  if(!selected.length){toast("Select at least one fee component");return}
-  const pmt={id:uuid("pay"),receipt:`MAS-${new Date().getFullYear()}-${String(state.payments.length+1).padStart(5,"0")}`,personId:person.id,personName:person.name,payerName:"",method:collectMethod.value,amount:total,date:new Date().toISOString(),items:selected.map(c=>c.dataset.key)};
+  const snap=selectedCollectionSnapshot(person);
+  if(!snap.items.length){toast("Select at least one fee component");return}
+  const pmt={
+    id:uuid("pay"),
+    receipt:`MAS-${new Date().getFullYear()}-${String(state.payments.length+1).padStart(5,"0")}`,
+    personId:person.id,
+    personName:person.name,
+    batch:person.batch||"General",
+    payerName:"",
+    method:collectMethod.value,
+    amount:snap.total,
+    date:new Date().toISOString(),
+    items:snap.keys,
+    itemDetails:snap.items.map(i=>({...i}))
+  };
   state.payments.push(pmt);saveState();renderDashboard();receiptModal(pmt);
 };
 
@@ -6615,7 +7261,7 @@ function openPastHistorySetup(){
     </div>
 
     <div class="preview-box">
-      <strong>Safe import:</strong> paste one statement per line. Masul matches only existing student names, shows a preview, and does not invent payment dates.
+      <strong>Safe import:</strong> paste one statement per line. Masul matches only existing student names and shows a preview. Historical payment date is optional and remains editable later.
     </div>
 
     <div class="grid-2">
@@ -6627,6 +7273,12 @@ function openPastHistorySetup(){
         <label>History year / session start year</label>
         <input id="historyYearInput" type="number" min="2000" max="2100" value="${defaultHistoryYear()}">
       </div>
+    </div>
+
+    <div class="field">
+      <label>Actual historical payment date <span class="optional">Optional</span></label>
+      <input id="historyPaidDate" type="date" max="2026-08-16">
+      <div class="form-note">If all records in this import were paid on the same known date, enter it here. Leave blank if the exact date is unknown; you can edit each historical record later.</div>
     </div>
 
     <div class="field">
@@ -6704,7 +7356,7 @@ function renderHistoryPreview(){
 
     ${matched.length?`
       <div class="preview-box">
-        <strong>Before applying:</strong> amounts are calculated from the configured fee/version for each month. Existing paid months are skipped. No historical payment date will be fabricated.
+        <strong>Before applying:</strong> amounts are calculated from the configured fee/version for each month. Existing paid months are skipped. If no historical payment date is entered, Masul records the date as “Before Masul” until you edit it.
       </div>`:""}
   `;
 }
@@ -6714,7 +7366,9 @@ window.applyPastHistory=()=>{
   const fee=state.fees.find(f=>f.id===feeId);
   const year=Number(document.getElementById("historyYearInput")?.value)||defaultHistoryYear();
   const note=String(document.getElementById("historyImportNote")?.value||"").trim();
+  const historyPaidDate=String(document.getElementById("historyPaidDate")?.value||"").trim();
   if(!fee){toast("Choose the monthly fee");return}
+  if(historyPaidDate && historyPaidDate>new Date().toISOString().slice(0,10)){toast("Historical payment date cannot be in the future");return}
 
   const matched=historyParsedRows.filter(r=>r.status==="matched");
   if(!matched.length){toast("Nothing matched to apply");return}
@@ -6755,8 +7409,8 @@ window.applyPastHistory=()=>{
       amount,
       date:new Date().toISOString(),       // record/import timestamp only
       historical:true,
-      paidDate:null,
-      paidDateLabel:"Before Masul",
+      paidDate:historyPaidDate||null,
+      paidDateLabel:historyPaidDate?formatDateOnly(historyPaidDate):"Before Masul",
       historyImportId:importId,
       feeId:fee.id,
       historyYear:year,
@@ -6777,6 +7431,7 @@ window.applyPastHistory=()=>{
     feeId:fee.id,
     feeName:fee.name,
     year,
+    paidDate:historyPaidDate||null,
     note,
     peopleUpdated,
     monthsAdded,
@@ -6855,21 +7510,210 @@ window.clearPersonForm=()=>{
   if(typeof mPersonEmail!=="undefined") mPersonEmail.value="";
 };
 
+function personRecordLinks(personId){
+  const payments=(state.payments||[]).filter(pm=>pm.personId===personId);
+  const requests=(state.paymentRequests||[]).filter(pr=>pr.personId===personId);
+  return {
+    payments,
+    requests,
+    awaiting:requests.filter(r=>r.status==="awaiting_payment"),
+    reported:requests.filter(r=>r.status==="payment_reported"),
+    verifiedRequests:requests.filter(r=>r.status==="verified_paid")
+  };
+}
+
+window.openEditPerson=(personId)=>{
+  const p=state.people.find(x=>x.id===personId); if(!p)return;
+  const linked=personRecordLinks(personId);
+  modal(`
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">Student Record</span>
+        <h3 style="margin:7px 0 0">Edit ${escapeHtml(p.name)}</h3>
+      </div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field"><label>Name</label><input id="editPersonName" value="${escapeHtml(p.name)}"></div>
+    <div class="field"><label>Batch / Group</label><input id="editPersonBatch" value="${escapeHtml(p.batch||"General")}" list="editPersonBatchOptions"></div>
+    <datalist id="editPersonBatchOptions">${(state.org.batches||[]).map(b=>`<option value="${escapeHtml(b.name)}">`).join("")}</datalist>
+    <div class="grid-2">
+      <div class="field"><label>Mobile <span class="optional">Optional</span></label><input id="editPersonMobile" value="${escapeHtml(p.mobile||"")}"></div>
+      <div class="field"><label>Email <span class="optional">Optional</span></label><input id="editPersonEmail" type="email" value="${escapeHtml(p.email||"")}"></div>
+    </div>
+    ${linked.payments.length||linked.requests.length?`
+      <label class="check-line">
+        <input type="checkbox" id="editPersonUpdateLinkedName" checked>
+        <span><strong>Apply corrected name/batch to linked payment and request display records</strong><small>Recommended for spelling/name corrections. Masul keeps a name-correction history on the student profile.</small></span>
+      </label>`:""}
+    <div class="preview-box">
+      Editing the student record does not change fee amounts, paid months, exemptions or transaction references.
+    </div>
+    <div class="request-action-row">
+      <button class="btn primary" onclick="savePersonEdit('${p.id}')">Save Changes</button>
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+};
+
+window.savePersonEdit=(personId)=>{
+  const p=state.people.find(x=>x.id===personId); if(!p)return;
+  const oldName=p.name;
+  const oldBatch=p.batch||"General";
+  const name=String(document.getElementById("editPersonName")?.value||"").trim();
+  const batch=String(document.getElementById("editPersonBatch")?.value||"").trim()||"General";
+  const mobile=String(document.getElementById("editPersonMobile")?.value||"").trim();
+  const email=String(document.getElementById("editPersonEmail")?.value||"").trim();
+  if(!name){toast("Enter the student's name");return}
+
+  if(name!==oldName || batch!==oldBatch){
+    p.nameHistory=Array.isArray(p.nameHistory)?p.nameHistory:[];
+    p.nameHistory.push({fromName:oldName,toName:name,fromBatch:oldBatch,toBatch:batch,changedAt:new Date().toISOString()});
+  }
+
+  p.name=name;
+  p.batch=batch;
+  p.mobile=mobile;
+  p.email=email;
+  p.updatedAt=new Date().toISOString();
+
+  const updateLinked=!!document.getElementById("editPersonUpdateLinkedName")?.checked;
+  if(updateLinked){
+    (state.payments||[]).filter(x=>x.personId===personId).forEach(x=>{
+      x.personName=name;
+      x.batch=batch;
+      x.profileCorrectionAt=new Date().toISOString();
+    });
+    (state.paymentRequests||[]).filter(x=>x.personId===personId).forEach(x=>{
+      x.personName=name;
+      x.batch=batch;
+      x.profileCorrectionAt=new Date().toISOString();
+    });
+  }
+
+  saveState();
+  closeModal();
+  renderDashboard();
+  renderCustomer();
+  toast(oldName!==name?"Student name updated":"Student record updated");
+};
+
 window.archivePerson=(personId)=>{
   const p=state.people.find(x=>x.id===personId); if(!p)return;
   p.archived=!p.archived;
+  if(p.archived){
+    p.leftSessionAt=new Date().toISOString();
+    (state.paymentRequests||[])
+      .filter(r=>r.personId===personId && r.status==="awaiting_payment")
+      .forEach(r=>{
+        r.status="cancelled";
+        r.cancelledAt=new Date().toISOString();
+        r.cancelReason="Student marked as left session";
+      });
+  }else{
+    p.restoredAt=new Date().toISOString();
+  }
   saveState();closeModal();renderDashboard();renderCustomer();
-  toast(p.archived?"Person archived":"Person restored");
+  toast(p.archived?"Marked as Left Session • awaiting payment links cancelled":"Student restored to active session");
 };
 
-window.deletePerson=(personId)=>{
+window.openDeletePersonWarning=(personId)=>{
   const p=state.people.find(x=>x.id===personId); if(!p)return;
-  const hasPayments=(state.payments||[]).some(pm=>pm.personId===personId);
-  if(hasPayments){toast("This person has payment history. Archive instead.");return}
-  if(!confirm(`Delete ${p.name}? This cannot be undone.`)) return;
-  state.people=state.people.filter(x=>x.id!==personId);
-  saveState();closeModal();renderDashboard();renderCustomer();toast("Person deleted");
+  const linked=personRecordLinks(personId);
+  playDangerSound(1);
+  modal(`
+    <div class="modal-head">
+      <div><span class="eyebrow">Student Record</span><h3 style="margin:7px 0 0">Delete ${escapeHtml(p.name)}?</h3></div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <span class="danger-stage">WARNING 1 OF 2</span>
+    <div class="danger-alert">
+      <div class="danger-title">⚠ The student profile can be deleted even when payments exist</div>
+      <p>Deleting removes this student from the active/session records and future dues. <strong>Verified payments, receipts and opening-history payments will be retained</strong> for financial integrity.</p>
+    </div>
+    <div class="record-impact-grid">
+      <div class="record-impact"><strong>${linked.payments.length}</strong><span>payment / history records retained</span></div>
+      <div class="record-impact"><strong>${linked.awaiting.length}</strong><span>awaiting payment requests will be cancelled</span></div>
+      <div class="record-impact"><strong>${linked.reported.length}</strong><span>reported payments retained for verification</span></div>
+    </div>
+    <div class="legal-strip warning">
+      <strong>If the student has simply left during the session:</strong> use <em>Mark Left Session</em> instead. This stops future dues, cancels awaiting links, preserves the full profile, and allows restoration later.
+    </div>
+    <div class="danger-choice-grid">
+      <div class="danger-choice">
+        <strong>Recommended — Left Session</strong>
+        <small>Keep the profile and financial history, but remove the student from active collection lists.</small>
+        <button class="btn ghost small" onclick="archivePerson('${p.id}')">Mark Left Session</button>
+      </div>
+      <div class="danger-choice">
+        <strong>Permanent profile deletion</strong>
+        <small>Payment/receipt history remains, but the student profile itself will be removed.</small>
+        <button class="btn danger small" onclick="openDeletePersonFinal('${p.id}',false)">Continue to Delete</button>
+      </div>
+    </div>
+    <div class="request-action-row">
+      <button class="btn primary small" onclick="downloadSafetyBackup();setTimeout(()=>openDeletePersonFinal('${p.id}',true),180)">Backup & Continue to Delete</button>
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
 };
+
+window.openDeletePersonFinal=(personId,backupTaken=false)=>{
+  const p=state.people.find(x=>x.id===personId); if(!p){closeModal();return}
+  const linked=personRecordLinks(personId);
+  playDangerSound(2);
+  modal(`
+    <div class="modal-head">
+      <div><span class="eyebrow">Final Confirmation</span><h3 style="margin:7px 0 0">Delete Student Profile</h3></div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <span class="danger-stage">WARNING 2 OF 2</span>
+    <div class="danger-alert">
+      <div class="danger-title">🚨 ${escapeHtml(p.name)} will be removed from student records</div>
+      <ul>
+        <li>${backupTaken?"A JSON backup download was requested.":"No new backup was requested in the previous step."}</li>
+        <li>${linked.payments.length} payment/opening-history record(s) will remain in Payments and reports.</li>
+        <li>${linked.awaiting.length} awaiting payment request(s) will be cancelled.</li>
+        <li>${linked.reported.length} payment-reported request(s) will remain available for verification/rejection.</li>
+        <li>The student profile, batch membership and exemption settings will be removed.</li>
+      </ul>
+    </div>
+    <div class="field">
+      <label>Type <span class="danger-confirm-word">DELETE</span> to remove the profile</label>
+      <input id="deletePersonConfirmWord" autocomplete="off" placeholder="Type DELETE">
+    </div>
+    <div class="request-action-row">
+      <button class="btn danger" id="deletePersonFinalBtn" disabled>Delete Student Profile</button>
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+  const input=document.getElementById("deletePersonConfirmWord");
+  const btn=document.getElementById("deletePersonFinalBtn");
+  input.addEventListener("input",()=>btn.disabled=input.value.trim().toUpperCase()!=="DELETE");
+  btn.onclick=()=>performDeletePerson(personId);
+  setTimeout(()=>input.focus(),50);
+};
+
+window.performDeletePerson=(personId)=>{
+  const p=state.people.find(x=>x.id===personId); if(!p)return;
+  const linked=personRecordLinks(personId);
+
+  linked.awaiting.forEach(r=>{
+    r.status="cancelled";
+    r.cancelledAt=new Date().toISOString();
+    r.cancelReason="Student profile deleted";
+  });
+
+  state.people=state.people.filter(x=>x.id!==personId);
+  selectedPeopleForBulkDelete.delete(personId);
+  saveState();
+  closeModal();
+  renderDashboard();
+  renderCustomer();
+  toast(`Student profile deleted • ${linked.payments.length} financial record(s) retained`);
+};
+
+// Backward-compatible internal name used by older buttons/bookmarks.
+window.deletePerson=(personId)=>openDeletePersonWarning(personId);
 
 window.saveNewPerson=()=>{
   const name=mPersonName.value.trim();if(!name){toast("Enter the person's name");return}
@@ -6933,7 +7777,7 @@ function openMasulTerms(){
     <p>Use of Masul does not by itself mean that Masul has verified, certified, approved or endorsed an organisation. A “verified” representation should be shown only when a genuine verification process exists.</p>
 
     <h4>5. Record integrity</h4>
-    <p>Completed financial history should be corrected through traceable adjustments, cancellation/void workflows or documented corrections rather than silent deletion or rewriting.</p>
+    <p>Completed financial history should remain traceable even when a student profile is removed. Masul therefore retains verified payments, receipts and opening-history records when a student profile is deleted.</p>
 
     <h4>6. Availability and third-party services</h4>
     <p>UPI apps, banks, email clients, Firebase, GitHub Pages and future payment providers are separate services. Their availability, authentication, settlement and service conditions are outside Masul's direct control.</p>
@@ -7302,76 +8146,62 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  const hasPayment=(state.payments||[]).some(pm=>pm.personId===personId);
-  const hasRequest=(state.paymentRequests||[]).some(pr=>pr.personId===personId);
-  return hasPayment||hasRequest;
+  // V1.47: payment history no longer prevents removal of a student profile.
+  // Financial records are retained separately.
+  return false;
 }
 
 function getBulkDeletePlan(){
   const people=[...selectedPeopleForBulkDelete]
     .map(id=>state.people.find(p=>p.id===id))
     .filter(Boolean);
-  const protectedPeople=people.filter(p=>personIsProtectedFromBulkDelete(p.id));
-  const deletable=people.filter(p=>!personIsProtectedFromBulkDelete(p.id));
-  return {people,protectedPeople,deletable};
+  const linkedPeople=people.filter(p=>{
+    const l=personRecordLinks(p.id);
+    return l.payments.length || l.requests.length;
+  });
+  return {people,deletable:people,linkedPeople};
 }
 
 function openBulkDeletePeopleWarning(){
   const plan=getBulkDeletePlan();
   if(!plan.people.length){toast("Select at least one student first");return}
-  if(!plan.deletable.length){
-    playDangerSound(1);
-    modal(`
-      <div class="modal-head">
-        <div><span class="eyebrow">Bulk Delete</span><h3 style="margin:7px 0 0">No selected record can be permanently deleted</h3></div>
-        <button class="close" onclick="closeModal()">×</button>
-      </div>
-      <div class="danger-alert">
-        <div class="danger-title">⚠ Financial-history protection</div>
-        <p>All ${plan.people.length} selected record(s) have payment or payment-request history. Masul will not permanently delete records linked to financial history.</p>
-      </div>
-      <div class="context-actions"><button class="btn primary" onclick="closeModal()">OK</button></div>
-    `);
-    return;
-  }
+
+  const retainedPayments=plan.people.reduce((n,p)=>n+personRecordLinks(p.id).payments.length,0);
+  const awaiting=plan.people.reduce((n,p)=>n+personRecordLinks(p.id).awaiting.length,0);
+  const reported=plan.people.reduce((n,p)=>n+personRecordLinks(p.id).reported.length,0);
 
   playDangerSound(1);
   modal(`
     <div class="modal-head">
-      <div>
-        <span class="eyebrow">Destructive Action</span>
-        <h3 style="margin:7px 0 0">Bulk Delete Students</h3>
-      </div>
+      <div><span class="eyebrow">Destructive Action</span><h3 style="margin:7px 0 0">Bulk Delete Student Profiles</h3></div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
-
     <span class="danger-stage">WARNING 1 OF 2</span>
     <div class="danger-alert">
-      <div class="danger-title">⚠ This action can permanently remove records</div>
-      <p>You selected <strong>${plan.people.length}</strong> record(s). <strong>${plan.deletable.length}</strong> can be permanently deleted.</p>
-      ${plan.protectedPeople.length?`<ul><li>${plan.protectedPeople.length} record(s) have payment/payment-request history and are protected. They will be skipped automatically.</li></ul>`:""}
+      <div class="danger-title">⚠ ${plan.people.length} student profile(s) are selected</div>
+      <p>Profiles can now be deleted even when they have payment history. Financial records are deliberately retained.</p>
     </div>
-
+    <div class="record-impact-grid">
+      <div class="record-impact"><strong>${retainedPayments}</strong><span>financial records retained</span></div>
+      <div class="record-impact"><strong>${awaiting}</strong><span>awaiting requests cancelled</span></div>
+      <div class="record-impact"><strong>${reported}</strong><span>reported payments retained</span></div>
+    </div>
     <div class="legal-strip warning">
-      <strong>Recommended:</strong> download a full Masul backup before bulk deletion. The JSON backup can later be restored if necessary.
+      <strong>For students who merely left the session, individual “Mark Left Session” is safer than permanent profile deletion.</strong>
     </div>
-
     <div class="danger-choice-grid">
       <div class="danger-choice">
-        <strong>🛡 Back up first</strong>
-        <small>Download a full restorable Masul backup, then continue to the final warning.</small>
-        <button class="btn primary small" style="margin-top:9px" onclick="bulkDeleteBackupAndContinue()">Download Backup & Continue</button>
+        <strong>Back up first</strong>
+        <small>Download a full restorable JSON backup, then continue.</small>
+        <button class="btn primary small" onclick="bulkDeleteBackupAndContinue()">Download Backup & Continue</button>
       </div>
       <div class="danger-choice">
-        <strong>⚠ Continue without backup</strong>
-        <small>Proceed to the final warning without downloading a backup.</small>
-        <button class="btn danger small" style="margin-top:9px" onclick="openBulkDeleteFinalWarning(false)">Continue Without Backup</button>
+        <strong>Continue without backup</strong>
+        <small>Proceed to the final warning without creating a new backup.</small>
+        <button class="btn danger small" onclick="openBulkDeleteFinalWarning(false)">Continue</button>
       </div>
     </div>
-
-    <div class="context-actions">
-      <button class="btn ghost" onclick="closeModal()">Cancel — Keep Data</button>
-    </div>
+    <div class="request-action-row"><button class="btn ghost" onclick="closeModal()">Cancel</button></div>
   `);
 }
 window.openBulkDeletePeopleWarning=openBulkDeletePeopleWarning;
@@ -7383,45 +8213,38 @@ window.bulkDeleteBackupAndContinue=()=>{
 
 function openBulkDeleteFinalWarning(backupTaken=false){
   const plan=getBulkDeletePlan();
-  if(!plan.deletable.length){closeModal();toast("No deletable records remain selected");return}
-  playDangerSound(2);
+  if(!plan.deletable.length){closeModal();toast("No selected records remain");return}
+  const retainedPayments=plan.people.reduce((n,p)=>n+personRecordLinks(p.id).payments.length,0);
+  const awaiting=plan.people.reduce((n,p)=>n+personRecordLinks(p.id).awaiting.length,0);
 
+  playDangerSound(2);
   modal(`
     <div class="modal-head">
-      <div>
-        <span class="eyebrow">Final Confirmation</span>
-        <h3 style="margin:7px 0 0">Confirm Bulk Delete</h3>
-      </div>
+      <div><span class="eyebrow">Final Confirmation</span><h3 style="margin:7px 0 0">Confirm Bulk Delete</h3></div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
-
     <span class="danger-stage">WARNING 2 OF 2</span>
     <div class="danger-alert">
-      <div class="danger-title">🚨 Final warning — permanent deletion</div>
-      <p><strong>${plan.deletable.length}</strong> student record(s) will be removed from this Masul data.</p>
+      <div class="danger-title">🚨 ${plan.deletable.length} student profile(s) will be removed</div>
       <ul>
-        <li>${backupTaken?"A backup download was requested in the previous step.":"You chose to continue without creating a backup."}</li>
-        <li>${plan.protectedPeople.length?`${plan.protectedPeople.length} financially linked record(s) will be protected and skipped.`:"Only the selected eligible records will be deleted."}</li>
-        <li>This operation cannot be undone inside the app.</li>
+        <li>${backupTaken?"A backup download was requested.":"You chose to continue without creating a new backup."}</li>
+        <li>${retainedPayments} payment/opening-history record(s) will remain.</li>
+        <li>${awaiting} awaiting payment request(s) will be cancelled.</li>
+        <li>Student profile fields, batch membership and exemptions will be removed.</li>
       </ul>
     </div>
-
     <div class="field">
-      <label>Type <span class="danger-confirm-word">DELETE</span> to enable permanent deletion</label>
+      <label>Type <span class="danger-confirm-word">DELETE</span> to continue</label>
       <input id="bulkDeleteConfirmWord" autocomplete="off" placeholder="Type DELETE">
     </div>
-
-    <div class="context-actions">
-      <button class="btn danger" id="bulkDeleteFinalBtn" disabled>Delete ${plan.deletable.length} Record(s)</button>
+    <div class="request-action-row">
+      <button class="btn danger" id="bulkDeleteFinalBtn" disabled>Delete ${plan.deletable.length} Profile(s)</button>
       <button class="btn ghost" onclick="closeModal()">Cancel</button>
     </div>
   `);
-
   const input=document.getElementById("bulkDeleteConfirmWord");
   const btn=document.getElementById("bulkDeleteFinalBtn");
-  input.addEventListener("input",()=>{
-    btn.disabled=input.value.trim().toUpperCase()!=="DELETE";
-  });
+  input.addEventListener("input",()=>btn.disabled=input.value.trim().toUpperCase()!=="DELETE");
   btn.onclick=performBulkDeletePeople;
   setTimeout(()=>input.focus(),50);
 }
@@ -7431,8 +8254,19 @@ function performBulkDeletePeople(){
   const plan=getBulkDeletePlan();
   if(!plan.deletable.length){closeModal();toast("Nothing to delete");return}
   const ids=new Set(plan.deletable.map(p=>p.id));
-  const deletedCount=ids.size;
-  const protectedCount=plan.protectedPeople.length;
+  let retainedPayments=0;
+  let cancelledRequests=0;
+
+  plan.deletable.forEach(p=>{
+    const linked=personRecordLinks(p.id);
+    retainedPayments+=linked.payments.length;
+    linked.awaiting.forEach(r=>{
+      r.status="cancelled";
+      r.cancelledAt=new Date().toISOString();
+      r.cancelReason="Student profile deleted in bulk";
+      cancelledRequests++;
+    });
+  });
 
   state.people=state.people.filter(p=>!ids.has(p.id));
   selectedPeopleForBulkDelete.clear();
@@ -7440,13 +8274,13 @@ function performBulkDeletePeople(){
   closeModal();
   renderDashboard();
   renderCustomer();
-  toast(`${deletedCount} record(s) deleted${protectedCount?` • ${protectedCount} protected record(s) skipped`:""}`);
+  toast(`${ids.size} profile(s) deleted • ${retainedPayments} financial record(s) retained${cancelledRequests?` • ${cancelledRequests} request(s) cancelled`:""}`);
 }
 
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.41",
+    version:"1.47",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -7929,6 +8763,8 @@ function buildExcelBackupWorkbook(fromMonth="",toMonth=""){
         Scope:e.scope||"",
         "Fee ID":e.feeId||"",
         "Fee Name":e.feeId?(state.fees.find(f=>f.id===e.feeId)?.name||""):"All Fees",
+        "Month Scope":(e.periodMode||"all")==="months"?"Selected Months":"All Months",
+        "Selected Months":(e.monthKeys||[]).join(", "),
         Reason:e.note||"",
         Active:e.active===false?"No":"Yes",
         Created:e.createdAt?new Date(e.createdAt).toLocaleString("en-IN"):"",
@@ -7936,7 +8772,7 @@ function buildExcelBackupWorkbook(fromMonth="",toMonth=""){
       });
     });
   });
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(exemptions.length?exemptions:[{"Exemption ID":"","Student":"","Mode":"","Value":"","Scope":"","Reason":""}]),"Fee Exemptions");
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(exemptions.length?exemptions:[{"Exemption ID":"","Student":"","Mode":"","Value":"","Scope":"","Month Scope":"","Selected Months":"","Reason":""}]),"Fee Exemptions");
 
   // 6. Payment Requests (filtered)
   const requests=(state.paymentRequests||[])
@@ -8242,6 +9078,8 @@ handlePaymentRequestFromUrl();
 
   let previouslyAuthenticated=false;
   let emailLinkLandingInProgress=isSignInWithEmailLink(auth,window.location.href);
+  let directInviteAuthInProgress=false;
+  let directInviteLandingOpen=false;
 
   const cloud={
     user:null,
@@ -9034,7 +9872,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.41"
+        sourceVersion:"1.47"
       };
 
       const ops=[];
@@ -9120,6 +9958,7 @@ handlePaymentRequestFromUrl();
       cloud.orgName=orgData.name||cloud.orgName;
       cloud.lastAction=`Synced ${new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}`;
       refreshCloudUI();
+      setTimeout(()=>window.MasulPublicPayments?.syncMirrors?.(local.paymentRequests||[]),0);
       return true;
     }catch(err){
       console.error("Masul live sync error:",err);
@@ -9476,7 +10315,7 @@ handlePaymentRequestFromUrl();
 
   function safeEmail(v){return String(v||"").trim().toLowerCase()}
   function randomToken(prefix="inv"){
-    const bytes=new Uint8Array(18);
+    const bytes=new Uint8Array(24);
     crypto.getRandomValues(bytes);
     return `${prefix}_${Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("")}`;
   }
@@ -9719,8 +10558,9 @@ handlePaymentRequestFromUrl();
         <div class="invite-row">
           <div><strong>${escapeHtml(inv.email||"")}</strong><small>${escapeHtml(displayRole(inv.role))} • Invited ${escapeHtml(accessDate(inv.createdAt))}</small></div>
           <div class="access-actions">
-            ${actionButton("Resend","resend-staff",inv.id)}
+            ${actionButton("Share","share-staff",inv.id)}
             ${actionButton("Copy Link","copy-staff",inv.id)}
+            ${actionButton("Email","resend-staff",inv.id)}
             ${actionButton("Cancel","cancel-staff",inv.id,"danger")}
           </div>
         </div>`).join(""):'<div class="empty">No pending staff invitations.</div>';
@@ -9812,11 +10652,125 @@ handlePaymentRequestFromUrl();
     document.getElementById("cancelOwnershipBtn")?.addEventListener("click",cancelOwnershipTransfer);
   }
 
-  async function sendInviteEmail(type,invite){
-    const param=type==="staff"?"staffInvite":"customerInvite";
+
+  function inviteEmailHint(email){
+    const e=safeEmail(email);
+    const [local,domain]=e.split("@");
+    if(!domain) return e||"the invited email";
+    const shown=local?local.slice(0,1):"";
+    return `${shown}${local?.length>1?"•••":""}@${domain}`;
+  }
+
+  function staffInviteUrl(invite){
     const url=new URL(window.location.origin+window.location.pathname);
     url.searchParams.set("org",invite.orgId||cloud.orgId||"");
-    url.searchParams.set(param,invite.id);
+    url.searchParams.set("staffInvite",invite.id);
+    url.searchParams.set("inviteOrg",invite.orgName||cloud.orgName||"Masul Organisation");
+    url.searchParams.set("inviteRole",invite.role||"read-only");
+    if(invite.email) url.searchParams.set("inviteHint",inviteEmailHint(invite.email));
+    return url.toString();
+  }
+
+  async function activateDirectStaffInvite(invite,{renew=false}={}){
+    if(!invite?.id) throw new Error("Invitation record is missing.");
+    const now=Date.now();
+    const currentExpiry=invite.expiresAt?.toDate?.()
+      || (invite.expiresAt?new Date(invite.expiresAt):null);
+    const expired=!currentExpiry || currentExpiry.getTime()<=now;
+    const update={
+      claimMode:"direct",
+      directLinkEnabledAt:serverTimestamp()
+    };
+    if(renew || expired){
+      update.expiresAt=new Date(now+7*24*60*60*1000);
+      update.renewedAt=serverTimestamp();
+    }
+    await setDoc(doc(db,"organizations",cloud.orgId,"staffInvites",invite.id),update,{merge:true});
+    return {
+      ...invite,
+      claimMode:"direct",
+      orgId:invite.orgId||cloud.orgId,
+      orgName:invite.orgName||cloud.orgName,
+      expiresAt:update.expiresAt||invite.expiresAt
+    };
+  }
+
+  async function shareDirectStaffInvite(invite){
+    const direct=await activateDirectStaffInvite(invite,{renew:true});
+    const url=staffInviteUrl(direct);
+    const role=displayRole(direct.role||"read-only");
+    const text=`You have been invited to ${direct.orgName||cloud.orgName||"a Masul organisation"} as ${role}.\n\nOpen this secure link and create an account or sign in using the email address to which the invitation was issued.\n\n${url}`;
+    if(navigator.share){
+      try{
+        await navigator.share({title:"Masul Organisation Invitation",text,url});
+        return;
+      }catch(err){
+        if(err?.name==="AbortError") return;
+      }
+    }
+    await navigator.clipboard.writeText(text);
+    cloudToast("Invitation text and secure link copied");
+  }
+
+  async function copyDirectStaffInvite(invite){
+    const direct=await activateDirectStaffInvite(invite,{renew:true});
+    const url=staffInviteUrl(direct);
+    await navigator.clipboard.writeText(url);
+    cloudToast("Secure invitation link copied");
+  }
+
+  function showStaffInviteReady(invite){
+    const role=displayRole(invite.role||"read-only");
+    const url=staffInviteUrl(invite);
+    window.modal(`
+      <div class="modal-head">
+        <div><span class="eyebrow">Secure Invitation Ready</span><h3 style="margin:7px 0 0">${escapeHtml(invite.orgName||cloud.orgName||"Masul Organisation")}</h3></div>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div class="direct-invite-shell">
+        <div class="direct-invite-title">
+          <div class="direct-invite-icon">↗</div>
+          <div>
+            <strong>${escapeHtml(invite.email||"Invited user")} • ${escapeHtml(role)}</strong>
+            <small>The recipient can create their own password account or sign in to an existing account. No Firebase invitation email is required.</small>
+          </div>
+        </div>
+        <div class="invite-link-box">${escapeHtml(url)}</div>
+        <div class="request-action-row">
+          <button class="btn primary" id="directInviteShareBtn">Share Invite</button>
+          <button class="btn ghost" id="directInviteCopyBtn">Copy Link</button>
+          <button class="btn ghost" id="directInviteEmailBtn">Email Link (Optional)</button>
+        </div>
+      </div>
+      <div class="invite-security-note">
+        <strong>Keep this link private.</strong> It is a one-time organisation-access credential locked to the invited email address. It expires after 7 days unless renewed.
+      </div>
+    `);
+    document.getElementById("directInviteShareBtn")?.addEventListener("click",()=>shareDirectStaffInvite(invite));
+    document.getElementById("directInviteCopyBtn")?.addEventListener("click",()=>copyDirectStaffInvite(invite));
+    document.getElementById("directInviteEmailBtn")?.addEventListener("click",async()=>{
+      const btn=document.getElementById("directInviteEmailBtn");
+      try{
+        btn.disabled=true;
+        await sendInviteEmail("staff",invite);
+        cloudToast("Optional Firebase email link sent");
+      }catch(err){
+        cloudToast(inviteDeliveryError(err));
+      }finally{
+        btn.disabled=false;
+      }
+    });
+  }
+
+  async function sendInviteEmail(type,invite){
+    let url;
+    if(type==="staff"){
+      url=new URL(staffInviteUrl(invite));
+    }else{
+      url=new URL(window.location.origin+window.location.pathname);
+      url.searchParams.set("org",invite.orgId||cloud.orgId||"");
+      url.searchParams.set("customerInvite",invite.id);
+    }
     const actionCodeSettings={url:url.toString(),handleCodeInApp:true};
     await sendSignInLinkToEmail(auth,invite.email,actionCodeSettings);
     return url.toString();
@@ -9842,44 +10796,67 @@ handlePaymentRequestFromUrl();
   function staffInviteModal(){
     if(!accessCanManage()){cloudToast("Only the organisation owner can manage roles in this build.");return}
     window.modal(`
-      <div class="modal-head"><div><span class="eyebrow">Users & Roles</span><h3 style="margin:7px 0 0">Invite organisation user</h3></div><button class="close" onclick="closeModal()">×</button></div>
+      <div class="modal-head">
+        <div><span class="eyebrow">Users & Roles</span><h3 style="margin:7px 0 0">Invite organisation user</h3></div>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
       <div class="grid-2">
         <div class="field"><label>Email address</label><input id="staffInviteEmail" type="email" placeholder="user@example.com"></div>
         <div class="field"><label>Role</label><select id="staffInviteRole">
-          <option value="admin">Admin</option><option value="accountant">Accountant</option><option value="collector">Collector</option><option value="read-only">Read-only</option>
+          <option value="admin">Admin</option>
+          <option value="accountant">Accountant</option>
+          <option value="collector">Collector</option>
+          <option value="read-only">Read-only</option>
         </select></div>
       </div>
-      <div class="field"><label>Name (optional)</label><input id="staffInviteName" placeholder="Person's name"></div>
-      <div class="legal-strip"><strong>Own login, same organisation.</strong> The recipient will not re-enter students or fees. Their role determines what they can access.</div>
-      <div class="request-action-row"><button class="btn primary" id="sendStaffInviteBtn">Create & Email Invitation</button><button class="btn ghost" onclick="closeModal()">Cancel</button></div>
+      <div class="field"><label>Name <span class="optional">Optional</span></label><input id="staffInviteName" placeholder="Person's name"></div>
+      <div class="legal-strip">
+        <strong>Direct invitation — recommended.</strong>
+        Masul creates a private link that you can share through WhatsApp, Telegram or another trusted channel. The recipient creates their own password or signs in with an existing account. Firebase invitation-email delivery is not required.
+      </div>
+      <div class="request-action-row">
+        <button class="btn primary" id="sendStaffInviteBtn">Create Secure Invite</button>
+        <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      </div>
       <div id="staffInviteMsg" class="report-note"></div>
     `);
+
     document.getElementById("sendStaffInviteBtn").onclick=async()=>{
       const email=safeEmail(document.getElementById("staffInviteEmail").value);
       const role=document.getElementById("staffInviteRole").value;
       const name=String(document.getElementById("staffInviteName").value||"").trim();
       const msg=document.getElementById("staffInviteMsg");
+      const btn=document.getElementById("sendStaffInviteBtn");
+
       if(!email || !email.includes("@")){msg.textContent="Enter a valid email address.";return}
       if(email===safeEmail(cloud.user?.email)){msg.textContent="This is already your owner account.";return}
+
       const duplicate=cloud.access.members.some(m=>safeEmail(m.email)===email && m.status!=="removed") ||
         cloud.access.staffInvites.some(i=>safeEmail(i.email)===email && i.status==="pending");
-      if(duplicate){msg.textContent="This email is already an active user or has a pending invitation.";return}
-      const id=randomToken("staff");
-      const data={
-        id,email,displayName:name,role,status:"pending",
-        orgId:cloud.orgId,orgName:cloud.orgName,
-        invitedByUid:cloud.user.uid,invitedByEmail:safeEmail(cloud.user.email),
-        createdAt:serverTimestamp(),
-        expiresAt:new Date(Date.now()+7*24*60*60*1000)
-      };
-      await setDoc(doc(db,"organizations",cloud.orgId,"staffInvites",id),data);
-      await logAccess("Staff invitation created",{email,type:"staff"},`Role: ${displayRole(role)}`);
+      if(duplicate){
+        msg.textContent="This email is already an active user or has a pending invitation. Use Share or Copy Link against the pending invitation.";
+        return;
+      }
+
+      btn.disabled=true;
+      msg.textContent="Creating secure invitation…";
       try{
-        await sendInviteEmail("staff",{id,email,orgId:cloud.orgId});
-        msg.textContent="Invitation created and email sign-in link sent.";
-        cloudToast("Staff invitation sent");
+        const id=randomToken("staff");
+        const data={
+          id,email,displayName:name,role,status:"pending",claimMode:"direct",
+          orgId:cloud.orgId,orgName:cloud.orgName,
+          invitedByUid:cloud.user.uid,invitedByEmail:safeEmail(cloud.user.email),
+          createdAt:serverTimestamp(),
+          expiresAt:new Date(Date.now()+7*24*60*60*1000)
+        };
+        await setDoc(doc(db,"organizations",cloud.orgId,"staffInvites",id),data);
+        await logAccess("Direct staff invitation created",{email,type:"staff"},`Role: ${displayRole(role)}`);
+        showStaffInviteReady({...data,createdAt:new Date().toISOString()});
       }catch(err){
-        msg.textContent=inviteDeliveryError(err);
+        console.error(err);
+        msg.textContent=err?.message||"Could not create the invitation.";
+      }finally{
+        btn.disabled=false;
       }
     };
   }
@@ -10047,20 +11024,25 @@ handlePaymentRequestFromUrl();
     }
     if(action==="resend-staff" && staffInv){
       try{
-        const expiresAt=new Date(Date.now()+7*24*60*60*1000);
-        await setDoc(doc(db,"organizations",cloud.orgId,"staffInvites",id),{resentAt:serverTimestamp(),expiresAt},{merge:true});
-        await sendInviteEmail("staff",{...staffInv,orgId:cloud.orgId});
-        await logAccess("Staff invitation resent",{email:staffInv.email,type:"staff"});
-        cloudToast("Invitation resent");
+        const direct=await activateDirectStaffInvite(staffInv,{renew:true});
+        await sendInviteEmail("staff",{...direct,orgId:cloud.orgId});
+        await logAccess("Optional staff invitation email sent",{email:staffInv.email,type:"staff"});
+        cloudToast("Optional email link sent");
       }catch(err){cloudToast(inviteDeliveryError(err))}
       return;
     }
+    if(action==="share-staff" && staffInv){
+      try{
+        await shareDirectStaffInvite(staffInv);
+        await logAccess("Direct staff invitation shared",{email:staffInv.email,type:"staff"});
+      }catch(err){cloudToast(err?.message||"Could not share invitation")}
+      return;
+    }
     if(action==="copy-staff" && staffInv){
-      const url=new URL(window.location.origin+window.location.pathname);
-      url.searchParams.set("org",cloud.orgId);
-      url.searchParams.set("staffInvite",id);
-      await navigator.clipboard.writeText(url.toString());
-      cloudToast("Invitation link copied");
+      try{
+        await copyDirectStaffInvite(staffInv);
+        await logAccess("Direct staff invitation link copied",{email:staffInv.email,type:"staff"});
+      }catch(err){cloudToast(err?.message||"Could not copy invitation")}
       return;
     }
     if(action==="cancel-staff" && staffInv){
@@ -10245,6 +11227,193 @@ handlePaymentRequestFromUrl();
     history.replaceState({},document.title,clean);
   }
 
+
+  function hasDirectStaffInviteInUrl(){
+    return !!inviteParamFromUrl("staffInvite") && !isSignInWithEmailLink(auth,window.location.href);
+  }
+
+  function directInviteOrgLabel(){
+    return inviteParamFromUrl("inviteOrg")||"Masul organisation";
+  }
+
+  function directInviteRoleLabel(){
+    return displayRole(inviteParamFromUrl("inviteRole")||"read-only");
+  }
+
+  function directInviteHint(){
+    return inviteParamFromUrl("inviteHint")||"the invited email address";
+  }
+
+  function directInviteErrorMessage(err){
+    const code=String(err?.code||"");
+    if(code==="auth/email-already-in-use") return "An account already exists for this email. Choose “I Already Have an Account” and sign in.";
+    if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
+    if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
+    if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.47 Firestore Rules have been published.";
+    return err?.message||"The invitation could not be completed.";
+  }
+
+  function openDirectStaffInviteLanding(message=""){
+    if(!hasDirectStaffInviteInUrl() || directInviteAuthInProgress) return;
+    directInviteLandingOpen=true;
+
+    const org=directInviteOrgLabel();
+    const role=directInviteRoleLabel();
+
+    if(auth.currentUser){
+      window.modal(`
+        <div class="modal-head">
+          <div><span class="eyebrow">Masul Secure Invitation</span><h3 style="margin:7px 0 0">Join ${escapeHtml(org)}</h3></div>
+          <button class="close" onclick="closeModal()">×</button>
+        </div>
+        <div class="direct-invite-shell">
+          <div class="direct-invite-title">
+            <div class="direct-invite-icon">✓</div>
+            <div>
+              <strong>${escapeHtml(role)} invitation</strong>
+              <small>This browser is currently signed in as ${escapeHtml(auth.currentUser.email||"a Masul user")}.</small>
+            </div>
+          </div>
+          ${message?`<div class="danger-alert"><p>${escapeHtml(message)}</p></div>`:""}
+          <div class="request-action-row">
+            <button class="btn primary" id="acceptDirectInviteCurrentBtn">Accept with This Account</button>
+            <button class="btn ghost" id="directInviteDifferentBtn">Use a Different Account</button>
+          </div>
+        </div>
+        <div class="invite-security-note">Masul will accept the invitation only if this signed-in account email matches the email locked to the invitation.</div>
+      `);
+
+      document.getElementById("acceptDirectInviteCurrentBtn")?.addEventListener("click",async()=>{
+        const btn=document.getElementById("acceptDirectInviteCurrentBtn");
+        try{
+          btn.disabled=true;
+          directInviteAuthInProgress=true;
+          await claimPendingInvite();
+        }catch(err){
+          console.error(err);
+          directInviteAuthInProgress=false;
+          openDirectStaffInviteLanding(directInviteErrorMessage(err));
+        }
+      });
+
+      document.getElementById("directInviteDifferentBtn")?.addEventListener("click",async()=>{
+        try{
+          directInviteAuthInProgress=true;
+          await signOutCloud({silent:true});
+          directInviteAuthInProgress=false;
+          directInviteLandingOpen=false;
+          setTimeout(()=>openDirectStaffInviteLanding(),120);
+        }catch(err){
+          directInviteAuthInProgress=false;
+          openDirectStaffInviteLanding(directInviteErrorMessage(err));
+        }
+      });
+      return;
+    }
+
+    window.modal(`
+      <div class="modal-head">
+        <div><span class="eyebrow">Masul Secure Invitation</span><h3 style="margin:7px 0 0">Join ${escapeHtml(org)}</h3></div>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+
+      <div class="direct-invite-shell">
+        <div class="direct-invite-title">
+          <div class="direct-invite-icon">↗</div>
+          <div>
+            <strong>${escapeHtml(role)} access</strong>
+            <small>This secure link is locked to ${escapeHtml(directInviteHint())}. Use that exact email below.</small>
+          </div>
+        </div>
+
+        ${message?`<div class="danger-alert"><p>${escapeHtml(message)}</p></div>`:""}
+
+        <div class="invite-mode-tabs">
+          <button class="invite-mode-tab active" id="directInviteCreateTab">Create Account</button>
+          <button class="invite-mode-tab" id="directInviteSignInTab">I Already Have an Account</button>
+        </div>
+
+        <div class="field">
+          <label>Invited email address</label>
+          <input id="directInviteEmail" type="email" autocomplete="email" placeholder="name@example.com">
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="directInvitePassword" type="password" autocomplete="new-password" placeholder="Minimum 6 characters">
+        </div>
+        <div class="field" id="directInviteConfirmField">
+          <label>Confirm password</label>
+          <input id="directInviteConfirmPassword" type="password" autocomplete="new-password" placeholder="Re-enter password">
+        </div>
+
+        <div class="request-action-row">
+          <button class="btn primary" id="directInviteSubmitBtn">Create Account & Join</button>
+          <button class="btn ghost" onclick="closeModal()">Not Now</button>
+        </div>
+        <div id="directInviteMsg" class="report-note"></div>
+      </div>
+
+      <div class="invite-security-note">
+        <strong>No invitation email is required.</strong> The secure link itself is a one-time access credential. Do not forward it to anyone else.
+      </div>
+    `);
+
+    let mode="create";
+    const createTab=document.getElementById("directInviteCreateTab");
+    const signInTab=document.getElementById("directInviteSignInTab");
+    const confirmField=document.getElementById("directInviteConfirmField");
+    const submit=document.getElementById("directInviteSubmitBtn");
+    const msg=document.getElementById("directInviteMsg");
+    const password=document.getElementById("directInvitePassword");
+
+    const setMode=next=>{
+      mode=next;
+      createTab.classList.toggle("active",mode==="create");
+      signInTab.classList.toggle("active",mode==="signin");
+      confirmField.style.display=mode==="create"?"block":"none";
+      submit.textContent=mode==="create"?"Create Account & Join":"Sign In & Join";
+      password.autocomplete=mode==="create"?"new-password":"current-password";
+      msg.textContent="";
+    };
+    createTab.onclick=()=>setMode("create");
+    signInTab.onclick=()=>setMode("signin");
+
+    submit.onclick=async()=>{
+      const email=safeEmail(document.getElementById("directInviteEmail")?.value||"");
+      const pass=String(document.getElementById("directInvitePassword")?.value||"");
+      const confirmPass=String(document.getElementById("directInviteConfirmPassword")?.value||"");
+
+      if(!email || !email.includes("@")){msg.textContent="Enter the email address used for this invitation.";return}
+      if(pass.length<6){msg.textContent="Password must contain at least 6 characters.";return}
+      if(mode==="create" && pass!==confirmPass){msg.textContent="The two passwords do not match.";return}
+
+      submit.disabled=true;
+      directInviteAuthInProgress=true;
+      msg.textContent=mode==="create"?"Creating your Masul account…":"Signing in…";
+
+      try{
+        if(mode==="create"){
+          await createUserWithEmailAndPassword(auth,email,pass);
+        }else{
+          await signInWithEmailAndPassword(auth,email,pass);
+        }
+        msg.textContent="Account authenticated. Joining organisation…";
+        await claimPendingInvite();
+        directInviteAuthInProgress=false;
+      }catch(err){
+        console.error("Direct invitation account flow:",err);
+        directInviteAuthInProgress=false;
+        if(auth.currentUser && inviteParamFromUrl("staffInvite")){
+          try{await signOut(auth)}catch(_){}
+        }
+        openDirectStaffInviteLanding(directInviteErrorMessage(err));
+      }finally{
+        if(submit) submit.disabled=false;
+      }
+    };
+  }
+
   async function claimPendingInvite(){
     if(!auth.currentUser) return false;
 
@@ -10316,6 +11485,8 @@ handlePaymentRequestFromUrl();
     await batch.commit();
 
     cleanInvitationUrl();
+    directInviteAuthInProgress=false;
+    directInviteLandingOpen=false;
     await loadProfileForUser(auth.currentUser);
     await logAccess("Staff invitation accepted",{uid:auth.currentUser.uid,email:signedEmail,type:"staff"},`Role: ${displayRole(invite.role)}`);
 
@@ -10379,7 +11550,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.41 will claim the still-pending invitation after authentication.
+      // V1.47 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -10462,10 +11633,152 @@ handlePaymentRequestFromUrl();
     });
   }
 
+
+  const publicPaymentWatchers=new Map();
+
+  function publicRequestRef(token){
+    return doc(db,"publicPaymentRequests",token);
+  }
+
+  function publicRequestPayload(req){
+    return {
+      token:req.publicToken,
+      orgId:cloud.orgId,
+      requestId:req.id,
+      orgName:String(req.orgName||cloud.orgName||"Masul Organisation"),
+      personName:String(req.personName||""),
+      batch:String(req.batch||"General"),
+      session:String(req.session||""),
+      currency:String(req.currency||"INR"),
+      amount:Number(req.amount||0),
+      items:(req.items||[]).map(i=>({
+        name:String(i.name||""),
+        meta:String(i.meta||""),
+        base:Number(i.base||0),
+        late:Number(i.late||0),
+        total:Number(i.total||0)
+      })),
+      status:String(req.status||"awaiting_payment"),
+      upiId:String(req.upiId||""),
+      payee:String(req.payee||req.orgName||""),
+      createdAt:String(req.createdAt||new Date().toISOString()),
+      payerName:String(req.payerName||""),
+      payerMobile:String(req.payerMobile||""),
+      transactionRef:String(req.transactionRef||""),
+      reportedAt:req.reportedAt||null,
+      verifiedAt:req.verifiedAt||null,
+      rejectedAt:req.rejectedAt||null,
+      receipt:String(req.receipt||""),
+      updatedAt:serverTimestamp()
+    };
+  }
+
+  async function publishPublicPaymentRequest(req){
+    if(!req?.publicToken) throw new Error("Payment request has no secure public token.");
+    if(!auth.currentUser || !cloud.orgId) throw new Error("Sign in to Masul Cloud first.");
+    await setDoc(publicRequestRef(req.publicToken),publicRequestPayload(req),{merge:true});
+    return req.publicToken;
+  }
+
+  async function fetchPublicPaymentRequest(token){
+    const snap=await getDoc(publicRequestRef(token));
+    if(!snap.exists()) throw new Error("This payment request was not found or is no longer available.");
+    const d=snap.data();
+    if(d.token!==token) throw new Error("Invalid payment request token.");
+    return {
+      id:d.requestId,
+      publicToken:token,
+      orgName:d.orgName||"Masul Organisation",
+      personName:d.personName||"",
+      batch:d.batch||"General",
+      session:d.session||"",
+      currency:d.currency||"INR",
+      amount:+d.amount||0,
+      items:Array.isArray(d.items)?d.items:[],
+      status:d.status||"awaiting_payment",
+      upiId:d.upiId||"",
+      payee:d.payee||d.orgName||"",
+      createdAt:d.createdAt||"",
+      payerName:d.payerName||"",
+      payerMobile:d.payerMobile||"",
+      transactionRef:d.transactionRef||"",
+      reportedAt:d.reportedAt?.toDate?.()?.toISOString?.()||d.reportedAt||null,
+      verifiedAt:d.verifiedAt?.toDate?.()?.toISOString?.()||d.verifiedAt||null,
+      rejectedAt:d.rejectedAt?.toDate?.()?.toISOString?.()||d.rejectedAt||null,
+      receipt:d.receipt||""
+    };
+  }
+
+  async function openPublicPaymentToken(token){
+    try{
+      showPublicPaymentLoading();
+      const req=await fetchPublicPaymentRequest(token);
+      window.__MASUL_PUBLIC_REQUEST__=req;
+      openPaymentRequest(req.id);
+    }catch(err){
+      console.error("Public payment lookup failed:",err);
+      showMissingCloudRequest("",err?.message||"Could not fetch this payment request.");
+    }
+  }
+
+  async function reportPublicPayment(token,{payerName,payerMobile,transactionRef}){
+    await setDoc(publicRequestRef(token),{
+      status:"payment_reported",
+      payerName:String(payerName||"").trim(),
+      payerMobile:String(payerMobile||"").trim(),
+      transactionRef:String(transactionRef||"").trim(),
+      reportedAt:serverTimestamp()
+    },{merge:true});
+  }
+
+  function watchPublicPaymentRequests(requests=[]){
+    if(!auth.currentUser || !cloud.orgId) return;
+    const activeTokens=new Set(requests.filter(r=>r?.publicToken).map(r=>r.publicToken));
+
+    for(const [token,unsub] of publicPaymentWatchers.entries()){
+      if(!activeTokens.has(token)){
+        try{unsub()}catch(_){}
+        publicPaymentWatchers.delete(token);
+      }
+    }
+
+    activeTokens.forEach(token=>{
+      if(publicPaymentWatchers.has(token)) return;
+      const unsub=onSnapshot(publicRequestRef(token),snap=>{
+        if(!snap.exists()) return;
+        bridge()?.mergePublicPaymentReport?.(token,snap.data());
+      },err=>console.warn("Public payment watcher failed:",token,err));
+      publicPaymentWatchers.set(token,unsub);
+    });
+  }
+
+  async function syncPublicPaymentMirrors(requests=[]){
+    if(!auth.currentUser || !cloud.orgId) return;
+    const candidates=requests.filter(r=>r?.publicToken);
+    for(const req of candidates){
+      try{await publishPublicPaymentRequest(req)}
+      catch(err){console.warn("Public payment mirror sync failed:",req.id,err)}
+    }
+    watchPublicPaymentRequests(candidates);
+  }
+
+  window.MasulPublicPayments={
+    publish:publishPublicPaymentRequest,
+    openToken:openPublicPaymentToken,
+    report:reportPublicPayment,
+    watchRequests:watchPublicPaymentRequests,
+    syncMirrors:syncPublicPaymentMirrors
+  };
+
+  if(window.__MASUL_PENDING_PUBLIC_PAY_TOKEN__){
+    const token=window.__MASUL_PENDING_PUBLIC_PAY_TOKEN__;
+    setTimeout(()=>openPublicPaymentToken(token),0);
+  }
+
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.41 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.47 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -10505,8 +11818,12 @@ handlePaymentRequestFromUrl();
       try{
         if(emailLinkLandingInProgress){
           // processEmailLinkLanding() owns this authentication transition.
-          // Do not race it by loading/claiming the organisation twice.
           refreshCloudUI();
+        }else if(hasDirectStaffInviteInUrl()){
+          // Direct invitations explicitly ask which account should accept.
+          // Never auto-claim using an arbitrary saved login.
+          refreshCloudUI();
+          if(!directInviteAuthInProgress) setTimeout(()=>openDirectStaffInviteLanding(),60);
         }else if(hasInvitationInUrl()){
           const claimed=await claimPendingInvite();
           if(!claimed) await loadProfileForUser(user);
@@ -10530,6 +11847,9 @@ handlePaymentRequestFromUrl();
 
       cloud.lastAction="";
       refreshCloudUI();
+      if(hasDirectStaffInviteInUrl() && !directInviteAuthInProgress){
+        setTimeout(()=>openDirectStaffInviteLanding(),80);
+      }
     }
 
     bindCloudButtons();
@@ -10550,9 +11870,15 @@ handlePaymentRequestFromUrl();
   bindCloudButtons();
   refreshCloudUI();
   renderAccessCentre();
-  processEmailLinkLanding().catch(err=>console.warn("Masul email-link landing:",err));
+  processEmailLinkLanding()
+    .then(handled=>{
+      if(!handled && hasDirectStaffInviteInUrl() && !directInviteAuthInProgress){
+        setTimeout(()=>openDirectStaffInviteLanding(),100);
+      }
+    })
+    .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.41 Firebase module ready");
+  console.info("Masul V1.47 Firebase module ready");
 
   window.MasulCloud={
     auth,
