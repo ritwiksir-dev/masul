@@ -297,12 +297,69 @@
       min-height:36px;padding:8px 10px;font-size:10px;border-radius:10px
     }
     .fee-target-choice.fee-target-hidden{display:none!important}
+    .fee-target-list{
+      border:1px solid #dfe6ee;border-radius:12px;background:#fff;overflow:auto;max-height:340px
+    }
+    .fee-target-row{
+      display:grid!important;
+      grid-template-columns:34px minmax(220px,1.5fr) minmax(120px,.8fr);
+      gap:8px;align-items:center;
+      padding:10px 11px!important;
+      margin:0!important;
+      border-bottom:1px solid #edf1f5;
+      background:#fff;
+      cursor:pointer;
+      color:#2f3d52!important;
+      font-size:11px!important;
+      font-weight:750!important;
+    }
+    .fee-target-row:last-child{border-bottom:none}
+    .fee-target-row:hover{background:#f8fbfe}
+    .fee-target-row:has(input:checked){background:#eef5fb}
+    .fee-target-row input[type="checkbox"]{
+      width:18px;height:18px;margin:0!important;justify-self:center
+    }
+    .fee-target-row.fee-target-hidden{display:none!important}
+    .fee-target-person{
+      display:block!important;
+      color:#223047!important;
+      font-size:12px!important;
+      font-weight:900!important;
+      line-height:1.35!important;
+      opacity:1!important;
+      visibility:visible!important;
+      white-space:normal!important;
+    }
+    .fee-target-batch{
+      display:block!important;
+      color:#65758b!important;
+      font-size:10px!important;
+      font-weight:750!important;
+      line-height:1.35!important;
+      opacity:1!important;
+      visibility:visible!important;
+      white-space:normal!important;
+    }
+    .fee-target-count{
+      display:inline-flex;align-items:center;gap:4px;
+      border:1px solid #d6e0eb;background:#f8fbfe;color:#52657d;
+      border-radius:999px;padding:4px 8px;font-size:8px;font-weight:900
+    }
     .fee-scope-badge{
       display:inline-flex;align-items:center;border:1px solid #d8e1ec;background:#f8fbfe;color:#586a80;
       border-radius:999px;padding:3px 7px;font-size:8px;font-weight:900;margin-left:4px
     }
-    @media(max-width:720px){.fee-target-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:480px){.fee-target-grid{grid-template-columns:1fr}}
+    @media(max-width:720px){
+      .fee-target-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .fee-target-row{grid-template-columns:32px minmax(150px,1fr) minmax(90px,.7fr)}
+    }
+    @media(max-width:480px){
+      .fee-target-grid{grid-template-columns:1fr}
+      .fee-target-toolbar{grid-template-columns:1fr 1fr}
+      .fee-target-toolbar input{grid-column:1/-1}
+      .fee-target-row{grid-template-columns:30px minmax(0,1fr)}
+      .fee-target-row .fee-target-batch{grid-column:2}
+    }
     .preset{
       border:1px solid var(--line);background:#fff;border-radius:999px;
       padding:9px 12px;font-size:12px;font-weight:750;color:#4d566b
@@ -3185,9 +3242,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.50</span>
+                <span class="chip">V1.51</span>
               </div>
-              <div class="request-meta">Masul V1.50 • Consistent Back Navigation</div>
+              <div class="request-meta">Masul V1.51 • Reliable Fee Target Selector</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3651,7 +3708,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.50: cloud/status refreshes must never render the full dashboard
+    // V1.51: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -4082,66 +4139,108 @@ window.filterFeeTargetChoices=(input)=>{
   const box=input?.closest(".fee-target-box");
   if(!box) return;
   const q=String(input.value||"").trim().toLowerCase();
-  box.querySelectorAll(".fee-target-choice").forEach(label=>{
-    const hay=String(label.dataset.search||label.textContent||"").toLowerCase();
-    label.classList.toggle("fee-target-hidden",!!q && !hay.includes(q));
+  box.querySelectorAll(".fee-target-row").forEach(row=>{
+    const hay=String(row.dataset.search||row.textContent||"").toLowerCase();
+    row.classList.toggle("fee-target-hidden",!!q && !hay.includes(q));
   });
+};
+
+window.updateFeeTargetSelectedCount=(source)=>{
+  const box=source?.closest?.(".fee-target-box") || source;
+  if(!box) return;
+  const selected=box.querySelectorAll(".fee-target-row input[type='checkbox']:checked").length;
+  const counter=box.querySelector("[data-fee-selected-count]");
+  if(counter) counter.textContent=`${selected} selected`;
 };
 
 window.selectVisibleFeeTargets=(button,checked)=>{
   const box=button?.closest(".fee-target-box");
   if(!box) return;
-  box.querySelectorAll(".fee-target-choice:not(.fee-target-hidden) input[type='checkbox']")
+  box.querySelectorAll(".fee-target-row:not(.fee-target-hidden) input[type='checkbox']")
     .forEach(cb=>cb.checked=!!checked);
+  updateFeeTargetSelectedCount(box);
   box.dispatchEvent(new Event("change",{bubbles:true}));
 };
+
 
 function feeTargetOptionsHtml(mode,valuePrefix="",selectedBatches=[],selectedPeople=[]){
   if(mode==="Selected batch"){
     const batches=[...new Set([
       ...(state.org?.batches||[]).map(b=>b.name),
       ...(state.people||[]).map(p=>p.batch||"General")
-    ].filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    ].filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),undefined,{sensitivity:"base"}));
+
     if(!batches.length) return `<div class="empty">Add a batch/group first, then choose it here.</div>`;
+
+    const memberCount=batch=>(state.people||[]).filter(p=>!p.archived && (p.batch||"General")===batch).length;
+
     return `
-      <div class="fee-target-head"><strong>Choose one or more batches / groups</strong><span class="fee-scope-badge">${batches.length} available</span></div>
+      <div class="fee-target-head">
+        <strong>Choose one or more batches / groups</strong>
+        <div style="display:flex;gap:5px;align-items:center">
+          <span class="fee-target-count" data-fee-selected-count>${selectedBatches.length} selected</span>
+          <span class="fee-scope-badge">${batches.length} available</span>
+        </div>
+      </div>
       <div class="fee-target-toolbar">
         <input type="search" placeholder="Search batch / group" oninput="filterFeeTargetChoices(this)">
         <button type="button" class="btn ghost small" onclick="selectVisibleFeeTargets(this,true)">Select visible</button>
         <button type="button" class="btn ghost small" onclick="selectVisibleFeeTargets(this,false)">Clear visible</button>
       </div>
-      <div class="fee-target-grid">
-        ${batches.map(b=>`
-          <label class="fee-target-choice" data-search="${escapeHtml(b.toLowerCase())}">
-            <input type="checkbox" class="${valuePrefix}fee-batch-target" value="${escapeHtml(b)}" ${selectedBatches.includes(b)?"checked":""}>
-            <span class="fee-target-name"><strong>${escapeHtml(b)}</strong></span>
-          </label>`).join("")}
+      <div class="fee-target-list">
+        ${batches.map(b=>{
+          const count=memberCount(b);
+          return `
+            <label class="fee-target-row" data-search="${escapeHtml(String(b).toLowerCase())}">
+              <input type="checkbox"
+                     class="${valuePrefix}fee-batch-target"
+                     value="${escapeHtml(b)}"
+                     ${selectedBatches.includes(b)?"checked":""}
+                     onchange="updateFeeTargetSelectedCount(this)">
+              <span class="fee-target-person" style="color:#223047!important;font-size:12px!important;font-weight:900!important;display:block!important">${escapeHtml(b)}</span>
+              <span class="fee-target-batch" style="color:#65758b!important;font-size:10px!important;display:block!important">${count} active ${count===1?"student":"students"}</span>
+            </label>`;
+        }).join("")}
       </div>`;
   }
 
   if(mode==="Selected people"){
     const people=[...(state.people||[])].filter(p=>!p.archived)
-      .sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"}));
+      .sort((a,b)=>String(a.name||a.personName||a.displayName||"").localeCompare(
+        String(b.name||b.personName||b.displayName||""),undefined,{sensitivity:"base"}
+      ));
+
     if(!people.length) return `<div class="empty">Add students/customers first, then choose them here.</div>`;
+
     return `
-      <div class="fee-target-head"><strong>Choose one or more students / customers</strong><span class="fee-scope-badge">${people.length} available</span></div>
+      <div class="fee-target-head">
+        <strong>Choose one or more students / customers</strong>
+        <div style="display:flex;gap:5px;align-items:center">
+          <span class="fee-target-count" data-fee-selected-count>${selectedPeople.length} selected</span>
+          <span class="fee-scope-badge">${people.length} available</span>
+        </div>
+      </div>
       <div class="fee-target-toolbar">
         <input type="search" placeholder="Search student or batch" oninput="filterFeeTargetChoices(this)">
         <button type="button" class="btn ghost small" onclick="selectVisibleFeeTargets(this,true)">Select visible</button>
         <button type="button" class="btn ghost small" onclick="selectVisibleFeeTargets(this,false)">Clear visible</button>
       </div>
-      <div class="fee-target-grid">
+      <div class="fee-target-list">
         ${people.map(p=>{
-          const name=String(p.name||p.personName||p.displayName||"Unnamed");
-          const batch=String(p.batch||"General");
+          const name=String(p.name||p.personName||p.displayName||"Unnamed Student").trim()||"Unnamed Student";
+          const batch=String(p.batch||"General").trim()||"General";
           const search=`${name} ${batch}`.toLowerCase();
           return `
-            <label class="fee-target-choice" data-search="${escapeHtml(search)}">
-              <input type="checkbox" class="${valuePrefix}fee-person-target" value="${escapeHtml(p.id)}" ${selectedPeople.includes(p.id)?"checked":""}>
-              <span class="fee-target-name">
-                <strong>${escapeHtml(name)}</strong>
-                <small>${escapeHtml(batch)}</small>
-              </span>
+            <label class="fee-target-row" data-search="${escapeHtml(search)}">
+              <input type="checkbox"
+                     class="${valuePrefix}fee-person-target"
+                     value="${escapeHtml(p.id)}"
+                     ${selectedPeople.includes(p.id)?"checked":""}
+                     onchange="updateFeeTargetSelectedCount(this)">
+              <span class="fee-target-person"
+                    style="color:#223047!important;font-size:12px!important;font-weight:900!important;line-height:1.35!important;display:block!important;opacity:1!important;visibility:visible!important">${escapeHtml(name)}</span>
+              <span class="fee-target-batch"
+                    style="color:#65758b!important;font-size:10px!important;font-weight:750!important;display:block!important;opacity:1!important;visibility:visible!important">${escapeHtml(batch)}</span>
             </label>`;
         }).join("")}
       </div>`;
@@ -4189,6 +4288,7 @@ function renderSetupFeeTargets(){
   }
   box.classList.remove("hidden");
   box.innerHTML=feeTargetOptionsHtml(applies,"setup-");
+  updateFeeTargetSelectedCount(box);
 }
 
 function feeEditorFieldsHtml(fee=null,prefix="mFee"){
@@ -4253,8 +4353,10 @@ function bindFeeEditorTarget(prefix,fee=null){
   box.addEventListener("change",()=>{
     batches=[...box.querySelectorAll(`.${prefix}-fee-batch-target:checked`)].map(x=>x.value);
     people=[...box.querySelectorAll(`.${prefix}-fee-person-target:checked`)].map(x=>x.value);
+    updateFeeTargetSelectedCount(box);
   });
   select.addEventListener("change",redraw);
+  updateFeeTargetSelectedCount(box);
 }
 
 function feeFormData(prefix){
@@ -5170,7 +5272,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.50: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.51: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 function renderPeople(){
@@ -5902,7 +6004,7 @@ async function createPaymentRequestFromCollect(){
         <p>${escapeHtml(err?.message||"Publish failed")}</p>
       </div>
       <div class="preview-box">
-        Publish the V1.50 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
+        Publish the V1.51 Firestore Rules, then open Payments and tap <strong>Copy Link</strong> again.
       </div>
     `);
   }
@@ -5950,7 +6052,7 @@ window.copyPaymentRequestLink=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.50 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.51 Firestore Rules.");
     return;
   }
 
@@ -5970,7 +6072,7 @@ window.sharePaymentRequest=async(id)=>{
     await window.MasulPublicPayments.publish(req);
   }catch(err){
     console.error(err);
-    toast("Public link could not be activated. Publish the V1.50 Firestore Rules.");
+    toast("Public link could not be activated. Publish the V1.51 Firestore Rules.");
     return;
   }
 
@@ -6172,7 +6274,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.50 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.51 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -6196,7 +6298,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.50 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.51 secure link.");
     },100);
     return true;
   }
@@ -8701,7 +8803,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.50: payment history no longer prevents removal of a student profile.
+  // V1.51: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -8835,7 +8937,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.50",
+    version:"1.51",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -10430,7 +10532,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.50"
+        sourceVersion:"1.51"
       };
 
       const ops=[];
@@ -11808,7 +11910,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.50 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.51 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -12108,7 +12210,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.50 will claim the still-pending invitation after authentication.
+      // V1.51 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -12336,7 +12438,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.50 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.51 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -12436,7 +12538,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.50 Firebase module ready");
+  console.info("Masul V1.51 Firebase module ready");
 
   window.MasulCloud={
     auth,
