@@ -2258,7 +2258,7 @@
     }
   
     /* ========================================================
-       V1.63.1 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
+       V1.63.2 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
        ======================================================== */
 .developer-shell{
       display:grid;grid-template-columns:235px minmax(0,1fr);gap:16px;align-items:start
@@ -3556,9 +3556,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.63.1</span>
+                <span class="chip">V1.63.2</span>
               </div>
-              <div class="request-meta">Masul V1.63.1 • Developer Console & Platform Administration</div>
+              <div class="request-meta">Masul V1.63.2 • Developer Console & Platform Administration</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3619,7 +3619,7 @@
               <img src="masul-icon.png" alt="Masul">
               <div>
                 <strong>Masul Developer Console</strong>
-                <small>Platform Administration<br>V1.63.1</small>
+                <small>Platform Administration<br>V1.63.2</small>
               </div>
             </div>
           </div>
@@ -3664,7 +3664,7 @@
                 <button class="dev-stat good dev-stat-action" type="button" onclick="developerMetricAction('billing')"><span>Setup Fees Received</span><strong id="devStatSetupPaid">₹0</strong><small>Open Masul billing ledger</small></button>
                 <button class="dev-stat attention dev-stat-action" type="button" onclick="developerMetricAction('billing')"><span>Setup Fees Due</span><strong id="devStatSetupDue">₹0</strong><small>Review outstanding setup fees</small></button>
                 <button class="dev-stat attention dev-stat-action" type="button" onclick="developerMetricAction('attention')"><span>Needs Attention</span><strong id="devStatAttention">0</strong><small>Open organisations needing follow-up</small></button>
-                <button class="dev-stat dev-stat-action" type="button" onclick="developerMetricAction('health')"><span>Current Release</span><strong>V1.63.1</strong><small>Open platform/version health</small></button>
+                <button class="dev-stat dev-stat-action" type="button" onclick="developerMetricAction('health')"><span>Current Release</span><strong>V1.63.2</strong><small>Open platform/version health</small></button>
                 <button class="dev-stat dev-stat-action" type="button" onclick="developerMetricAction('audit')"><span>Audit Activity</span><strong id="devStatAudit">0</strong><small>Open Developer Console change history</small></button>
               </div>
 
@@ -3759,7 +3759,7 @@
             <section class="developer-tab" id="devtab-health">
               <div class="dev-health-grid">
                 <div class="dev-health"><strong>Firebase Project</strong><span>masul-900d7<br>Production cloud data layer</span></div>
-                <div class="dev-health"><strong>Current Web Release</strong><span>Masul V1.63.1<br>Platform administration</span></div>
+                <div class="dev-health"><strong>Current Web Release</strong><span>Masul V1.63.2<br>Platform administration</span></div>
                 <div class="dev-health"><strong>Platform Admin Security</strong><span>Protected UID registry<br>No hard-coded super-admin email</span></div>
                 <div class="dev-health"><strong>Organisation Privacy</strong><span>Aggregate usage counts<br>No default student/payment-detail browsing</span></div>
                 <div class="dev-health"><strong>Public Payments</strong><span>Secure token mirror<br>Manual verification before receipt</span></div>
@@ -4176,6 +4176,15 @@ window.goBackFromView=(viewId)=>{
     showView(origin.view||"homeView",{record:false});
   }
 };
+
+window.preparePlatformWorkspaceNavigation=()=>{
+  // The organisation workspace was deliberately opened from Developer Console.
+  // Record that origin explicitly so every root-level Back path returns there.
+  dashboardOriginState={view:"developerView",dash:null};
+  dashNavHistory=[];
+  currentDashTarget="overview";
+};
+
 
 const developerUiState={
   tab:"overview",
@@ -4618,7 +4627,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.63.1: cloud/status refreshes must never render the full dashboard
+    // V1.63.2: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -6192,7 +6201,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.63.1: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.63.2: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 
@@ -7658,7 +7667,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.63.1 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.63.2 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -7682,7 +7691,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.63.1 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.63.2 secure link.");
     },100);
     return true;
   }
@@ -8526,14 +8535,19 @@ function updateDashboardBackButton(){
     const previous=dashNavHistory[dashNavHistory.length-1];
     label.textContent=`Back to ${dashPageLabel(previous)}`;
     if(context) context.textContent=`Previous page • ${dashPageLabel(previous)}`;
-  }else if(window.MasulPlatform?.state?.isAdmin){
+    return;
+  }
+
+  const origin=dashboardOriginState||{view:"homeView",dash:null};
+
+  if(origin.view==="developerView"){
     label.textContent="Back to Developer Console";
     if(context) context.textContent="Platform Home";
-  }else{
-    const origin=dashboardOriginState||{view:"homeView"};
-    label.textContent=`Back to ${navigationLabel(origin)}`;
-    if(context) context.textContent="Previous menu";
+    return;
   }
+
+  label.textContent=`Back to ${navigationLabel(origin)}`;
+  if(context) context.textContent="Previous menu";
 }
 
 function dashJump(target,options={}){
@@ -8570,19 +8584,18 @@ window.goBackDashboard=()=>{
     return;
   }
 
-  // For the platform developer, the root-level Back action from an
-  // organisation workspace returns to the Masul Developer Console,
-  // matching the global Home button.
-  if(window.MasulPlatform?.state?.isAdmin){
-    window.MasulPlatform.open();
+  const origin=dashboardOriginState||{view:"homeView",dash:null};
+
+  if(origin.view==="developerView"){
+    window.MasulPlatform?.open?.();
     return;
   }
 
-  const origin=dashboardOriginState||{view:"homeView",dash:null};
   if(origin.view==="dashboardView"){
     dashJump(origin.dash||"overview",{record:false});
     return;
   }
+
   showView(origin.view||"homeView",{record:false});
 };
 
@@ -10459,7 +10472,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.63.1: payment history no longer prevents removal of a student profile.
+  // V1.63.2: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -13702,7 +13715,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.63.1 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.63.2 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -14002,7 +14015,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.63.1 will claim the still-pending invitation after authentication.
+      // V1.63.2 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -14094,7 +14107,7 @@ handlePaymentRequestFromUrl();
 
 
   // ==========================================================
-  // V1.63.1 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
+  // V1.63.2 PLATFORM DEVELOPER / SUPER ADMIN CONSOLE
   // ==========================================================
   const platform={
     isAdmin:false,
@@ -14528,6 +14541,9 @@ handlePaymentRequestFromUrl();
       cloud.role="";
       await loadProfileForUser(auth.currentUser);
 
+      // Explicitly establish Developer Console as the organisation workspace origin.
+      // This fixes both the displayed Back label and the root Back destination.
+      window.preparePlatformWorkspaceNavigation?.();
       window.showView?.("dashboardView",{record:false});
       window.dashJump?.("overview",{record:false});
       cloudToast(`Opened ${org.name} as ${org.accessRole}`);
@@ -14787,7 +14803,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.63.1 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.63.2 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -14898,7 +14914,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.63.1 Firebase module ready");
+  console.info("Masul V1.63.2 Firebase module ready");
 
   window.MasulCloud={
     auth,
