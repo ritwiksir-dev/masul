@@ -459,6 +459,61 @@
       display:grid;grid-template-columns:180px 1fr;gap:18px;align-items:center;
       padding:17px;border:1px solid var(--line);border-radius:18px;background:#fff;margin-top:14px
     }
+    .payment-route-grid{
+      display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:10px;margin-top:12px
+    }
+    .payment-route{
+      border:1px solid #dce4ee;border-radius:16px;background:#fff;padding:13px;
+      min-height:112px;display:flex;flex-direction:column;justify-content:space-between;gap:10px
+    }
+    .payment-route.recommended{border-color:#bcd9c8;background:#f4fbf7}
+    .payment-route .route-kicker{
+      display:inline-flex;align-items:center;width:max-content;border-radius:999px;
+      padding:4px 7px;font-size:8px;font-weight:950;border:1px solid #d9e2ec;background:#f8fafc;color:#607086
+    }
+    .payment-route.recommended .route-kicker{background:#e7f5ed;border-color:#cce7d7;color:#317153}
+    .payment-route strong{display:block;font-size:12px;color:#29384d}
+    .payment-route p{font-size:9px;line-height:1.45;color:#6d7a8d;margin:4px 0 0}
+    .payment-route .btn{width:100%;justify-content:center}
+    .universal-pay-note{
+      border:1px solid #e4e8ee;border-radius:13px;background:#fafbfd;padding:10px 12px;
+      font-size:9px;line-height:1.5;color:#647287;margin-top:10px
+    }
+    .receipt-actions{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:12px
+    }
+    .completed-payment-box{
+      border:1px solid #cfe6d8;background:#f3faf6;border-radius:16px;padding:14px;
+      display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px
+    }
+    .completed-payment-box strong{display:block;color:#2e6f50;font-size:12px}
+    .completed-payment-box span{display:block;color:#647287;font-size:9px;line-height:1.45;margin-top:3px}
+    .receipt-official-mark{
+      display:inline-flex;align-items:center;gap:5px;border:1px solid #cfe2d6;background:#f3faf6;
+      color:#347154;border-radius:999px;padding:4px 8px;font-size:8px;font-weight:950;margin-top:4px
+    }
+    .receipt-share-note{font-size:8px;line-height:1.45;color:#7a8797;margin-top:8px}
+    .customer-receipt-ready{
+      border:1px solid #cde5d6;background:#f3faf6;border-radius:16px;padding:14px;margin-top:12px
+    }
+    .customer-receipt-ready strong{display:block;color:#2f7252;font-size:12px}
+    .customer-receipt-ready p{font-size:9px;line-height:1.5;color:#647287;margin:4px 0 0}
+    .public-receipt-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .public-receipt-actions .btn{justify-content:center}
+    .receipt-link-box{
+      margin-top:10px;border:1px solid #dce4ed;border-radius:12px;background:#fafbfd;
+      padding:9px 10px;font-size:9px;line-height:1.45;color:#5d6b7e;word-break:break-all
+    }
+    .receipt-history-notice{
+      border:1px solid #e5dcc7;background:#fffaf1;color:#755d2c;
+      border-radius:12px;padding:9px 10px;font-size:9px;line-height:1.5;margin-bottom:10px
+    }
+    .receipt-generated-note{
+      margin-top:10px;text-align:center;font-size:8px;line-height:1.45;color:#7c8899
+    }
+    @media(max-width:760px){
+      .payment-route-grid{grid-template-columns:1fr}
+    }
     #qrcode{width:180px;height:180px;display:grid;place-items:center;background:#fff}
     .receipt{
       border:1px solid var(--line);border-radius:18px;padding:18px;background:#fff;
@@ -3314,9 +3369,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.57</span>
+                <span class="chip">V1.60</span>
               </div>
-              <div class="request-meta">Masul V1.57 • Minimal Universal UPI</div>
+              <div class="request-meta">Masul V1.60 • Customer Receipt Link</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3832,7 +3887,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.57: cloud/status refreshes must never render the full dashboard
+    // V1.60: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -5406,7 +5461,7 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.57: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.60: rendering is read-only. State is saved only by actual user/data changes.
 }
 
 
@@ -6347,6 +6402,11 @@ function upiUriForRequest(req){
   }
 }
 
+window.scrollRequestQrIntoView=()=>{
+  const el=document.getElementById("requestQr");
+  if(el) el.scrollIntoView({behavior:"smooth",block:"center"});
+};
+
 window.copyRequestUpiId=async(id)=>{
   const req=localOrPublicPaymentRequest(id);
   if(!req?.upiId){toast('UPI ID is not available');return}
@@ -6363,6 +6423,256 @@ window.copyRequestUpiId=async(id)=>{
       <div class="preview-box">Copy this UPI ID manually and use it in any UPI app if the automatic intent is not supported on this device.</div>
     `);
   }
+};
+
+
+
+function safePublicReceiptLogo(){
+  const src=String(state.org?.logo||"").trim();
+  if(!src) return "";
+  if(!/^(data:image\/|https:\/\/)/i.test(src)) return "";
+  // Keep the public payment mirror comfortably below Firestore's document limit.
+  return src.length<=300000 ? src : "";
+}
+
+function buildPublicReceiptSnapshot(payment){
+  const person=state.people.find(p=>p.id===payment.personId);
+  return {
+    version:1,
+    receiptNo:String(payment.receipt||""),
+    orgName:String(state.org?.name||"Masul Organisation"),
+    orgLogo:safePublicReceiptLogo(),
+    orgMeta:receiptOrgMeta().map(String),
+    statutory:receiptStatutoryDetails().map(([label,value])=>({
+      label:String(label||""),
+      value:String(value||"")
+    })),
+    personLabel:String(peopleSingularLabel()),
+    personName:String(payment.personName||person?.name||""),
+    batch:String(payment.batch||person?.batch||"General"),
+    payerName:String(payment.payerName||""),
+    method:String(payment.method||"UPI / QR"),
+    amount:Number(payment.amount||0),
+    paymentDate:String(paymentDisplayDate(payment)),
+    verifiedAt:String(payment.date||new Date().toISOString()),
+    reference:String(payment.reference||""),
+    items:paymentReceiptItems(payment).map(i=>({
+      name:String(i.name||"Fee item"),
+      meta:String(i.meta||""),
+      base:Number(i.base||0),
+      late:Number(i.late||0),
+      discount:Number(i.discount||0),
+      exemption:String(i.exemption||"")
+    })),
+    acknowledgement:"This computer-generated receipt records payment acknowledged by the organisation. It is not, by itself, a tax invoice unless the organisation separately issues it as one in accordance with applicable law.",
+    generatedAt:new Date().toISOString()
+  };
+}
+
+function publicReceiptUrl(req){
+  const base=requestPublicUrl(req);
+  return `${base}&receipt=1`;
+}
+
+function publicReceiptLogoHtml(snapshot){
+  const src=String(snapshot?.orgLogo||"").trim();
+  const fallback=escapeHtml((snapshot?.orgName||"M").charAt(0).toUpperCase());
+  if(!src) return `<div class="receipt-logo-fallback">${fallback}</div>`;
+  return `<img src="${src.replace(/"/g,"&quot;")}"
+               alt="${escapeHtml(snapshot?.orgName||"Organisation")} logo"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+          <div class="receipt-logo-fallback" style="display:none">${fallback}</div>`;
+}
+
+function publicReceiptDocumentHtml(req){
+  const s=req?.receiptSnapshot;
+  if(!s) return "";
+  const statutory=Array.isArray(s.statutory)?s.statutory:[];
+  const orgMeta=Array.isArray(s.orgMeta)?s.orgMeta:[];
+  const items=Array.isArray(s.items)?s.items:[];
+  return `
+    <div class="receipt" id="masulPublicReceiptPrintable">
+      <div class="receipt-brand">
+        <div class="receipt-logo">${publicReceiptLogoHtml(s)}</div>
+        <div class="receipt-org">
+          <strong>${escapeHtml(s.orgName||req.orgName||"Masul Organisation")}</strong>
+          ${orgMeta.length?`<small>${orgMeta.map(escapeHtml).join(" • ")}</small>`:""}
+          <span class="receipt-official-mark">✓ Official Masul payment receipt</span>
+        </div>
+      </div>
+
+      <div class="receipt-line"><span>Receipt No.</span><strong>${escapeHtml(s.receiptNo||req.receipt||"—")}</strong></div>
+      <div class="receipt-line"><span>${escapeHtml(s.personLabel||"Person")}</span><strong>${escapeHtml(s.personName||req.personName||"—")}</strong></div>
+      <div class="receipt-line"><span>Batch / Group</span><strong>${escapeHtml(s.batch||req.batch||"General")}</strong></div>
+      ${s.payerName?`<div class="receipt-line"><span>Payer</span><strong>${escapeHtml(s.payerName)}</strong></div>`:""}
+      <div class="receipt-line"><span>Payment mode</span><strong>${escapeHtml(s.method||"UPI / QR")}</strong></div>
+      ${s.reference?`<div class="receipt-line"><span>Transaction / Reference</span><strong>${escapeHtml(s.reference)}</strong></div>`:""}
+      <div class="receipt-line"><span>Payment date</span><strong>${escapeHtml(s.paymentDate||"—")}</strong></div>
+      <div class="receipt-line"><span>Amount received</span><strong>${money(Number(s.amount||req.amount||0))}</strong></div>
+
+      ${items.length?`
+        <div class="receipt-items">
+          <div class="receipt-items-head">Fee details</div>
+          ${items.map(i=>`
+            <div class="receipt-item">
+              <div>
+                <strong>${escapeHtml(i.name||"Fee item")}</strong>
+                ${i.meta?`<small>${escapeHtml(i.meta)}</small>`:""}
+                ${i.discount?`<small class="receipt-discount">Exemption / concession − ${money(i.discount)}${i.exemption?` • ${escapeHtml(i.exemption)}`:""}</small>`:""}
+                ${i.late?`<small>Late fee included: ${money(i.late)}</small>`:""}
+              </div>
+              <div class="receipt-item-amount">${money((+i.base||0)+(+i.late||0))}</div>
+            </div>`).join("")}
+        </div>`:""}
+
+      <div class="receipt-statutory">
+        ${statutory.length
+          ? `<div class="stat-lines">${statutory.map(r=>`${escapeHtml(r.label)}: ${escapeHtml(r.value)}`).join(" • ")}</div>`
+          : `<div class="stat-lines">No statutory registration identifiers are displayed for this organisation.</div>`
+        }
+        <strong>Payment acknowledgement:</strong>
+        ${escapeHtml(s.acknowledgement||"This computer-generated receipt records payment acknowledged by the organisation.")}
+      </div>
+
+      <div class="receipt-generated-note">
+        Customer receipt • Verified by organisation • Receipt available through the secure Masul payment link
+      </div>
+    </div>`;
+}
+
+window.openPublicReceipt=(requestId)=>{
+  const req=localOrPublicPaymentRequest(requestId);
+  if(!req?.receiptSnapshot){
+    toast("Receipt is not available yet");
+    return;
+  }
+  modal(`
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">Verified Payment Receipt</span>
+        <h3 style="margin:7px 0 0">Receipt ${escapeHtml(req.receiptSnapshot.receiptNo||req.receipt||"")}</h3>
+        <p style="font-size:10px;color:var(--muted);margin:5px 0 0">Available from this secure payment link after organisation verification.</p>
+      </div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+
+    ${publicReceiptDocumentHtml(req)}
+
+    <div class="public-receipt-actions">
+      <button class="btn primary" onclick="printPublicReceipt('${req.id}')">Print / Save PDF</button>
+      <button class="btn ghost" onclick="sharePublicReceipt('${req.id}')">Share Receipt</button>
+      <button class="btn ghost" onclick="copyPublicReceiptLink('${req.id}')">Copy Receipt Link</button>
+      <button class="btn ghost" onclick="openPaymentRequest('${req.id}')">Back to Payment Status</button>
+    </div>
+  `);
+};
+
+window.printPublicReceipt=(requestId)=>{
+  const req=localOrPublicPaymentRequest(requestId);
+  if(!req?.receiptSnapshot){toast("Receipt is not available yet");return}
+  const w=window.open("","_blank","noopener,noreferrer");
+  if(!w){toast("Allow pop-ups to print / save the receipt");return}
+  const body=publicReceiptDocumentHtml(req);
+  w.document.open();
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Receipt ${escapeHtml(req.receiptSnapshot.receiptNo||"")}</title>
+    <style>
+      *{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#202b3d;background:#fff;margin:0;padding:24px}
+      .receipt{max-width:760px;margin:auto;border:1px solid #dfe4ea;border-radius:14px;padding:22px;background:#fff}
+      .receipt-brand{display:flex;align-items:center;gap:14px;padding-bottom:14px;margin-bottom:10px;border-bottom:1px solid #dfe4ea}
+      .receipt-logo{width:76px;height:76px;border:1px solid #dfe4ea;border-radius:12px;display:grid;place-items:center;background:#fff;overflow:hidden;flex:0 0 auto}
+      .receipt-logo img{width:100%;height:100%;object-fit:contain;padding:5px}.receipt-logo-fallback{font-size:28px;font-weight:800}
+      .receipt-org strong{display:block;font-size:20px}.receipt-org small{display:block;font-size:10px;line-height:1.5;color:#68768a;margin-top:3px}
+      .receipt-official-mark{display:inline-block;margin-top:5px;border:1px solid #cfe2d6;background:#f3faf6;color:#347154;border-radius:999px;padding:4px 8px;font-size:8px;font-weight:bold}
+      .receipt-line{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px dashed #dfe4ea;font-size:12px}
+      .receipt-items{margin-top:13px;border:1px solid #dfe4ea;border-radius:10px;overflow:hidden}.receipt-items-head{padding:9px 11px;background:#f7f9fb;font-size:9px;font-weight:bold;text-transform:uppercase}
+      .receipt-item{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 11px;border-top:1px solid #edf0f4}.receipt-item strong{display:block;font-size:11px}.receipt-item small{display:block;font-size:9px;color:#68768a;margin-top:2px}.receipt-item-amount{font-size:11px;font-weight:bold}
+      .receipt-statutory{margin-top:14px;border:1px solid #dfe4ea;border-radius:10px;padding:11px;background:#fafbfd;font-size:9px;line-height:1.55;color:#5f6d80}.stat-lines{margin-bottom:5px;font-weight:bold}
+      .receipt-generated-note{text-align:center;margin-top:10px;font-size:8px;color:#7c8899}.receipt-discount{font-weight:bold}
+      @media print{body{padding:0}.receipt{border:none;max-width:none}}
+    </style></head><body>${body}<script>window.onload=()=>setTimeout(()=>window.print(),150)<\/script></body></html>`);
+  w.document.close();
+};
+
+function publicReceiptShareText(req){
+  const s=req?.receiptSnapshot;
+  if(!s) return "";
+  return [
+    s.orgName||req.orgName||"Masul Organisation",
+    "Official Payment Receipt",
+    `Receipt: ${s.receiptNo||req.receipt||"—"}`,
+    `${s.personLabel||"Person"}: ${s.personName||req.personName||"—"}`,
+    `Amount: ${money(Number(s.amount||req.amount||0))}`,
+    `Payment mode: ${s.method||"UPI / QR"}`,
+    `Date: ${s.paymentDate||"—"}`,
+    s.reference?`Transaction / Reference: ${s.reference}`:"",
+    publicReceiptUrl(req)
+  ].filter(Boolean).join("\n");
+}
+
+window.sharePublicReceipt=async(requestId)=>{
+  const req=localOrPublicPaymentRequest(requestId);
+  if(!req?.receiptSnapshot){toast("Receipt is not available yet");return}
+  const url=publicReceiptUrl(req);
+  const text=publicReceiptShareText(req);
+  if(navigator.share){
+    try{
+      await navigator.share({
+        title:`Receipt ${req.receiptSnapshot.receiptNo||req.receipt||""}`,
+        text,
+        url
+      });
+      return;
+    }catch(err){
+      if(err?.name==="AbortError") return;
+    }
+  }
+  try{
+    await navigator.clipboard.writeText(text);
+    toast("Receipt details and link copied");
+  }catch(_){
+    toast("Could not open sharing on this device");
+  }
+};
+
+window.copyPublicReceiptLink=async(requestId)=>{
+  const req=localOrPublicPaymentRequest(requestId);
+  if(!req?.receiptSnapshot){toast("Receipt is not available yet");return}
+  const url=publicReceiptUrl(req);
+  try{
+    await navigator.clipboard.writeText(url);
+    toast("Receipt link copied");
+  }catch(_){
+    modal(`<div class="modal-head"><h3>Receipt Link</h3><button class="close" onclick="closeModal()">×</button></div><div class="payment-link-box">${escapeHtml(url)}</div>`);
+  }
+};
+
+function paymentForRequest(req){
+  if(!req) return null;
+  return (state.payments||[]).find(p=>
+    (req.id && p.requestId===req.id) ||
+    (req.receipt && p.receipt===req.receipt)
+  ) || null;
+}
+
+window.openReceiptForPaymentRequest=(requestId)=>{
+  const req=localOrPublicPaymentRequest(requestId);
+  if(!req){toast("Payment request not found");return}
+  const payment=paymentForRequest(req);
+  if(!payment){
+    toast("The official receipt is available to the organisation from Payments.");
+    return;
+  }
+  receiptModal(payment);
+};
+
+window.shareReceiptForPaymentRequest=(requestId)=>{
+  const req=localOrPublicPaymentRequest(requestId);
+  const payment=paymentForRequest(req);
+  if(!payment){
+    toast("Open Payments to share the official receipt.");
+    return;
+  }
+  shareStoredReceipt(payment.id);
 };
 
 window.openPaymentRequest=(id)=>{
@@ -6399,19 +6709,68 @@ window.openPaymentRequest=(id)=>{
       <div class="qr-wrap">
         <div id="requestQr"></div>
         <div>
-          <h3>Pay ${money(req.amount)}</h3>
-          <p style="font-size:12px;color:var(--muted)">Recipient: ${escapeHtml(req.payee||req.orgName)}<br>UPI ID: ${escapeHtml(req.upiId)}</p><p style="font-size:9px;color:var(--muted)">QR and app button use the same minimal cross-app UPI payload.</p>
-          ${uri
-            ? `<a class="btn primary" href="${uri}" style="text-decoration:none">Open UPI App</a>`
-            : `<button class="btn primary" disabled>UPI configuration needs correction</button>`}
+          <span class="eyebrow">Recommended</span>
+          <h3 style="margin:5px 0 4px">Scan UPI QR • ${money(req.amount)}</h3>
+          <p style="font-size:12px;color:var(--muted)">Recipient: ${escapeHtml(req.payee||req.orgName)}<br>UPI ID: ${escapeHtml(req.upiId)}</p>
+          <p style="font-size:9px;color:var(--muted)">Open your preferred UPI app and use Scan & Pay. This avoids browser-to-app deep-link differences.</p>
         </div>
       </div>
+
+      <div class="payment-route-grid">
+        <div class="payment-route recommended">
+          <div>
+            <span class="route-kicker">1 • Recommended</span>
+            <strong style="margin-top:8px">Scan the QR</strong>
+            <p>Use BHIM, Google Pay, PhonePe, CRED or another UPI app’s Scan & Pay option.</p>
+          </div>
+          <button class="btn ghost" onclick="scrollRequestQrIntoView()">Show QR</button>
+        </div>
+
+        <div class="payment-route">
+          <div>
+            <span class="route-kicker">2 • Universal fallback</span>
+            <strong style="margin-top:8px">Copy UPI ID</strong>
+            <p>Paste/search the exact VPA manually in any UPI app. Amount: ${money(req.amount)}.</p>
+          </div>
+          <button class="btn ghost" onclick="copyRequestUpiId('${req.id}')">Copy ${escapeHtml(req.upiId)}</button>
+        </div>
+
+        <div class="payment-route">
+          <div>
+            <span class="route-kicker">3 • Convenience</span>
+            <strong style="margin-top:8px">Open UPI App</strong>
+            <p>Direct launch works in some apps/devices. Compatibility can vary between UPI apps.</p>
+          </div>
+          ${uri
+            ? `<a class="btn ghost" href="${uri}" style="text-decoration:none">Open UPI App</a>`
+            : `<button class="btn ghost" disabled>UPI configuration needs correction</button>`}
+        </div>
+      </div>
+
+      <div class="universal-pay-note">
+        <strong>Masul does not mark this payment paid automatically.</strong>
+        After paying, use <em>I Have Paid</em> and submit the UPI transaction/reference number. The organisation verifies the credit before dues are cleared and the final receipt is confirmed.
+      </div>
       <div class="request-action-row">
-        <button class="btn ghost" onclick="copyRequestUpiId('${req.id}')">Copy UPI ID</button>
         <button class="btn primary" onclick="openReportPaymentForm('${req.id}')">I Have Paid</button>
       </div>` :
       reported ? `<div class="preview-box"><strong>Payment reported.</strong><br>The business owner must verify the credit before these fees are marked paid.</div>` :
-      paid ? `<div class="preview-box"><strong>✓ Payment verified.</strong><br>Receipt: ${escapeHtml(req.receipt||"")}</div>` :
+      paid ? `
+        <div class="completed-payment-box">
+          <div>
+            <strong>✓ Payment completed and verified</strong>
+            <span>This is the payment-request status, not the receipt. Official receipt no.: ${escapeHtml(req.receipt||"—")}</span>
+          </div>
+          <div class="student-action-row">
+            ${paymentForRequest(req)
+              ? `<button class="btn primary small" onclick="openReceiptForPaymentRequest('${req.id}')">View Official Receipt</button>
+                 <button class="btn ghost small" onclick="shareReceiptForPaymentRequest('${req.id}')">Share Receipt</button>`
+              : req.receiptSnapshot
+                ? `<a class="btn primary small" href="${publicReceiptUrl(req)}" style="text-decoration:none">View / Download Receipt</a>
+                   <button class="btn ghost small" onclick="sharePublicReceipt('${req.id}')">Share Receipt</button>`
+                : `<span class="status-badge verified">Preparing receipt…</span>`}
+          </div>
+        </div>` :
       `<div class="preview-box">This request is ${escapeHtml(requestStatusLabel(req.status).toLowerCase())}.</div>`
     }
   `);
@@ -6478,14 +6837,14 @@ window.reportRequestPayment=async(id)=>{
   toast("Payment reported to the business owner");
 };
 
-window.confirmPaymentRequest=(id)=>{
+window.confirmPaymentRequest=async(id)=>{
   const req=(state.paymentRequests||[]).find(r=>r.id===id);if(!req)return;
   if(req.status!=="payment_reported"){toast("Only reported payments can be verified");return}
   if(!confirm(`Confirm that ${money(req.amount)} was received for ${req.personName}?`)) return;
 
   const pmt={
     id:uuid("pay"),
-    receipt:`MAS-${new Date().getFullYear()}-${String(state.payments.length+1).padStart(5,"0")}`,
+    receipt:nextMasulReceiptNumber(),
     personId:req.personId,
     personName:req.personName,
     method:"UPI / QR",
@@ -6496,13 +6855,27 @@ window.confirmPaymentRequest=(id)=>{
     payerName:req.payerName,
     requestId:req.id,
     batch:req.batch||"General",
-    itemDetails:(req.items||[]).map(i=>({...i}))
+    itemDetails:(req.items||[]).map(i=>({...i})),
+    receiptGeneratedAt:new Date().toISOString()
   };
   state.payments.push(pmt);
   req.status="verified_paid";
   req.verifiedAt=pmt.date;
   req.receipt=pmt.receipt;
-  saveState();renderDashboard();receiptModal(pmt);
+  req.receiptSnapshot=buildPublicReceiptSnapshot(pmt);
+  saveState();
+  renderDashboard();
+
+  try{
+    if(window.MasulPublicPayments?.publish && req.publicToken){
+      await window.MasulPublicPayments.publish(req);
+    }
+  }catch(err){
+    console.warn("Customer receipt mirror publish failed:",err);
+    toast("Payment verified • customer receipt link will retry with cloud sync");
+  }
+
+  receiptModal(pmt);
 };
 
 window.rejectPaymentRequest=(id)=>{
@@ -6554,7 +6927,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.57 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.60 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -6578,7 +6951,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.57 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.60 secure link.");
     },100);
     return true;
   }
@@ -6645,6 +7018,7 @@ window.clearHistoricalPaymentDate=(paymentId)=>{
 window.openStoredReceipt=(paymentId)=>{
   const p=(state.payments||[]).find(x=>x.id===paymentId);
   if(!p){toast("Payment record not found");return}
+  ensureReceiptIdentity(p);
   receiptModal(p);
 };
 
@@ -6655,14 +7029,15 @@ function renderPayments(){
     <thead><tr><th>Receipt</th><th>Person</th><th>Payer</th><th>Mode</th><th>Amount</th><th>Date</th><th>Actions</th></tr></thead>
     <tbody>${
       [...state.payments].reverse().map(p=>`<tr>
-        <td>${escapeHtml(p.receipt)}</td>
+        <td>${escapeHtml(p.receipt||"Generate on demand")}</td>
         <td>${escapeHtml(p.personName)}</td>
         <td>${escapeHtml(p.payerName||"—")}</td>
         <td>${escapeHtml(p.method)}</td>
         <td>${money(p.amount)}</td>
         <td>${p.historical?`<span class="history-date-pill">${escapeHtml(historicalPaidDateLabel(p))}</span>`:new Date(p.date).toLocaleDateString("en-IN")}</td>
         <td><div class="student-action-row">
-          <button class="btn ghost small" onclick="openStoredReceipt('${p.id}')">Receipt</button>
+          <button class="btn ghost small" onclick="openStoredReceipt('${p.id}')">${p.historical?"Generate / Reprint Receipt":"View / Reprint Receipt"}</button>
+          <button class="btn ghost small" onclick="shareStoredReceipt('${p.id}')">Share</button>
           ${p.historical?`<button class="btn ghost small" onclick="editHistoricalPaymentDate('${p.id}')">Edit Date</button>`:""}
         </div></td>
       </tr>`).join("")
@@ -6767,7 +7142,20 @@ function renderPaymentMethodDetail(){
       paymentMethodDetail.innerHTML=`<div class="danger-alert"><div class="danger-title">UPI configuration needs correction</div><p>${escapeHtml(err?.message||"Invalid UPI configuration")}</p></div>`;
       return;
     }
-    paymentMethodDetail.innerHTML=`<div class="qr-wrap"><div id="qrcode"></div><div><h3>Pay ${money(total)}</h3><p style="font-size:13px;color:var(--muted)">Scan with a UPI app, or tap below on the same phone.</p><a class="btn primary" href="${uri}" style="text-decoration:none">Open UPI app</a><div class="hint">UPI ID: ${escapeHtml(cleanUpiId(upi))}</div></div></div>`;
+    paymentMethodDetail.innerHTML=`
+      <div class="qr-wrap">
+        <div id="qrcode"></div>
+        <div>
+          <span class="eyebrow">Recommended</span>
+          <h3 style="margin:5px 0">Scan & Pay ${money(total)}</h3>
+          <p style="font-size:12px;color:var(--muted)">Use Scan & Pay in any UPI app. For same-phone convenience, direct app opening is also available but compatibility can vary.</p>
+          <div class="hint">UPI ID: ${escapeHtml(cleanUpiId(upi))}</div>
+          <div class="button-row" style="margin-top:9px">
+            <button class="btn ghost" onclick="navigator.clipboard.writeText('${escapeHtml(cleanUpiId(upi))}').then(()=>toast('UPI ID copied'))">Copy UPI ID</button>
+            <a class="btn ghost" href="${uri}" style="text-decoration:none">Open UPI App</a>
+          </div>
+        </div>
+      </div>`;
     if(window.QRCode) new QRCode(document.getElementById("qrcode"),{text:uri,width:180,height:180});
   }else{
     paymentMethodDetail.innerHTML=`<div class="preview-box" style="margin-top:14px"><strong>Smart Online</strong> is represented in this V1 interface. Live payment-provider checkout and automatic confirmation require secure backend integration and merchant credentials.</div>`;
@@ -7108,6 +7496,35 @@ function resolvePaymentItemName(key){
   return k||"Fee item";
 }
 
+
+function nextMasulReceiptNumber(){
+  const year=new Date().getFullYear();
+  let max=0;
+  (state.payments||[]).forEach(p=>{
+    const m=String(p.receipt||"").match(new RegExp(`^MAS-${year}-(\\d+)$`));
+    if(m) max=Math.max(max,Number(m[1])||0);
+  });
+  return `MAS-${year}-${String(max+1).padStart(5,"0")}`;
+}
+
+function ensureReceiptIdentity(payment){
+  if(!payment) return payment;
+  if(!payment.receipt){
+    payment.receipt=nextMasulReceiptNumber();
+    payment.receiptGeneratedAt=new Date().toISOString();
+    payment.receiptGeneratedLater=true;
+    saveState();
+  }
+  return payment;
+}
+
+function receiptGenerationLabel(payment){
+  if(payment?.receiptGeneratedAt){
+    return new Date(payment.receiptGeneratedAt).toLocaleString("en-IN");
+  }
+  return new Date().toLocaleString("en-IN");
+}
+
 function paymentReceiptItems(payment){
   if(Array.isArray(payment?.itemDetails) && payment.itemDetails.length){
     return payment.itemDetails.map(i=>({
@@ -7150,7 +7567,23 @@ function receiptOrgMeta(){
   return bits;
 }
 
-function receiptModal(payment){
+
+function receiptLogoHtml(){
+  const src=String(state.org?.logo||"").trim();
+  const fallback=escapeHtml((state.org?.short||state.org?.name||"M").charAt(0).toUpperCase());
+  if(!src) return `<div class="receipt-logo-fallback">${fallback}</div>`;
+
+  const safeSrc=/^(data:image\/|https:\/\/|blob:)/i.test(src) ? src : "";
+  if(!safeSrc) return `<div class="receipt-logo-fallback">${fallback}</div>`;
+
+  return `<img src="${safeSrc.replace(/"/g,"&quot;")}"
+               alt="${escapeHtml(state.org?.name||"Organisation")} logo"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+          <div class="receipt-logo-fallback" style="display:none">${fallback}</div>`;
+}
+
+function receiptDocumentHtml(payment,{forPrint=false}={}){
+  ensureReceiptIdentity(payment);
   const person=state.people.find(p=>p.id===payment.personId);
   const batch=payment.batch||person?.batch||"General";
   const items=paymentReceiptItems(payment);
@@ -7158,35 +7591,34 @@ function receiptModal(payment){
   const orgMeta=receiptOrgMeta();
   const discountTotal=items.reduce((s,i)=>s+(+i.discount||0),0);
   const lateTotal=items.reduce((s,i)=>s+(+i.late||0),0);
-  const logo=state.org.logo
-    ? `<img src="${escapeHtml(state.org.logo)}" alt="${escapeHtml(state.org.name||"Organisation")} logo">`
-    : `<div class="receipt-logo-fallback">${escapeHtml((state.org.short||state.org.name||"M").charAt(0).toUpperCase())}</div>`;
+  const singular=peopleSingularLabel ? peopleSingularLabel() : (state.org.peopleLabel||"Student").replace(/s$/,"");
+  const logo=receiptLogoHtml();
 
-  modal(`
-    <div class="modal-head">
-      <div>
-        <span class="eyebrow">${payment.historical?"Opening history record":"Payment recorded"}</span>
-        <h3 style="margin:7px 0 0">Receipt ${escapeHtml(payment.receipt||"")}</h3>
-      </div>
-      <button class="close" onclick="closeModal()">×</button>
-    </div>
+  return `
+    ${payment.historical?`
+      <div class="receipt-history-notice">
+        <strong>Opening History acknowledgement.</strong>
+        This receipt is generated from a payment/history record entered into Masul after the original transaction.
+        It is not presented as an original contemporaneous receipt.
+      </div>`:""}
 
-    <div class="receipt">
+    <div class="receipt" id="masulReceiptPrintable">
       <div class="receipt-brand">
         <div class="receipt-logo">${logo}</div>
         <div class="receipt-org">
           <strong>${escapeHtml(state.org.name||"Masul Organisation")}</strong>
           ${orgMeta.length?`<small>${orgMeta.map(escapeHtml).join(" • ")}</small>`:""}
+          <span class="receipt-official-mark">✓ Official Masul payment receipt</span>
         </div>
       </div>
 
       <div class="receipt-line"><span>Receipt No.</span><strong>${escapeHtml(payment.receipt||"—")}</strong></div>
-      <div class="receipt-line"><span>${escapeHtml((state.org.peopleLabel||"Student").replace(/s$/,""))}</span><strong>${escapeHtml(payment.personName||person?.name||"—")}</strong></div>
+      <div class="receipt-line"><span>${escapeHtml(singular)}</span><strong>${escapeHtml(payment.personName||person?.name||"—")}</strong></div>
       <div class="receipt-line"><span>Batch / Group</span><strong>${escapeHtml(batch)}</strong></div>
       ${payment.payerName?`<div class="receipt-line"><span>Payer</span><strong>${escapeHtml(payment.payerName)}</strong></div>`:""}
       <div class="receipt-line"><span>Payment mode</span><strong>${escapeHtml(payment.method||"—")}</strong></div>
       ${payment.reference?`<div class="receipt-line"><span>Transaction / Reference</span><strong>${escapeHtml(payment.reference)}</strong></div>`:""}
-      <div class="receipt-line"><span>Date</span><strong>${escapeHtml(paymentDisplayDate(payment))}</strong></div>
+      <div class="receipt-line"><span>${payment.historical?"Recorded payment date":"Payment date"}</span><strong>${escapeHtml(paymentDisplayDate(payment))}</strong></div>
       ${discountTotal?`<div class="receipt-line"><span>Fee exemption / concession</span><strong class="receipt-discount">− ${money(discountTotal)}</strong></div>`:""}
       ${lateTotal?`<div class="receipt-line"><span>Late fee included</span><strong>${money(lateTotal)}</strong></div>`:""}
       <div class="receipt-line"><span>Amount received / recorded</span><strong>${money(payment.amount)}</strong></div>
@@ -7216,9 +7648,127 @@ function receiptModal(payment){
         It is not, by itself, a tax invoice unless the organisation separately issues it as one in accordance with applicable law.
         Statutory identifiers displayed above are those entered by the organisation in Masul.
       </div>
+
+      <div class="receipt-generated-note">
+        ${payment.historical?"Generated from Masul Opening History record":"Computer-generated receipt"} • Generated / reprinted ${escapeHtml(receiptGenerationLabel(payment))}
+      </div>
+    </div>`;
+}
+
+function receiptModal(payment){
+  if(!payment){toast("Payment record not found");return}
+  ensureReceiptIdentity(payment);
+  modal(`
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">${payment.historical?"Opening history receipt":"Payment receipt"}</span>
+        <h3 style="margin:7px 0 0">Receipt ${escapeHtml(payment.receipt||"")}</h3>
+        <p style="font-size:10px;color:var(--muted);margin:5px 0 0">Available for viewing and reprinting at any time from Payments.</p>
+      </div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+
+    ${receiptDocumentHtml(payment)}
+
+    <div class="receipt-actions">
+      <button class="btn primary" onclick="shareStoredReceipt('${payment.id}')">Share Receipt</button>
+      <button class="btn ghost" onclick="printStoredReceipt('${payment.id}')">Print / Save PDF</button>
+      <button class="btn ghost" onclick="copyStoredReceiptSummary('${payment.id}')">Copy Receipt Details</button>
+      <button class="btn ghost" onclick="closeModal()">Close</button>
+    </div>
+    <div class="receipt-share-note">
+      Share Receipt opens the device share sheet for the verified receipt details. For a visual receipt containing the logo, use Print / Save PDF and share that PDF.
     </div>
   `);
 }
+
+window.printStoredReceipt=(paymentId)=>{
+  const payment=(state.payments||[]).find(p=>p.id===paymentId);
+  if(!payment){toast("Payment record not found");return}
+  ensureReceiptIdentity(payment);
+
+  const printWindow=window.open("","_blank","noopener,noreferrer");
+  if(!printWindow){toast("Allow pop-ups to print / save the receipt");return}
+
+  const title=`Receipt ${payment.receipt||""}`;
+  const body=receiptDocumentHtml(payment,{forPrint:true});
+  printWindow.document.open();
+  printWindow.document.write(`<!doctype html>
+    <html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title>
+    <style>
+      *{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#202b3d;background:#fff;margin:0;padding:24px}
+      .receipt-history-notice{max-width:760px;margin:0 auto 12px;border:1px solid #e5dcc7;background:#fffaf1;color:#755d2c;border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.5}
+      .receipt{max-width:760px;margin:auto;border:1px solid #dfe4ea;border-radius:14px;padding:22px;background:#fff}
+      .receipt-brand{display:flex;align-items:center;gap:14px;padding-bottom:14px;margin-bottom:10px;border-bottom:1px solid #dfe4ea}
+      .receipt-logo{width:76px;height:76px;border:1px solid #dfe4ea;border-radius:12px;display:grid;place-items:center;background:#fff;overflow:hidden;flex:0 0 auto}
+      .receipt-logo img{width:100%;height:100%;object-fit:contain;padding:5px}.receipt-logo-fallback{font-size:28px;font-weight:800}
+      .receipt-org strong{display:block;font-size:20px}.receipt-org small{display:block;font-size:10px;line-height:1.5;color:#68768a;margin-top:3px}
+      .receipt-official-mark{display:inline-block;margin-top:5px;border:1px solid #cfe2d6;background:#f3faf6;color:#347154;border-radius:999px;padding:4px 8px;font-size:8px;font-weight:bold}
+      .receipt-line{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px dashed #dfe4ea;font-size:12px}
+      .receipt-items{margin-top:13px;border:1px solid #dfe4ea;border-radius:10px;overflow:hidden}.receipt-items-head{padding:9px 11px;background:#f7f9fb;font-size:9px;font-weight:bold;text-transform:uppercase}
+      .receipt-item{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 11px;border-top:1px solid #edf0f4}.receipt-item strong{display:block;font-size:11px}.receipt-item small{display:block;font-size:9px;color:#68768a;margin-top:2px}.receipt-item-amount{font-size:11px;font-weight:bold}
+      .receipt-statutory{margin-top:14px;border:1px solid #dfe4ea;border-radius:10px;padding:11px;background:#fafbfd;font-size:9px;line-height:1.55;color:#5f6d80}.stat-lines{margin-bottom:5px;font-weight:bold}
+      .receipt-generated-note{text-align:center;margin-top:10px;font-size:8px;color:#7c8899}.receipt-discount{font-weight:bold}
+      @media print{body{padding:0}.receipt{border:none;max-width:none}.receipt-history-notice{max-width:none}}
+    </style></head><body>${body}<script>window.onload=()=>setTimeout(()=>window.print(),150)<\\/script></body></html>`);
+  printWindow.document.close();
+};
+
+function storedReceiptShareText(p){
+  ensureReceiptIdentity(p);
+  const person=state.people.find(x=>x.id===p.personId);
+  return [
+    `${state.org.name||"Masul Organisation"}`,
+    `Official Payment Receipt`,
+    `Receipt: ${p.receipt||"—"}`,
+    `${peopleSingularLabel()}: ${p.personName||person?.name||"—"}`,
+    p.batch?`Batch / Group: ${p.batch}`:"",
+    `Amount: ${money(p.amount)}`,
+    `Payment mode: ${p.method||"—"}`,
+    `Date: ${paymentDisplayDate(p)}`,
+    p.reference?`Transaction / Reference: ${p.reference}`:"",
+    p.historical?"Record type: Opening History acknowledgement":"",
+    `Generated through Masul`
+  ].filter(Boolean).join("\n");
+}
+
+window.shareStoredReceipt=async(paymentId)=>{
+  const p=(state.payments||[]).find(x=>x.id===paymentId);
+  if(!p){toast("Payment record not found");return}
+  ensureReceiptIdentity(p);
+  const text=storedReceiptShareText(p);
+  const title=`Receipt ${p.receipt||""} • ${state.org.name||"Masul"}`;
+
+  if(navigator.share){
+    try{
+      await navigator.share({title,text});
+      return;
+    }catch(err){
+      if(err?.name==="AbortError") return;
+      console.warn("Masul receipt share:",err);
+    }
+  }
+
+  try{
+    await navigator.clipboard.writeText(text);
+    toast("Sharing unavailable here • receipt details copied instead");
+  }catch(err){
+    toast("Could not open sharing on this device");
+  }
+};
+
+window.copyStoredReceiptSummary=async(paymentId)=>{
+  const p=(state.payments||[]).find(x=>x.id===paymentId);
+  if(!p){toast("Payment record not found");return}
+  const text=storedReceiptShareText(p);
+  try{
+    await navigator.clipboard.writeText(text);
+    toast("Receipt details copied");
+  }catch(err){
+    toast("Could not copy receipt details");
+  }
+};
+
 
 function dashPageLabel(target){
   return ({
@@ -7970,7 +8520,7 @@ recordPaymentBtn.onclick=()=>{
   if(!snap.items.length){toast("Select at least one fee component");return}
   const pmt={
     id:uuid("pay"),
-    receipt:`MAS-${new Date().getFullYear()}-${String(state.payments.length+1).padStart(5,"0")}`,
+    receipt:nextMasulReceiptNumber(),
     personId:person.id,
     personName:person.name,
     batch:person.batch||"General",
@@ -9154,7 +9704,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.57: payment history no longer prevents removal of a student profile.
+  // V1.60: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -9292,7 +9842,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.57",
+    version:"1.60",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -10910,7 +11460,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.57"
+        sourceVersion:"1.60"
       };
 
       const ops=[];
@@ -12390,7 +12940,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.57 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.60 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -12690,7 +13240,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.57 will claim the still-pending invitation after authentication.
+      // V1.60 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -12781,7 +13331,7 @@ handlePaymentRequestFromUrl();
   }
 
   function publicRequestPayload(req){
-    return {
+    const payload={
       token:req.publicToken,
       orgId:cloud.orgId,
       requestId:req.id,
@@ -12811,6 +13361,14 @@ handlePaymentRequestFromUrl();
       receipt:String(req.receipt||""),
       updatedAt:serverTimestamp()
     };
+
+    // Initial request creation keeps the original V1.46 field set.
+    // The customer-safe receipt snapshot is added only after verification,
+    // so existing public-create rules remain compatible.
+    if(req.status==="verified_paid" && req.receiptSnapshot){
+      payload.receiptSnapshot=req.receiptSnapshot;
+    }
+    return payload;
   }
 
   async function publishPublicPaymentRequest(req){
@@ -12820,10 +13378,7 @@ handlePaymentRequestFromUrl();
     return req.publicToken;
   }
 
-  async function fetchPublicPaymentRequest(token){
-    const snap=await getDoc(publicRequestRef(token));
-    if(!snap.exists()) throw new Error("This payment request was not found or is no longer available.");
-    const d=snap.data();
+  function publicPaymentDocToRequest(token,d){
     if(d.token!==token) throw new Error("Invalid payment request token.");
     return {
       id:d.requestId,
@@ -12845,16 +13400,53 @@ handlePaymentRequestFromUrl();
       reportedAt:d.reportedAt?.toDate?.()?.toISOString?.()||d.reportedAt||null,
       verifiedAt:d.verifiedAt?.toDate?.()?.toISOString?.()||d.verifiedAt||null,
       rejectedAt:d.rejectedAt?.toDate?.()?.toISOString?.()||d.rejectedAt||null,
-      receipt:d.receipt||""
+      receipt:d.receipt||"",
+      receiptSnapshot:d.receiptSnapshot||null
     };
+  }
+
+  async function fetchPublicPaymentRequest(token){
+    const snap=await getDoc(publicRequestRef(token));
+    if(!snap.exists()) throw new Error("This payment request was not found or is no longer available.");
+    return publicPaymentDocToRequest(token,snap.data());
+  }
+
+  let publicPaymentPageUnsub=null;
+
+  function renderPublicPaymentLanding(req){
+    window.__MASUL_PUBLIC_REQUEST__=req;
+    const receiptMode=new URLSearchParams(location.search).get("receipt")==="1";
+    if(receiptMode){
+      if(req.receiptSnapshot) openPublicReceipt(req.id);
+      else{
+        openPaymentRequest(req.id);
+        if(req.status==="verified_paid") toast("Receipt is being prepared. This page will update automatically.");
+      }
+    }else{
+      openPaymentRequest(req.id);
+    }
   }
 
   async function openPublicPaymentToken(token){
     try{
       showPublicPaymentLoading();
       const req=await fetchPublicPaymentRequest(token);
-      window.__MASUL_PUBLIC_REQUEST__=req;
-      openPaymentRequest(req.id);
+      renderPublicPaymentLanding(req);
+
+      if(publicPaymentPageUnsub){
+        try{publicPaymentPageUnsub()}catch(_){}
+        publicPaymentPageUnsub=null;
+      }
+
+      publicPaymentPageUnsub=onSnapshot(publicRequestRef(token),snap=>{
+        if(!snap.exists()) return;
+        try{
+          const updated=publicPaymentDocToRequest(token,snap.data());
+          renderPublicPaymentLanding(updated);
+        }catch(err){
+          console.warn("Public payment live update:",err);
+        }
+      },err=>console.warn("Public payment live listener failed:",err));
     }catch(err){
       console.error("Public payment lookup failed:",err);
       showMissingCloudRequest("",err?.message||"Could not fetch this payment request.");
@@ -12918,7 +13510,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.57 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.60 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -13018,7 +13610,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.57 Firebase module ready");
+  console.info("Masul V1.60 Firebase module ready");
 
   window.MasulCloud={
     auth,
