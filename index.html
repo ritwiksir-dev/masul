@@ -2292,11 +2292,11 @@
 
           <div class="hub-actions">
             <button class="hub-action accent" id="homeBulkPeopleBtn">
-              <span class="hub-icon">📋</span><strong>Bulk Add Students</strong>
+              <span class="hub-icon">📋</span><strong data-people-text="bulk-add">Bulk Add Students</strong>
               <span>Paste grouped lists or import your register; missing batches are created automatically.</span>
             </button>
             <button class="hub-action" id="homeAddStudentBtn">
-              <span class="hub-icon">＋</span><strong>Add Student</strong>
+              <span class="hub-icon">＋</span><strong data-people-text="add-one">Add Student</strong>
               <span>Add one new student/customer manually at any time.</span>
             </button>
             <button class="hub-action" id="homeAddBatchBtn">
@@ -2304,7 +2304,7 @@
               <span>Create one batch manually. Optional if Bulk Entry already creates it.</span>
             </button>
             <button class="hub-action" data-home-dash="people">
-              <span class="hub-icon">👥</span><strong>People</strong>
+              <span class="hub-icon">👥</span><strong data-people-text="plural">People</strong>
               <span>Search, add, archive and open individual fee cards.</span>
             </button>
             <button class="hub-action" data-home-dash="batches">
@@ -2436,6 +2436,7 @@
                     <option>Members</option>
                     <option>Customers</option>
                     <option>Clients</option>
+                    <option>Learners</option>
                   </select>
                 </div>
                 <div class="field">
@@ -2728,7 +2729,7 @@
       <div class="dashboard-layout">
         <aside class="sidebar">
           <button class="nav-btn active" data-dash="overview"><span class="nav-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span><span class="nav-label">Overview</span></button>
-          <button class="nav-btn" data-dash="people"><span class="nav-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M18 8a3 3 0 1 1 0 6"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg></span><span class="nav-label">People</span></button>
+          <button class="nav-btn" data-dash="people"><span class="nav-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M18 8a3 3 0 1 1 0 6"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg></span><span class="nav-label" data-people-text="plural">People</span></button>
           <button class="nav-btn" data-dash="batches"><span class="nav-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-9 5 9 5 9-5-9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/></svg></span><span class="nav-label">Batches</span></button>
           <button class="nav-btn" data-dash="fees"><span class="nav-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12a2 2 0 0 1 2 2v16l-3-2-3 2-3-2-3 2-3-2V4a2 2 0 0 1 2-2Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg></span><span class="nav-label">Fees & Rules</span></button>
           <button class="nav-btn" data-dash="pending"><span class="nav-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M18.5 5.5 20 4"/></svg></span><span class="nav-label">Pending Dues</span></button>
@@ -2764,10 +2765,10 @@
               <div class="stat-card"><span>Collected this month</span><strong id="statCollected">₹0</strong></div>
               <div class="stat-card"><span>Pending</span><strong id="statPending">₹0</strong></div>
               <div class="stat-card"><span>Payments</span><strong id="statPayments">0</strong></div>
-              <div class="stat-card"><span>People with dues</span><strong id="statDuePeople">0</strong></div>
+              <div class="stat-card"><span data-people-text="with-dues">People with dues</span><strong id="statDuePeople">0</strong></div>
             </div>
             <div class="hub-grid">
-              <button class="hub-card people" data-dash-jump="people"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M18 8a3 3 0 1 1 0 6"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg></span><strong>People</strong><span id="hubPeopleText">View all students/customers</span></button>
+              <button class="hub-card people" data-dash-jump="people"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M18 8a3 3 0 1 1 0 6"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg></span><strong data-people-text="plural">People</strong><span id="hubPeopleText">View all students/customers</span></button>
               <button class="hub-card batches" data-dash-jump="batches"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-9 5 9 5 9-5-9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/></svg></span><strong>Batches</strong><span id="hubBatchText">View groups and their members</span></button>
               <button class="hub-card fees" data-dash-jump="fees"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12a2 2 0 0 1 2 2v16l-3-2-3 2-3-2-3 2-3-2V4a2 2 0 0 1 2-2Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg></span><strong>Fees & Rules</strong><span>Amounts, due dates and late-fee settings</span></button>
               <button class="hub-card pending" data-dash-jump="pending"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M18.5 5.5 20 4"/></svg></span><strong>Pending Dues</strong><span>See who needs to pay and collect quickly</span></button>
@@ -2775,13 +2776,13 @@
               <button class="hub-card payments" data-dash-jump="payments"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/><path d="M7 15h4"/></svg></span><strong>Payments</strong><span>Receipts and transaction history</span></button>
               <button class="hub-card payments reports" data-dash-jump="reports"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg></span><strong>Reports & Analytics</strong><span>Filter, analyse, export and print fee reports</span></button>
               <button class="hub-card access" data-dash-jump="access"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.7 3.1 8 7.5 9.5 4.4-1.5 7.5-4.8 7.5-9.5V6L12 3Z"/><circle cx="12" cy="10" r="2.3"/><path d="M8.8 16c.7-1.7 1.8-2.5 3.2-2.5s2.5.8 3.2 2.5"/></svg></span><strong>Users & Roles</strong><span>Invite staff, assign roles and manage organisation access</span></button>
-              <button class="hub-card customer-access" data-dash-jump="customer-access"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20v-1.5A5.5 5.5 0 0 1 8.5 13h1A5.5 5.5 0 0 1 15 18.5V20"/><path d="m17 11 2 2 3-4"/></svg></span><strong>Customer Access</strong><span>Bulk invite parents/students and manage portal access</span></button>
+              <button class="hub-card customer-access" data-dash-jump="customer-access"><span class="hub-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20v-1.5A5.5 5.5 0 0 1 8.5 13h1A5.5 5.5 0 0 1 15 18.5V20"/><path d="m17 11 2 2 3-4"/></svg></span><strong>Customer Access</strong><span>Bulk invite customers/parents and manage portal access</span></button>
             </div>
             <div class="two-col">
               <div class="clean-card">
                 <h3>Quick actions</h3>
                 <div class="list-stack">
-                  <button class="btn soft" data-dash-jump="people">View / Add People</button>
+                  <button class="btn soft" data-dash-jump="people" data-people-text="view-add">View / Add People</button>
                   <button class="btn soft" data-dash-jump="batches">View Batches</button>
                   <button class="btn soft" data-open-collect>Collect / record payment</button>
                   <button class="btn soft" data-dash-jump="fees">Edit fees & due-date rules</button>
@@ -2797,11 +2798,11 @@
           </section>
 
           <section class="dash-section" id="dash-people">
-            <div class="crumbs"><button data-dash-jump="overview">Overview</button><span>›</span><span>People</span></div>
+            <div class="crumbs"><button data-dash-jump="overview">Overview</button><span>›</span><span data-people-text="plural">People</span></div>
             <div class="section-title">
-              <div><h2>People</h2><p id="peopleSummary">Students, members, customers or clients attached to this organisation.</p>
+              <div><h2 data-people-text="plural">People</h2><p id="peopleSummary">Students, members, customers or clients attached to this organisation.</p>
               <div class="button-row">
-                <button class="btn primary small" id="peopleAddStudentBtn">+ Add Student</button>
+                <button class="btn primary small" id="peopleAddStudentBtn" data-people-text="add-one-plus">+ Add Student</button>
                 <button class="btn ghost small" id="peopleBulkAddBtn">Bulk Entry</button>
               </div>
             </div>
@@ -2809,13 +2810,14 @@
                 <button class="btn ghost small" data-dash-jump="batches">View Batches</button>
                 <button class="btn ghost small" id="bulkPeopleBtn">📋 Bulk paste</button>
                 <button class="btn ghost small" id="peopleHistoryBtn">↺ Past History</button>
+                <button class="btn ghost small" id="peopleTrashBtn" onclick="openPeopleTrash()">🗑 Trash <span id="peopleTrashCount">0</span></button>
                 <button class="btn danger small" id="bulkDeletePeopleBtn" disabled>⚠ Bulk Delete</button>
-                <button class="btn primary small" id="addPersonBtn">+ Add Student</button>
+                <button class="btn primary small" id="addPersonBtn" data-people-text="add-one-plus">+ Add Student</button>
               </div>
             </div>
             <div class="clean-card">
               <div class="grid-2">
-                <div class="field"><label>Search people</label><input id="peopleSearch" placeholder="Type a name or batch"></div>
+                <div class="field"><label data-people-text="search">Search people</label><input id="peopleSearch" placeholder="Type a name or batch"></div>
                 <div class="field"><label>Filter by batch</label><select id="peopleBatchFilter"><option value="">All batches</option></select></div>
               </div>
               <div id="peopleTableWrap"></div>
@@ -2825,7 +2827,7 @@
           <section class="dash-section" id="dash-batches">
             <div class="crumbs"><button data-dash-jump="overview">Overview</button><span>›</span><span>Batches</span></div>
             <div class="section-title">
-              <div><h2>Batches & Groups</h2><p>Open a batch to see its students/customers, or add/import more.</p>
+              <div><h2>Batches & Groups</h2><p>Open a batch to see its <span data-people-text="plural-lower">people</span>, or add/import more.</p>
               <div class="button-row">
                 <button class="btn primary small" id="batchesAddManualBtn">+ Add Batch / Group</button>
                 <button class="btn ghost small" id="batchesPasteBtn">Paste Batch List</button>
@@ -2949,8 +2951,8 @@
                     <option value="monthly_summary">Monthly Collection Summary</option>
                     <option value="payments">Payment Register</option>
                     <option value="pending">Pending Dues</option>
-                    <option value="full_paid">Fully-Paid Students</option>
-                    <option value="student_statement">Student Fee Statement</option>
+                    <option value="full_paid" id="reportFullyPaidOption">Fully-Paid Students</option>
+                    <option value="student_statement" id="reportPersonStatementOption">Student Fee Statement</option>
                     <option value="batch_summary">Batch Summary</option>
                   </select>
                 </div>
@@ -2963,8 +2965,8 @@
                   <input id="reportToMonth" type="month">
                 </div>
                 <div class="field">
-                  <label>Student</label>
-                  <select id="reportPerson"><option value="">All students</option></select>
+                  <label id="reportPersonLabel">Student</label>
+                  <select id="reportPerson"><option value="" id="reportAllPeopleOption">All students</option></select>
                 </div>
                 <div class="field">
                   <label>Batch / Group</label>
@@ -3144,6 +3146,17 @@
                 <div class="field"><label>Business name</label><input id="settingsOrgName"></div>
                 <div class="field"><label>Session</label><input id="settingsSession"></div>
                 <div class="field">
+                  <label>People terminology</label>
+                  <select id="settingsPeopleLabel">
+                    <option>Students</option>
+                    <option>Members</option>
+                    <option>Customers</option>
+                    <option>Clients</option>
+                    <option>Learners</option>
+                  </select>
+                  <div class="form-note">This term is used consistently throughout Masul: navigation, counts, dues, reports, receipts and exports.</div>
+                </div>
+                <div class="field">
                   <label>Currency</label>
                   <select id="settingsCurrency">
                     <option value="INR">₹ INR — Indian Rupee</option>
@@ -3206,7 +3219,7 @@
                 <button class="btn primary small" id="excelBackupBtn">Excel Backup</button>
                 <button class="btn ghost small" id="exportExcelBtn">Quick Excel Export</button>
                 <button class="btn ghost small" id="downloadExcelTemplateBtn">Excel Template</button>
-                <button class="btn ghost small" id="exportPeopleBtn">Export People CSV</button>
+                <button class="btn ghost small" id="exportPeopleBtn" data-people-text="export">Export People CSV</button>
               </div>
               <div class="preview-box" style="margin-top:12px">
                 <strong>Last saved:</strong> <span id="lastSavedText">—</span><br>
@@ -3300,9 +3313,9 @@
                   <h3 style="margin:6px 0 3px">App information</h3>
                   <p>Version details are kept here rather than in the main navigation.</p>
                 </div>
-                <span class="chip">V1.54</span>
+                <span class="chip">V1.55</span>
               </div>
-              <div class="request-meta">Masul V1.54 • UPI Intent Reliability</div>
+              <div class="request-meta">Masul V1.55 • Terminology & Trash Visibility</div>
             </div>
 
             <div class="clean-card" style="margin-top:14px">
@@ -3568,6 +3581,57 @@ function isPrototypeDummyPerson(p){
   return n==="sample student" || n==="sample student 1" || n==="sample student 2";
 }
 
+
+const PEOPLE_SINGULAR_LABELS={
+  Students:"Student",
+  Members:"Member",
+  Customers:"Customer",
+  Clients:"Client",
+  Learners:"Learner"
+};
+
+function peoplePluralLabel(){
+  return String(state.org?.peopleLabel||"Students").trim()||"Students";
+}
+function peopleSingularLabel(){
+  const plural=peoplePluralLabel();
+  return PEOPLE_SINGULAR_LABELS[plural] || plural.replace(/s$/i,"") || "Person";
+}
+function peopleLowerPlural(){return peoplePluralLabel().toLowerCase()}
+function peopleLowerSingular(){return peopleSingularLabel().toLowerCase()}
+
+function applyPeopleTerminology(){
+  const plural=peoplePluralLabel();
+  const singular=peopleSingularLabel();
+  const lowerPlural=plural.toLowerCase();
+
+  document.querySelectorAll('[data-people-text="plural"]').forEach(el=>el.textContent=plural);
+  document.querySelectorAll('[data-people-text="plural-lower"]').forEach(el=>el.textContent=lowerPlural);
+  document.querySelectorAll('[data-people-text="bulk-add"]').forEach(el=>el.textContent=`Bulk Add ${plural}`);
+  document.querySelectorAll('[data-people-text="add-one"]').forEach(el=>el.textContent=`Add ${singular}`);
+  document.querySelectorAll('[data-people-text="add-one-plus"]').forEach(el=>el.textContent=`+ Add ${singular}`);
+  document.querySelectorAll('[data-people-text="view-add"]').forEach(el=>el.textContent=`View / Add ${plural}`);
+  document.querySelectorAll('[data-people-text="with-dues"]').forEach(el=>el.textContent=`${plural} with dues`);
+  document.querySelectorAll('[data-people-text="search"]').forEach(el=>el.textContent=`Search ${lowerPlural}`);
+  document.querySelectorAll('[data-people-text="export"]').forEach(el=>el.textContent=`Export ${plural} CSV`);
+
+  if(typeof homePeopleLabel!=="undefined" && homePeopleLabel) homePeopleLabel.textContent=plural;
+  if(typeof reportFullyPaidOption!=="undefined" && reportFullyPaidOption) reportFullyPaidOption.textContent=`Fully-Paid ${plural}`;
+  if(typeof reportPersonStatementOption!=="undefined" && reportPersonStatementOption) reportPersonStatementOption.textContent=`${singular} Fee Statement`;
+  if(typeof reportPersonLabel!=="undefined" && reportPersonLabel) reportPersonLabel.textContent=singular;
+  if(typeof reportAllPeopleOption!=="undefined" && reportAllPeopleOption) reportAllPeopleOption.textContent=`All ${lowerPlural}`;
+}
+
+window.openPeopleTrash=()=>{
+  dashJump("people",{record:false});
+  setTimeout(()=>{
+    const panel=document.querySelector(".people-trash-panel");
+    if(!panel){toast("Trash is not available on this screen");return}
+    panel.open=true;
+    panel.scrollIntoView({behavior:"smooth",block:"start"});
+  },60);
+};
+
 function normalisePeopleData(){
   if(!Array.isArray(state.people)) state.people=[];
   // Early Masul prototypes silently created Sample Student records.
@@ -3767,7 +3831,7 @@ window.MasulLocalBridge = {
     updateSaveIndicators();
   },
   refreshUI(){
-    // V1.54: cloud/status refreshes must never render the full dashboard
+    // V1.55: cloud/status refreshes must never render the full dashboard
     // or cause persistence. They update indicators only.
     updateSaveIndicators();
   },
@@ -4931,11 +4995,11 @@ function buildMonthlySummaryReport(f){
 
   return {
     title:"Monthly Collection Summary",
-    meta:`${reportSelectedPeriodLabel(f)} • ${people.length} student(s) in scope`,
+    meta:`${reportSelectedPeriodLabel(f)} • ${people.length} ${peopleLowerPlural()} in scope`,
     rows,
     columns:[
       {key:"Month",label:"Month"},{key:"Payments",label:"Payments"},
-      {key:"Students",label:"Students Paying"},
+      {key:"Students",label:`${peoplePluralLabel()} Paying`},
       {label:"Collected",value:r=>reportMoney(r.Collected)},
       {key:"Modes",label:"Modes"}
     ],
@@ -4983,7 +5047,7 @@ function buildPaymentsReport(f){
     meta:`${reportSelectedPeriodLabel(f)} • ${rows.length} transaction record(s)`,
     rows,
     columns:[
-      {key:"Receipt",label:"Receipt"},{key:"Student",label:"Student"},{key:"Batch",label:"Batch"},
+      {key:"Receipt",label:"Receipt"},{key:"Student",label:peopleSingularLabel()},{key:"Batch",label:"Batch"},
       {key:"Payer",label:"Payer"},{key:"Mode",label:"Mode"},
       {label:"Amount",value:r=>reportMoney(r.Amount)},{key:"Date",label:"Date"},
       {key:"Reference",label:"Reference"},{key:"Type",label:"Record Type"}
@@ -5031,10 +5095,10 @@ function buildPendingReport(f){
 
   return {
     title:"Pending Dues",
-    meta:`${reportSelectedPeriodLabel(f)} • ${rows.length} student(s) with pending items`,
+    meta:`${reportSelectedPeriodLabel(f)} • ${rows.length} ${peopleLowerPlural()} with pending items`,
     rows,
     columns:[
-      {key:"Student",label:"Student"},{key:"Batch",label:"Batch"},{key:"Items",label:"Pending Items"},
+      {key:"Student",label:peopleSingularLabel()},{key:"Batch",label:"Batch"},{key:"Items",label:"Pending Items"},
       {label:"Base Due",value:r=>reportMoney(r.Base)},
       {label:"Late Fee",value:r=>reportMoney(r.Late)},
       {label:"Total Pending",value:r=>`<strong>${escapeHtml(reportMoney(r.Pending))}</strong>`,html:true},
@@ -5042,7 +5106,7 @@ function buildPendingReport(f){
     ],
     cards:[
       {label:"Total Pending",value:reportMoney(total),note:"Selected range"},
-      {label:"Students Pending",value:rows.length,note:`Out of ${people.length} in scope`},
+      {label:`${peoplePluralLabel()} Pending`,value:rows.length,note:`Out of ${people.length} in scope`},
       {label:"Pending Items",value:detail.length,note:"Fee components"},
       {label:"Late Fees",value:reportMoney(late),note:"As currently calculated"}
     ],
@@ -5070,25 +5134,25 @@ function buildFullyPaidReport(f){
   const byBatch={};
   rows.forEach(r=>byBatch[r.Batch]=(byBatch[r.Batch]||0)+1);
   return {
-    title:"Fully-Paid Students",
-    meta:`${reportSelectedPeriodLabel(f)} • ${rows.length} fully clear student(s)`,
+    title:`Fully-Paid ${peoplePluralLabel()}`,
+    meta:`${reportSelectedPeriodLabel(f)} • ${rows.length} fully clear ${peopleLowerPlural()}`,
     rows,
     columns:[
-      {key:"Student",label:"Student"},{key:"Batch",label:"Batch"},
+      {key:"Student",label:peopleSingularLabel()},{key:"Batch",label:"Batch"},
       {key:"Items",label:"Expected Items"},{key:"Paid",label:"Paid"},
       {key:"Exempt",label:"Exempt"},
       {label:"Status",value:r=>`<span class="report-status clear">${escapeHtml(r.Status)}</span>`,html:true}
     ],
     cards:[
-      {label:"Fully Clear",value:rows.length,note:`Out of ${people.length} students in scope`},
-      {label:"100% Status",value:people.length?`${Math.round(rows.length/people.length*100)}%`:"0%",note:"Students with no pending selected items"},
+      {label:"Fully Clear",value:rows.length,note:`Out of ${people.length} ${peopleLowerPlural()} in scope`},
+      {label:"100% Status",value:people.length?`${Math.round(rows.length/people.length*100)}%`:"0%",note:`${peoplePluralLabel()} with no pending selected items`},
       {label:"Paid Components",value:rows.reduce((s,r)=>s+r.Paid,0),note:"Across fully clear students"},
       {label:"Exempt Components",value:rows.reduce((s,r)=>s+r.Exempt,0),note:"Counted as clear"}
     ],
     charts:[
-      reportBarChart("Fully-paid students by batch","Number of students clear for the selected range.",Object.entries(byBatch).sort((a,b)=>b[1]-a[1]).map(([label,value])=>({label,value,display:String(value)})),"good")
+      reportBarChart(`Fully-paid ${peopleLowerPlural()} by batch`,`Number of ${peopleLowerPlural()} clear for the selected range.`,Object.entries(byBatch).sort((a,b)=>b[1]-a[1]).map(([label,value])=>({label,value,display:String(value)})),"good")
     ],
-    info:`<strong>Fully-Paid:</strong> a student appears here only when every expected fee item in the selected range is either Paid or fully Exempt.`
+    info:`<strong>Fully-Paid:</strong> a ${escapeHtml(peopleLowerSingular())} appears here only when every expected fee item in the selected range is either Paid or fully Exempt.`
   };
 }
 
@@ -5118,11 +5182,11 @@ function buildStudentStatementReport(f){
   ];
 
   return {
-    title:"Student Fee Statement",
-    meta:`${reportSelectedPeriodLabel(f)} • ${people.length} student(s)`,
+    title:`${peopleSingularLabel()} Fee Statement`,
+    meta:`${reportSelectedPeriodLabel(f)} • ${people.length} ${peopleLowerPlural()}`,
     rows,
     columns:[
-      {key:"Student",label:"Student"},{key:"Batch",label:"Batch"},{key:"Month",label:"Month"},
+      {key:"Student",label:peopleSingularLabel()},{key:"Batch",label:"Batch"},{key:"Month",label:"Month"},
       {key:"Fee",label:"Fee"},{label:"Original",value:r=>reportMoney(r.Original)},
       {label:"Exemption",value:r=>r.Exemption?`− ${reportMoney(r.Exemption)}`:"—"},
       {label:"Payable",value:r=>reportMoney(r.FeePayable)},
@@ -5138,7 +5202,7 @@ function buildStudentStatementReport(f){
       {label:"Exempt",value:exempt.length,note:"Fully waived items"}
     ],
     charts:[reportBarChart("Statement status","Fee components by status.",byStatus)],
-    info:`<strong>Student Statement:</strong> choose a specific student for an individual ledger-style report, or leave Student as “All students” for a combined statement.`
+    info:`<strong>${escapeHtml(peopleSingularLabel())} Statement:</strong> choose a specific ${escapeHtml(peopleLowerSingular())} for an individual ledger-style report, or leave the selector at “All ${escapeHtml(peopleLowerPlural())}” for a combined statement.`
   };
 }
 
@@ -5169,14 +5233,14 @@ function buildBatchSummaryReport(f){
     meta:`${reportSelectedPeriodLabel(f)} • ${rows.length} batch(es)`,
     rows,
     columns:[
-      {key:"Batch",label:"Batch"},{key:"Students",label:"Students"},{key:"Clear",label:"Fully Clear"},
-      {key:"PendingStudents",label:"Students Pending"},{key:"PendingItems",label:"Pending Items"},
+      {key:"Batch",label:"Batch"},{key:"Students",label:peoplePluralLabel()},{key:"Clear",label:"Fully Clear"},
+      {key:"PendingStudents",label:`${peoplePluralLabel()} Pending`},{key:"PendingItems",label:"Pending Items"},
       {label:"Collected",value:r=>reportMoney(r.Collected)},
       {label:"Pending",value:r=>reportMoney(r.Pending)}
     ],
     cards:[
       {label:"Batches",value:rows.length,note:"In selected scope"},
-      {label:"Students",value:people.length,note:"Active records"},
+      {label:peoplePluralLabel(),value:people.length,note:"Active records"},
       {label:"Collected",value:reportMoney(rows.reduce((s,r)=>s+r.Collected,0)),note:"Actual verified payments"},
       {label:"Pending",value:reportMoney(rows.reduce((s,r)=>s+r.Pending,0)),note:"Selected fee range"}
     ],
@@ -5309,6 +5373,7 @@ function renderDashboard(){
   dashSession.textContent=`${state.org.sessionType||"Session"} ${state.org.sessionName||""}`.trim();
   settingsOrgName.value=state.org.name||"";
   settingsSession.value=state.org.sessionName||"";
+  if(typeof settingsPeopleLabel!=="undefined" && settingsPeopleLabel) settingsPeopleLabel.value=state.org.peopleLabel||"Students";
   settingsCurrency.value=state.org.currency||"INR";
   settingsCash.checked=!!state.paymentsConfig.cash;
   settingsUpi.checked=!!state.paymentsConfig.upi;
@@ -5325,7 +5390,7 @@ function renderDashboard(){
   statPending.textContent=money(Math.max(0,pending-collected));
   statPayments.textContent=state.payments.length;
   renderPaymentRequests();
-  statDuePeople.textContent=state.people.length;
+  statDuePeople.textContent=(state.people||[]).filter(p=>!p.archived && !p.trashed).length;
 
   enabledMethods.innerHTML=[
     state.paymentsConfig.cash?`<div class="item-card"><div><strong>Cash</strong><small>Manual record & receipt</small></div><span class="pill success">On</span></div>`:"",
@@ -5340,11 +5405,74 @@ function renderDashboard(){
   renderCollect();
   renderPayments();
   renderReports();
-  // V1.54: rendering is read-only. State is saved only by actual user/data changes.
+  // V1.55: rendering is read-only. State is saved only by actual user/data changes.
+}
+
+
+function peopleSupplementarySectionsHtml(){
+  const plural=peoplePluralLabel();
+  const archived=[...state.people].filter(p=>p.archived && !p.trashed)
+    .sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
+  const trashed=[...state.people].filter(p=>p.trashed)
+    .sort((a,b)=>new Date(b.trashedAt||0)-new Date(a.trashedAt||0));
+
+  const archivedHtml=archived.length ? `<details class="archived-people-panel">
+    <summary><span>Left Session / Archived</span><span class="left-session-badge">${archived.length} ${archived.length===1?peopleSingularLabel():plural}</span></summary>
+    <div class="archived-people-inner">
+      <table class="table-lite">
+        <thead><tr><th>Name</th><th>Batch</th><th>Actions</th></tr></thead>
+        <tbody>${archived.map(p=>`<tr>
+          <td><button class="student-link" onclick="openStudentQuickCard('${p.id}')">${escapeHtml(p.name)}</button></td>
+          <td>${escapeHtml(p.batch||"General")}</td>
+          <td><div class="student-action-row">
+            <button class="btn ghost small" onclick="archivePerson('${p.id}')">Restore</button>
+            <button class="btn person-edit-action small" onclick="openEditPerson('${p.id}')">Edit</button>
+            <button class="btn person-delete-action small" onclick="openDeletePersonWarning('${p.id}')">Delete</button>
+          </div></td>
+        </tr>`).join("")}</tbody>
+      </table>
+    </div>
+  </details>` : "";
+
+  const trashHtml=`<details class="people-trash-panel">
+    <summary><span>Recently Deleted / Trash</span><span class="trash-badge">${trashed.length}</span></summary>
+    <div class="people-trash-inner">
+      <div class="preview-box" style="margin-bottom:10px">
+        ${trashed.length
+          ? `Deleted ${lowerFirst(plural)} can be restored for <strong>30 days</strong>. Permanent deletion is a separate irreversible action. Payment and receipt history remains protected.`
+          : `Trash is empty. Deleted ${lowerFirst(plural)} will appear here and can normally be restored for <strong>30 days</strong>.`}
+      </div>
+      ${trashed.length ? `<table class="table-lite">
+        <thead><tr><th>Name</th><th>Batch</th><th>Deleted</th><th>Actions</th></tr></thead>
+        <tbody>${trashed.map(p=>{
+          const days=trashDaysRemaining(p);
+          return `<tr>
+            <td>${escapeHtml(p.name)}</td>
+            <td>${escapeHtml(p.batch||"General")}</td>
+            <td>${escapeHtml(formatDateOnly(p.trashedAt||""))}
+              <span class="trash-days">${days>0?`${days} day${days===1?"":"s"} to restore`:"Recovery period ended"}</span>
+            </td>
+            <td><div class="student-action-row">
+              ${days>0?`<button class="btn ghost small" onclick="restoreTrashedPerson('${p.id}')">Restore</button>`:""}
+              <button class="btn person-delete-action small" onclick="openPermanentDeletePersonWarning('${p.id}')">Delete Permanently</button>
+            </div></td>
+          </tr>`;
+        }).join("")}</tbody>
+      </table>` : `<div class="empty">No deleted ${escapeHtml(lowerFirst(plural))}.</div>`}
+    </div>
+  </details>`;
+
+  return `${archivedHtml}${trashHtml}`;
+}
+
+function lowerFirst(text){
+  const s=String(text||"");
+  return s ? s.charAt(0).toLowerCase()+s.slice(1) : s;
 }
 
 function renderPeople(){
   normalisePeopleData();
+  applyPeopleTerminology();
   const all=[...state.people].filter(p=>!p.archived && !p.trashed).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
 
   // Drop stale selections if records no longer exist.
@@ -5374,18 +5502,20 @@ function renderPeople(){
   updateBulkDeletePeopleButton();
 
   if(!all.length){
-    peopleTableWrap.innerHTML=`<div class="empty">No people added yet.
+    peopleTableWrap.innerHTML=`<div class="empty">No ${escapeHtml(peopleLowerPlural())} added yet.
       <div class="empty-actions">
-        <button class="btn primary small" onclick="document.getElementById('addPersonBtn').click()">+ Add Student</button>
+        <button class="btn primary small" onclick="document.getElementById('addPersonBtn').click()">+ Add ${escapeHtml(peopleSingularLabel())}</button>
         <button class="btn ghost small" onclick="openBulkPeopleModal()">📋 Bulk paste</button>
         <button class="btn ghost small" onclick="dashJump('batches')">View Batches</button>
       </div>
-    </div>`;
+    </div>${peopleSupplementarySectionsHtml()}`;
+    if(typeof peopleTrashCount!=="undefined" && peopleTrashCount) peopleTrashCount.textContent=state.people.filter(p=>p.trashed).length;
     return;
   }
 
   if(!people.length){
-    peopleTableWrap.innerHTML=`<div class="empty">No matching people found.</div>`;
+    peopleTableWrap.innerHTML=`<div class="empty">No matching ${escapeHtml(peopleLowerPlural())} found.</div>${peopleSupplementarySectionsHtml()}`;
+    if(typeof peopleTrashCount!=="undefined" && peopleTrashCount) peopleTrashCount.textContent=state.people.filter(p=>p.trashed).length;
     return;
   }
 
@@ -5401,7 +5531,7 @@ function renderPeople(){
     </div>
     <table class="table-lite">
       <thead><tr>
-        <th style="width:34px"><input class="bulk-check" type="checkbox" ${allVisibleSelected?"checked":""} aria-label="Select all visible students" onchange="toggleAllVisiblePeople(this.checked)"></th>
+        <th style="width:34px"><input class="bulk-check" type="checkbox" ${allVisibleSelected?"checked":""} aria-label="Select all visible records" onchange="toggleAllVisiblePeople(this.checked)"></th>
         <th>Name</th><th>Batch</th><th>Actions</th>
       </tr></thead>
       <tbody>${
@@ -5420,57 +5550,8 @@ function renderPeople(){
         </tr>`).join("")
       }</tbody>
     </table>
-    ${(()=>{
-      const archived=[...state.people].filter(p=>p.archived && !p.trashed).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{sensitivity:"base"}));
-      if(!archived.length) return "";
-      return `<details class="archived-people-panel">
-        <summary><span>Left Session / Archived</span><span class="left-session-badge">${archived.length} record${archived.length===1?"":"s"}</span></summary>
-        <div class="archived-people-inner">
-          <table class="table-lite">
-            <thead><tr><th>Name</th><th>Batch</th><th>Actions</th></tr></thead>
-            <tbody>${archived.map(p=>`<tr>
-              <td><button class="student-link" onclick="openStudentQuickCard('${p.id}')">${escapeHtml(p.name)}</button></td>
-              <td>${escapeHtml(p.batch||"General")}</td>
-              <td><div class="student-action-row">
-                <button class="btn ghost small" onclick="archivePerson('${p.id}')">Restore</button>
-                <button class="btn person-edit-action small" onclick="openEditPerson('${p.id}')">Edit</button>
-                <button class="btn person-delete-action small" onclick="openDeletePersonWarning('${p.id}')">Delete</button>
-              </div></td>
-            </tr>`).join("")}</tbody>
-          </table>
-        </div>
-      </details>`;
-    })()}
-    ${(()=>{
-      const trashed=[...state.people].filter(p=>p.trashed)
-        .sort((a,b)=>new Date(b.trashedAt||0)-new Date(a.trashedAt||0));
-      if(!trashed.length) return "";
-      return `<details class="people-trash-panel">
-        <summary><span>Recently Deleted / Trash</span><span class="trash-badge">${trashed.length} record${trashed.length===1?"":"s"}</span></summary>
-        <div class="people-trash-inner">
-          <div class="preview-box" style="margin-bottom:10px">
-            Deleted profiles can be restored for <strong>30 days</strong>. Permanent deletion is a separate irreversible action. Payment and receipt history remains protected.
-          </div>
-          <table class="table-lite">
-            <thead><tr><th>Name</th><th>Batch</th><th>Deleted</th><th>Actions</th></tr></thead>
-            <tbody>${trashed.map(p=>{
-              const days=trashDaysRemaining(p);
-              return `<tr>
-                <td>${escapeHtml(p.name)}</td>
-                <td>${escapeHtml(p.batch||"General")}</td>
-                <td>${escapeHtml(formatDateOnly(p.trashedAt||""))}
-                  <span class="trash-days">${days>0?`${days} day${days===1?"":"s"} to restore`:"Recovery period ended"}</span>
-                </td>
-                <td><div class="student-action-row">
-                  ${days>0?`<button class="btn ghost small" onclick="restoreTrashedPerson('${p.id}')">Restore</button>`:""}
-                  <button class="btn person-delete-action small" onclick="openPermanentDeletePersonWarning('${p.id}')">Delete Permanently</button>
-                </div></td>
-              </tr>`;
-            }).join("")}</tbody>
-          </table>
-        </div>
-      </details>`;
-    })()}`;
+    ${peopleSupplementarySectionsHtml()}`;
+  if(typeof peopleTrashCount!=="undefined" && peopleTrashCount) peopleTrashCount.textContent=state.people.filter(p=>p.trashed).length;
 }
 
 
@@ -5483,7 +5564,7 @@ function getBatchNames(){
 function renderBatches(){
   normalisePeopleData();
   const batches=getBatchNames();
-  if(typeof hubPeopleText!=="undefined" && hubPeopleText) hubPeopleText.textContent=`${state.people.filter(p=>!p.archived && !p.trashed).length} people • view and collect`;
+  if(typeof hubPeopleText!=="undefined" && hubPeopleText) hubPeopleText.textContent=`${state.people.filter(p=>!p.archived && !p.trashed).length} ${peopleLowerPlural()} • view and collect`;
   if(typeof hubBatchText!=="undefined" && hubBatchText) hubBatchText.textContent=`${batches.length} batches/groups • open members`;
 
   if(!batches.length){
@@ -6443,7 +6524,7 @@ window.showMissingCloudRequest=function(id,message=""){
     <div class="modal-head"><div><span class="eyebrow">Masul Payment Request</span><h3 style="margin:7px 0 0">${escapeHtml(id||"")}</h3></div><button class="close" onclick="closeModal()">×</button></div>
     <div class="danger-alert">
       <div class="danger-title">Payment request could not be opened</div>
-      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.54 link.")}</p>
+      <p>${escapeHtml(message||"The secure public request was not found, withdrawn, or this is an older pre-V1.55 link.")}</p>
     </div>
     <div class="preview-box">
       If the link begins with a short <strong>MSL-…</strong> ID, ask the organisation to generate a new secure link with <strong>Copy Link</strong>.
@@ -6467,7 +6548,7 @@ function handlePaymentRequestFromUrl(){
     const local=(state.paymentRequests||[]).find(r=>r.id===token);
     setTimeout(()=>{
       if(local) openPaymentRequest(local.id);
-      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.54 secure link.");
+      else showMissingCloudRequest(token,"This is an older local-only Masul link. Ask the organisation to create a new V1.55 secure link.");
     },100);
     return true;
   }
@@ -9045,7 +9126,7 @@ function updateBulkDeletePeopleButton(){
 }
 
 function personIsProtectedFromBulkDelete(personId){
-  // V1.54: payment history no longer prevents removal of a student profile.
+  // V1.55: payment history no longer prevents removal of a student profile.
   // Financial records are retained separately.
   return false;
 }
@@ -9183,7 +9264,7 @@ function performBulkDeletePeople(){
 function downloadBackup(){
   const payload={
     app:"Masul",
-    version:"1.54",
+    version:"1.55",
     exportedAt:new Date().toISOString(),
     data:state
   };
@@ -9858,6 +9939,7 @@ saveSettingsBtn.onclick=()=>{
 
   state.org.name=settingsOrgName.value.trim()||state.org.name;
   state.org.sessionName=settingsSession.value.trim()||state.org.sessionName;
+  if(typeof settingsPeopleLabel!=="undefined" && settingsPeopleLabel) state.org.peopleLabel=settingsPeopleLabel.value||state.org.peopleLabel||"Students";
   state.org.currency=settingsCurrency.value||"INR";
   state.paymentsConfig.cash=settingsCash.checked;
   state.paymentsConfig.upi=settingsUpi.checked;
@@ -10800,7 +10882,7 @@ handlePaymentRequestFromUrl();
         setupComplete:!!local.setupComplete,
         late:cleanForFirestore(local.late||{}),
         paymentsConfig:cleanForFirestore(local.paymentsConfig||{}),
-        sourceVersion:"1.54"
+        sourceVersion:"1.55"
       };
 
       const ops=[];
@@ -12280,7 +12362,7 @@ handlePaymentRequestFromUrl();
     if(code==="auth/invalid-credential" || code==="auth/wrong-password" || code==="auth/user-not-found") return "Email or password is incorrect.";
     if(code==="auth/weak-password") return "Choose a password with at least 6 characters.";
     if(code==="auth/network-request-failed") return "Network error. Check the internet connection and try again.";
-    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.54 Firestore Rules have been published.";
+    if(code==="permission-denied" || /insufficient permissions/i.test(String(err?.message||""))) return "Firebase blocked the invitation claim. Ask the owner to confirm that the V1.55 Firestore Rules have been published.";
     return err?.message||"The invitation could not be completed.";
   }
 
@@ -12580,7 +12662,7 @@ handlePaymentRequestFromUrl();
       // A Firebase email-link action code is single-use/time-limited. If it is
       // already used/expired, preserve the Masul invitation token separately.
       // An existing recipient account can then sign in with its password and
-      // V1.54 will claim the still-pending invitation after authentication.
+      // V1.55 will claim the still-pending invitation after authentication.
       if(code==="auth/invalid-action-code" && invitePreserved){
         cloud.lastError="";
         refreshCloudUI();
@@ -12808,7 +12890,7 @@ handlePaymentRequestFromUrl();
   window.addEventListener("error",event=>{
     const msg=String(event?.message||"");
     if(event?.error?.name==="RangeError" || /maximum call stack/i.test(msg)){
-      console.error("Masul V1.54 call-stack guard:",event.error||event.message);
+      console.error("Masul V1.55 call-stack guard:",event.error||event.message);
       cloud.syncing=false;
       cloud.lastError="A browser call-stack error was stopped. Refresh this tab; the Firebase copy is not deleted by this error.";
       cloudStatus("error","Cloud issue");
@@ -12908,7 +12990,7 @@ handlePaymentRequestFromUrl();
     })
     .catch(err=>console.warn("Masul email-link landing:",err));
   document.documentElement.dataset.masulCloudReady="1";
-  console.info("Masul V1.54 Firebase module ready");
+  console.info("Masul V1.55 Firebase module ready");
 
   window.MasulCloud={
     auth,
